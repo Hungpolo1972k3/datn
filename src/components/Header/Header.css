@@ -1,0 +1,38 @@
+.header-container {
+    background-color: #f7fafc;
+    padding: 1rem;
+    margin-top: 20px;
+    margin-left: 180px;
+    width: 1170px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .header-title {
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  .header-icon {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .header-icon-user,
+  .header-icon-logout {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #1d4ed8;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .header-icon-user:hover,
+  .header-icon-logout:hover {
+    color: #3b82f6;
+  }
+  

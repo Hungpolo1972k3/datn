@@ -1,0 +1,46 @@
+.menubar {
+    background-color: #f7fafc;
+    width: 20rem;
+    height: 50rem;
+    padding: 1rem;
+    position: fixed;
+    left: 0; 
+    top: 0; 
+    font-size: large;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.menubar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.menubar li {
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.menubar li:hover {
+    background-color: #e2e8f0;
+}
+
+.menubar .submenu {
+    padding-left: 1rem;
+}
+
+.menubar .menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+}
+
+.menubar .menu-item-icon {
+    transition: transform 0.3s ease;
+}
+
+.menubar .menu-item.open .menu-item-icon {
+    transform: rotate(180deg);
+}
