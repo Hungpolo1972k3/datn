@@ -1,57 +1,37 @@
 const mongoose = require('mongoose');
 const sampleSchema = new mongoose.Schema({
-    user_id: {
-        type: String,
-        require: true
-    },
-    code:{
-        type: String,
-        require: true
-    },
     name:{
         type: String,
         require: true
     },
-    species:{
+    // Tên loài sinh vật
+    strain: {
         type: String,
         require: true
     },
-    microorganism:{
+    header: {
         type: String,
         require: true
     },
-    time: {
-        type: Date,
-        require: true
-    },
-    sequence:{
+    sequence: {
         type: String,
         require: true
     },
-    describe:{
-        type: String,
+    length:{
+        type: Number,
         require: true
     },
-    image_url:{
+    user_id: {
         type: String,
-        require: true
-    },
-    public: {
-        type: Boolean,
-        default: True
+        require: true,
     },
     status: {
         type: Boolean,
-        default: True
+        default: true,
     },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updateAt: {
-        type: Date,
-        default: Date.now
-    }
+},
+{
+    timestamps: true
 });
 const Sample = mongoose.model('Sample', sampleSchema);
 module.exports = Sample;

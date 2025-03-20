@@ -40,15 +40,9 @@ const userSchema = new mongoose.Schema({
     status: {
         type: Boolean,
         default: true,
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updateAt: {
-        type: Date,
-        default: Date.now
     }
+},{
+    timestamps: true
 });
 const User = mongoose.model('User', userSchema);
 module.exports = User;
