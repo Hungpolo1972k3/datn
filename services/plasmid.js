@@ -13,7 +13,7 @@ const removeFiles = (files) => {
 const runBlastn = (filePath, res) => {
     const fastaFilePath = path.resolve(filePath);
     const outputFilePath = `${fastaFilePath}_blastn_results.txt`;
-    const dbPath = "../db/acinetobacterplasmidtype_feb2025.fasta";
+    const dbPath = "../../db/acinetobacterplasmidtype_feb2025.fasta";
     const command = `blastn -query ${dbPath} -subject ${fastaFilePath} -out ${outputFilePath} -outfmt 6 -perc_identity 95`;
 
     exec(command, (error, stdout, stderr) => {
