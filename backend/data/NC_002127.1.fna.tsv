@@ -1,0 +1,6 @@
+#Sequence Id	Type	Start	Stop	Strand	Locus Tag	Gene	Product	DbXrefs
+contig_1	cds	2	736	+	DOGAIA_01	mobA	(5' truncated) plasmid mobilization protein MobA	GO:0006355, SO:0001217, UniRef:UniRef50_G4VUV6, UniRef:UniRef90_G4VUV6
+contig_1	oriT	179	404	?			origin of transfer	
+contig_1	cds	971	1351	-	DOGAIA_02	lsoB	type II toxin-antitoxin system antitoxin LsoB	BlastRules:WP_000710826, RefSeq:WP_000710826.1, SO:0001217, UniParc:UPI00000BEEC7, UniRef:UniRef100_Q7DKW4, UniRef:UniRef50_Q7DKW4, UniRef:UniRef90_Q7DKW4
+contig_1	cds	1348	2388	-	DOGAIA_03	lsoA	type II toxin-antitoxin system mRNA endoribonuclease LsoA	BlastRules:WP_000068433, EC:3.1.-.-, GO:0004521, RefSeq:WP_000068433.1, SO:0001217, UniParc:UPI00000B51BA, UniRef:UniRef100_O82881, UniRef:UniRef50_O82881, UniRef:UniRef90_O82881
+contig_1	ncRNA	2495	2598	-	DOGAIA_04	RNAI	RNAI	RFAM:RF00106, SO:0000655
