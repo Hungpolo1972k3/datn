@@ -57,4 +57,27 @@ const getUserById = async (token) => {
         return null;
     }
 };
-module.exports = { createUser, loginUser, getUserById };
+
+const updateUserInfo = async (user_id, email,username,address,birthday,gender,career,workplace) => {
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            user_id,
+            {
+                email,
+                username,
+                address,
+                birthday,
+                gender,
+                career,
+                workplace
+            },
+            { new: true } 
+        );
+
+        return updatedUser;
+    } catch (error) {
+        throw new Error("Lỗi khi cập nhật thông tin người dùng: " + error.message);
+    }
+};
+
+module.exports = { createUser, loginUser, getUserById, updateUserInfo };

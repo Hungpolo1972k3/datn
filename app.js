@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors'); 
 const connectDb = require('./configs/connectDb');
 const userRoutes = require('./routes/user');
 const virulenceRoutes = require('./routes/virulence')
@@ -7,6 +8,7 @@ const PlasmidRoutes = require('./routes/plasmid')
 connectDb();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use('/api/user', userRoutes);
 app.use('/api/virulence', virulenceRoutes)

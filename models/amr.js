@@ -3,7 +3,8 @@ const amrSchema = new mongoose.Schema({
     // Định danh của protein và 
     protein_identifier: {
         type: String,
-        require: true
+        require: true,
+        default: null
     },
     contig_id: {
         type: String,
@@ -21,7 +22,6 @@ const amrSchema = new mongoose.Schema({
     strand: {
         type: String,
         require: true,
-        enum: ["+", "-"]
     },
     gene_symbol: {
         type: String,
@@ -35,12 +35,10 @@ const amrSchema = new mongoose.Schema({
     scope: {
         type: String,
         require: true,
-        enum: ["cor", "plasmid"]
     },
     element_type: {
         type: String,
         require: true,
-        enum: ["point", "transporon"]
     },
     class: {
         type: String,
@@ -67,6 +65,26 @@ const amrSchema = new mongoose.Schema({
         type: String,
         require: true
     },
+    method: {
+        type: String,
+        require: true
+    },
+    reference_length: {
+        type: Number,
+        require: true
+    },
+    alignment_length: {
+        type: Number,
+        require: true
+    },
+    hmm_accession: {
+        type: String,
+        default: null
+    },
+    hmm_description: {
+        type: String,
+        default: null
+    },    
     sample_id: {
         type: String,
         require: true,

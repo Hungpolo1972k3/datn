@@ -44,4 +44,29 @@ const getUserById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-module.exports = { registerUser, loginUser, getUserById };
+
+const updateUserInfo = async (req, res) => {
+    try {
+        const { user_id } = req.params; // Lấy user_id từ params
+        const { email, username, address, birthday, gender, career, workplace } = req.body;
+
+        if (!user_id) {
+            return res.status(400).json({ message: "Thiếu ID người dùng" });
+        }
+
+        const updatedUser = await userService.updateUserInfo(user_id,email,username,address,birthday,gender,career,workplace);
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "Không tìm thấy người dùng" });
+        }
+
+        return res.status(200).json({
+            message: "Cập nhật thông tin người dùng thành công",
+            data: updatedUser
+        });
+
+    } catch (error) {
+        return res.status(500).json({ message: "Lỗi server: " + error.message });
+    }
+};
+module.exports = { registerUser, loginUser, getUserById, updateUserInfo };

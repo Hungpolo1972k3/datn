@@ -21,4 +21,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/getvirulenceinfo', upload.single('fasta'), virulenceController.getVirulenceInfo);
+router.post('/savevirulenceinfo', virulenceController.saveVirulenceInfo);
+router.get('/getallvirulencesbysampleid', virulenceController.getAllVirulencesBySampleId)
+router.get('/getvirulencebyid', virulenceController.getVirulenceById)
+
 module.exports = router;

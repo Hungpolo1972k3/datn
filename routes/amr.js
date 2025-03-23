@@ -21,4 +21,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/getamrinfo', upload.single('fasta'), amrController.getAmrInfo);
+router.post('/saveamrinfo', amrController.saveAmrInfo);
+router.get('/getallamrsbysampleid', amrController.getAllAmrsBySampleId)
+router.get('/getamrbyid', amrController.getAmrById)
+
 module.exports = router;

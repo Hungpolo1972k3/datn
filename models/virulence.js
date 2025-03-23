@@ -24,6 +24,19 @@ const virulenceSchema = new mongoose.Schema({
         type: String,
         require: true
     },
+    // Thông tin coverage mới
+    coverage_raw: {
+        type: String, // Dữ liệu này có dạng "1-2169/2169"
+        required: true,
+    },
+    coverage_map: {
+        type: String, // Dữ liệu dạng "========/======"
+        required: true,
+    },
+    gaps: {
+        type: String, // Dữ liệu dạng "1/1"
+        required: true,
+    },
     coverage:{
         type: Number,
         require: true
