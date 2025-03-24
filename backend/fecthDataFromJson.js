@@ -1,18 +1,16 @@
 import fs from "fs/promises";
-const filePath = "./data/NC_002127.1.fna.json";
 
-export const fetchJson = async (req, res) => {
+export const getData = async (filePath) => {
   try {
     const data = await fs.readFile(filePath, { encoding: "utf8" });
 
-    const jsonData = JSON.parse(data);
+    // const lines = data
+    //   .split("\n")
+    //   .map((line) => line.trim())
+    //   .filter((line) => line);
 
-    const genome = jsonData.genome;
-    const stats = jsonData.stats;
-
-    res.json(jsonData);
+    return data;
   } catch (err) {
-    console.error("Lỗi khi phân tích file JSON:", err);
+    console.error(err);
   }
 };
-export default fetchJson;

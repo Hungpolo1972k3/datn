@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
-import test from "../utils/test.txt";
 const Container = styled.div`
   margin-top: 50px;
   display: flex;

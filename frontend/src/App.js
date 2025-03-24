@@ -10,12 +10,11 @@ import Footer from "./components/Footer";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
 import Viewer from "./pages/Viewer";
-
-import CirclePlot from "./components/CirclePlot";
 import Login from "./pages/Login";
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  background-color: white;
 `;
 const Main = styled.div`
   min-height: calc(100vh - 240px);

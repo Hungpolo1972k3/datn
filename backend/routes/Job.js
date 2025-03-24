@@ -14,4 +14,6 @@ router.post("/add", submitJob);
 router.get("/", getAllJobs);
 router.get("/get/:id", getAJob);
 router.get("/getImage/:id", getImages);
+
+router.get("/get/jsonFile", get);
 export default router;

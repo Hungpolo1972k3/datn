@@ -1,192 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import DrawCirclePlot from "../components/DrawCirclePlot";
-import App from "../components/test";
-import DraggableLine from "../components/test";
-import SkewChart from "../components/test";
-import DraggableZoomableSVG from "../components/Draw";
-import DNAViewer from "../components/Genomeviewer";
-import Ge from "../components/Ge";
-const Container = styled.div`
-  margin-top: 20px;
-  width: 100%; /* Mặc định */
-  max-width: 2000px;
-  display: flex;
-  justify-content: center;
+import d3 from "../script/d3";
 
-  @media (max-width: 1024px) {
-    width: 95%;
-    margin-top: 15px;
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    margin-top: 10px;
-    flex-direction: column;
-  }
-
-  @media (max-width: 400px) {
-    width: 100%;
-    margin-top: 5px;
-    padding: 0 10px;
-  }
-`;
-
-const Wrapper = styled.div`
-  width: 90%;
-  margin-left: 20px;
-  /* @media (max-width: 400px) {
-    background-color: green;
-  } */
-`;
-const Menu = styled.div`
-  display: flex;
-  /* min-width: 500px; */
-  flex-wrap: wrap;
-`;
-const MenuItem = styled.div`
-  padding: 6px;
-  border-collapse: collapse;
-  border-radius: 7px 7px 0 0;
-  /* width: 120px; */
-  display: flex;
-  color: ${(props) => (props.$active ? "black" : "#0c49ef")};
-  border: ${(props) =>
-    props.$active ? " 0.5px solid black" : "0.5px solid transparent"};
-  border-bottom: none;
-
-  justify-content: center;
-  &:hover {
-    cursor: pointer;
-    border: 0.5px solid black;
-    border-bottom: none;
-  }
-`;
-const Item = styled.div`
-  width: ${(props) => props.w};
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  /* min-width: 300px; */
-  min-height: 200px;
-`;
-const Title = styled.div`
-  font-weight: bold;
-  font-size: 22px;
-  padding: 10px 40px;
-`;
-const Detail = styled.div`
+const SvgContainer = styled.svg`
   width: 100%;
-`;
-const DetailItem = styled.div`
-  color: gray;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  margin-top: 8px;
-`;
-const More = styled.div`
-  display: flex;
-`;
-const Info = styled.div`
-  border: 0.5px solid black;
-  min-height: 500px;
-`;
-const JobStatistics = styled.div`
-  display: ${(props) => (props.$active === 0 ? "grid" : "none")};
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-row: 1fr 1fr 1fr;
-  min-height: 500px;
-  @media (max-width: 768px) {
-    grid-row: 1fr 1fr 1fr 1fr;
-  }
-`;
-const Input = styled.div`
-  grid-column: 1/2;
-  grid-row: 1/2;
-  @media (max-width: 768px) {
-    grid-column: 1/4;
-    grid-row: 1/2;
-  }
-`;
-const Runtime = styled.div`
-  grid-column: 2/4;
-  grid-row: 1/2;
-
-  @media (max-width: 768px) {
-    grid-column: 1/4;
-    grid-row: 2/3;
-  }
-`;
-const Statistics = styled.div`
-  grid-column: 1/2;
-  grid-row: 2/3;
-  @media (max-width: 768px) {
-    grid-column: 1/4;
-    grid-row: 3/4;
-  }
-`;
-const Feature = styled.div`
-  grid-column: 1/4;
-  grid-row: 3/4;
-  @media (max-width: 768px) {
-    grid-column: 1/4;
-    grid-row: 4/5;
-  }
-`;
-const Bold = styled.p`
-  font-weight: bold;
-  color: black;
-  grid-column: 1/2;
-  display: flex;
-  justify-content: flex-end;
-  margin-right: 30px;
+  background: #f0f0f0;
+  cursor: ${(props) => (props.isPanning ? "grabbing" : "click")};
+  user-select: none;
 `;
 
-const Border = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  border: none;
-`;
-const BorderTopL = styled.hr`
-  width: 132px;
-  border: 0.5 solid black;
-`;
-const Disable = styled.hr`
-  width: 132px;
-  opacity: 0;
-`;
-const BorderTopR = styled.hr`
-  width: calc(100% - 1px - 132 * 2px);
-  border: 0.5px solid black;
-`;
-const AnnotationTable = styled.table`
-  display: ${(props) => (props.$active === 1 ? "" : "none")};
-  /* border: none; */
-  border-collapse: collapse;
-  margin-top: 10px;
-  width: 100%;
-  overflow-x: hidden;
-`;
-const THead = styled.thead``;
-const TR = styled.tr`
-  background-color: ${(props) => (props.$type === 0 ? "#F2F2F2" : "white")};
-`;
-const Td = styled.td`
-  text-align: left;
-  padding-left: 20px;
-`;
-const Genomeviewer = styled.div`
-  display: ${(props) => (props.$active === 2 ? "" : "none")};
-`;
-const CircularPlot = styled.div`
-  display: ${(props) => (props.$active === 3 ? "" : "none")};
-`;
-const Downloads = styled.div`
-  display: ${(props) => (props.$active === 4 ? "" : "none")};
-`;
-const Viewer = () => {
-  const [fileContent, setFileContent] = useState({
+const SkewChart = ({ w, h, windowLength }) => {
+  const [input, setInput] = useState({
     genome: {
       genus: null,
       species: null,
@@ -446,277 +270,281 @@ const Viewer = () => {
       },
     },
   });
-  const [view, setView] = useState(3);
-  const [genome, setGenome] = useState(null);
-  const [stats, setStats] = useState(null);
-  const [features, setFeatures] = useState(null);
-  const [sequences, setSequences] = useState(null);
-  const [runtime, setRuntime] = useState(null);
-  const handleFile = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const svgRef = useRef(null);
+  const [viewBox, setViewBox] = useState({
+    x: 0,
+    y: 0,
+    width: w || 1400,
+    height: h || 1400,
+  });
+  const [isPanning, setIsPanning] = useState(false);
+  const startPos = useRef({ x: 0, y: 0 });
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setFileContent(JSON.parse(e.target.result));
-    };
-    reader.readAsText(file);
-  };
   useEffect(() => {
-    setGenome(fileContent.genome);
-    setFeatures(fileContent.features);
-    setStats(fileContent.stats);
-    setSequences(fileContent.sequences);
-    setRuntime(fileContent.run);
-    return;
-    // loadFeatures();
-  }, [fileContent]);
-  const menuItems = [
-    "JobStatistics",
-    "AnnotationTable",
-    "Genomeviewer",
-    "CircularPlot",
-  ];
-  const allFeatures = [];
-  const featureQty = {};
+    const svg = svgRef.current;
+    if (!svg) return;
 
-  const loadFeatures = () => {
-    features.forEach((item, index) => {
-      const featureType = item.type;
+    const getMousePosition = (event) => {
+      const rect = svg.getBoundingClientRect();
+      return {
+        x:
+          ((event.clientX - rect.left) / rect.width) * viewBox.width +
+          viewBox.x,
+        y:
+          ((event.clientY - rect.top) / rect.height) * viewBox.height +
+          viewBox.y,
+      };
+    };
 
-      if (!allFeatures.includes(featureType)) {
-        allFeatures.push(featureType);
-        featureQty[featureType] = { count: 1, positions: [index] };
-      } else {
-        featureQty[featureType].count += 1;
-        featureQty[featureType].positions.push(index);
+    const handleMouseMove = (event) => {
+      if (!isPanning) return;
+      const mousePos = getMousePosition(event);
+      setViewBox((prev) => ({
+        ...prev,
+        x: prev.x - (mousePos.x - startPos.current.x),
+        y: prev.y - (mousePos.y - startPos.current.y),
+      }));
+    };
+
+    const handleMouseDown = (event) => {
+      if (event.button !== 0) return; // Chỉ xử lý chuột trái
+      setIsPanning(true);
+      startPos.current = getMousePosition(event);
+    };
+
+    const handleMouseUp = () => setIsPanning(false);
+
+    const handleWheel = (event) => {
+      event.preventDefault();
+      const zoomFactor = event.deltaY > 0 ? 1.1 : 0.9;
+      const mousePos = getMousePosition(event);
+      setViewBox((prev) => ({
+        x: mousePos.x - (mousePos.x - prev.x) * zoomFactor,
+        y: mousePos.y - (mousePos.y - prev.y) * zoomFactor,
+        width: prev.width * zoomFactor,
+        height: prev.height * zoomFactor,
+      }));
+    };
+
+    svg.addEventListener("mousemove", handleMouseMove);
+    svg.addEventListener("mousedown", handleMouseDown);
+    svg.addEventListener("mouseup", handleMouseUp);
+    svg.addEventListener("mouseleave", handleMouseUp);
+    svg.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      svg.removeEventListener("mousemove", handleMouseMove);
+      svg.removeEventListener("mousedown", handleMouseDown);
+      svg.removeEventListener("mouseup", handleMouseUp);
+      svg.removeEventListener("mouseleave", handleMouseUp);
+      svg.removeEventListener("wheel", handleWheel);
+    };
+  }, [isPanning, viewBox]);
+
+  const width = w || 1400;
+  const height = h || 1400;
+
+  const centerX = width / 2;
+  const centerY = height / 2;
+  console.log(centerY);
+  const radius = 300;
+  const radius2 = 450;
+  const radiusF1 = 450;
+  const radiusF2 = 500;
+  const features = input.features;
+  const sequences = input.sequences;
+  const windowSize = windowLength || 11;
+  const extendRadius = 50;
+  const sequence = sequences[0].nt;
+  useEffect(() => {
+    if (!sequence) return;
+
+    const newData = [];
+    const newData2 = [];
+    const newLineHelper = [];
+
+    for (let i = 0; i < sequence.length; i += 2) {
+      const windowSeq = sequence.substring(i, i + windowSize);
+      if (!windowSeq) continue;
+
+      const gCount = [...windowSeq].filter((char) => char === "G").length;
+      const cCount = [...windowSeq].filter((char) => char === "C").length;
+      const gcSum = gCount + cCount;
+      const gcSkew = gcSum === 0 ? 0 : (gCount - cCount) / gcSum;
+
+      const angle = (i / sequence.length) * 2 * Math.PI - Math.PI / 2;
+      const skewOffset = gcSkew * extendRadius;
+
+      const x = centerX + (radius + skewOffset) * Math.cos(angle);
+      const y = centerY + (radius + skewOffset) * Math.sin(angle);
+      const x2 = centerX + (radius2 + skewOffset) * Math.cos(angle + 0.5);
+      const y2 = centerY + (radius2 + skewOffset) * Math.sin(angle + 0.5);
+
+      newData.push([x, y]);
+      newData2.push([x2, y2]);
+      newLineHelper.push({
+        gcSkew,
+        start: i + 1,
+        end: i + windowSize,
+        pos: {
+          xh1: centerX + (radius - extendRadius) * Math.cos(angle),
+          yh1: centerY + (radius - extendRadius) * Math.sin(angle),
+          xh2: centerX + (radius + extendRadius) * Math.cos(angle),
+          yh2: centerY + (radius + extendRadius) * Math.sin(angle),
+        },
+      });
+    }
+
+    setData(newData);
+    setData2(newData2);
+    setLineHelper(newLineHelper);
+  }, [sequence]);
+  const [data, setData] = useState([]);
+  const [data2, setData2] = useState([]);
+  const [lineHelper, setLineHelper] = useState([]);
+  const line = d3.line().curve(d3.curveLinear);
+  const sortedFeatures = [...features].sort((a, b) => a.start - b.start);
+  const layers = [];
+  sortedFeatures.forEach((item) => {
+    let placed = false;
+    for (const layer of layers) {
+      if (layer[layer.length - 1].stop <= item.start) {
+        layer.push(item);
+        placed = true;
+        break;
       }
-    });
-  };
-  return (
-    <Container>
-      <Wrapper>
-        <input
-          type="file"
-          name=""
-          id=""
-          accept=".json"
-          onChange={(e) => handleFile(e)}
-        />
-        <Menu>
-          {menuItems.map((item, index) => (
-            <MenuItem
-              key={index}
-              $active={view === index}
-              onClick={() => setView(index)}
-            >
-              {item}
-            </MenuItem>
-          ))}
-        </Menu>
-        <Info>
-          <JobStatistics $active={view}>
-            <Input>
-              <Title>Input</Title>
-              <Detail>
-                <DetailItem>
-                  <Bold>Organism:</Bold> N.A.
-                </DetailItem>
-                <DetailItem>
-                  <Bold>Sequence:</Bold>
-                  {genome?.complete ? (
-                    <p>1 complete chromosome</p>
-                  ) : (
-                    <p>{sequences?.length} contigs</p>
-                  )}
-                </DetailItem>
-                <DetailItem>
-                  <Bold>Genome size:</Bold> {stats?.size} bp
-                </DetailItem>
-              </Detail>
-            </Input>
-            <Runtime>
-              <Title>Runtime</Title>
-              {runtime ? (
-                <Detail>
-                  <DetailItem>
-                    <Bold>Start:</Bold> {runtime.start}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>Stop:</Bold> {runtime.end}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>Duration:</Bold> {runtime.duration}
-                  </DetailItem>
-                </Detail>
-              ) : (
-                <></>
-              )}
-            </Runtime>
-            <Statistics>
-              <Title>Statistics</Title>
-              {stats ? (
-                <Detail>
-                  <DetailItem>
-                    <Bold>N50</Bold>
-                    {stats.n50}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>N90</Bold>
-                    {stats.n90}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>GC-content</Bold> {stats.gc.toFixed(2)}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>Coding ratio</Bold> {stats.coding_ratio.toFixed(2)}
-                    bp
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>N-ratio</Bold> {stats.n_ratio}
-                  </DetailItem>
-                </Detail>
-              ) : (
-                <></>
-              )}
-            </Statistics>
-            {features ? (
-              <Feature>
-                {loadFeatures()}
-                <Title>Feature Count (Total: {features.length})</Title>
-                <More>
-                  <Detail>
-                    <DetailItem>
-                      <Bold>tRNAs:</Bold>
-                      {allFeatures["tRNA"] ? allFeatures["tRNA"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>tmRNAs:</Bold>
-                      {allFeatures["tmRNA"] ? allFeatures["tmRNA"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>rRNAs:</Bold>
-                      {allFeatures["rRNA"] ? allFeatures["rRNA"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>ncRNAs:</Bold>
-                      {allFeatures["ncRNA"] ? allFeatures["ncRNA"].count : 0}
-                    </DetailItem>
-                  </Detail>
+    }
+    if (!placed) {
+      layers.push([item]);
+    }
+  });
+  function drawRingPart(outerRadius, innerRadius, startAngle, endAngle) {
+    const x1 = centerX + outerRadius * Math.cos(startAngle);
+    const y1 = centerY + outerRadius * Math.sin(startAngle);
 
-                  <Detail>
-                    <DetailItem>
-                      <Bold>ncRNA: </Bold>
-                      {allFeatures["ncRNA"] ? allFeatures["ncRNA"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>CRISPR: </Bold>
-                      {allFeatures["CRISPR"] ? allFeatures["CRISPR"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>CDSs: </Bold>
-                      {allFeatures["CDS"] ? allFeatures["CDS"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>sORFs: </Bold>
-                      {allFeatures["sORF"] ? allFeatures["sORF"].count : 0}
-                    </DetailItem>
-                  </Detail>
-                  <Detail>
-                    <DetailItem>
-                      <Bold>oriCs: </Bold>
-                      {allFeatures["oriC"] ? allFeatures["oriC"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>oriVs: </Bold>
-                      {allFeatures["oriV"] ? allFeatures["oriV"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>oriTs: </Bold>
-                      {allFeatures["oriT"] ? allFeatures["oriT"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>gaps: </Bold>
-                      {allFeatures["gap"] ? allFeatures["gap"].count : 0}
-                    </DetailItem>
-                  </Detail>
-                </More>
-              </Feature>
-            ) : (
-              ""
-            )}
-          </JobStatistics>
-          {features ? (
-            <AnnotationTable $active={view}>
-              <thead>
-                <tr>
-                  <th>Sequence</th>
-                  <th>Type</th>
-                  <th>Start</th>
-                  <th>Stop</th>
-                  <th>Strand</th>
-                  <th>Locus Tag</th>
-                  <th>Gene</th>
-                  <th>Product</th>
-                  <th>DbXrefs</th>
-                </tr>
-              </thead>
-              <tbody>
-                {features.map((item, index) => {
+    const x2 = centerX + outerRadius * Math.cos(endAngle);
+    const y2 = centerY + outerRadius * Math.sin(endAngle);
+
+    const x3 = centerX + innerRadius * Math.cos(endAngle);
+    const y3 = centerY + innerRadius * Math.sin(endAngle);
+
+    const x4 = centerX + innerRadius * Math.cos(startAngle);
+    const y4 = centerY + innerRadius * Math.sin(startAngle);
+
+    const largeArcFlag = endAngle - startAngle <= Math.PI ? "0" : "1";
+
+    return `
+  M ${x1},${y1}
+  A ${outerRadius},${outerRadius} 0 ${largeArcFlag} 1 ${x2},${y2}
+  L ${x3},${y3}
+  A ${innerRadius},${innerRadius} 0 ${largeArcFlag} 0 ${x4},${y4}
+  Z
+  `;
+  }
+  return (
+    <SvgContainer
+      viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
+      isPanning={isPanning}
+      id="gc-skew-chart"
+      ref={svgRef}
+    >
+      <g>
+        <g className="feature">
+          {layers.map((layer, index) => {
+            const rindex = layers.length - index;
+            const currentOuterRadius = radiusF2 + rindex * 80;
+            const currentInnerRadius = radiusF1 + rindex * 80;
+
+            return (
+              <g key={index}>
+                {layer.map((item, i) => {
+                  const startAngle = (item.start * 2 * Math.PI) / 3306;
+                  const endAngle = (item.stop * 2 * Math.PI) / 3306;
+                  const pathData = drawRingPart(
+                    currentOuterRadius,
+                    currentInnerRadius,
+                    startAngle - Math.PI / 2,
+                    endAngle - Math.PI / 2
+                  );
+                  const typeColors = {
+                    cds: "#D6AADF",
+                    tRNA: "#b2df8a",
+                    tmRNA: "#b2df8a",
+                    rRNA: "#fb8072",
+                    ncRNA: "#fdb462",
+                    "ncRNA-region": "#80b1d3",
+                    CRISPR: "#bebada",
+                    Gap: "#000000",
+                    Misc: "#666666",
+                    oriT: "#cccccc",
+                  };
+
                   return (
-                    <TR key={index} $type={index % 2}>
-                      <Td>{item.sequence}</Td>
-                      <Td>{item.type}</Td>
-                      <Td>{item.start}</Td>
-                      <Td>{item.stop}</Td>
-                      <Td>{item.strand}</Td>
-                      <Td>{item.locus}</Td>
-                      <Td>{item.gene}</Td>
-                      <Td>{item.product}</Td>
-                      <Td>
-                        {item.db_xrefs?.map((db, index) => {
-                          return (
-                            <a
-                              key={index}
-                              href="#blank"
-                              style={{ color: "blue" }}
-                            >
-                              <div style={{ margin: "10px 0 10px 0" }}>
-                                {db}
-                              </div>
-                            </a>
-                          );
-                        })}
-                      </Td>
-                      <Td></Td>
-                    </TR>
+                    <path key={i} d={pathData} fill={typeColors[item.type]} />
                   );
                 })}
-              </tbody>
-            </AnnotationTable>
-          ) : (
-            <></>
+              </g>
+            );
+          })}
+        </g>
+
+        <g className="gc">
+          <g className="gcContent">
+            <circle cx={centerX} cy={centerY} r={radius2} fill="#BCBD22" />
+            <path d={line(data2)} fill="#17BECF" />
+            <defs>
+              <clipPath id="inner-clip-2">
+                <circle cx={centerX} cy={centerY} r={radius2} />
+              </clipPath>
+            </defs>
+            <path d={line(data2)} fill="white" clipPath="url(#inner-clip-2)" />
+          </g>
+
+          <g className="gcSkew">
+            <circle cx={centerX} cy={centerY} r={radius} fill="#CAB2D6" />
+            <path d={line(data)} fill="#FB9A99" />
+            <defs>
+              <clipPath id="inner-clip-1">
+                <circle cx={centerX} cy={centerY} r={radius} />
+              </clipPath>
+            </defs>
+            <path d={line(data)} fill="white" clipPath="url(#inner-clip-1)" />
+          </g>
+
+          {[radius - 50, radius - 25, radius, radius + 25, radius + 50].map(
+            (r, i) => (
+              <circle
+                key={i}
+                cx={centerX}
+                cy={centerY}
+                r={r}
+                fill="none"
+                stroke={r === radius ? "black" : "#DDDDDD"}
+              />
+            )
           )}
-          <Genomeviewer $active={view}>
-            {/* <DNAViewer /> */ <Ge />}
-          </Genomeviewer>
-          <CircularPlot
-            $active={view}
-            style={{
-              justifyContent: "center",
-              width: "100%",
-            }}
-          >
-            {/* <DrawCirclePlot input={fileContent} /> */}
-            {/* <DrawCirclePlot /> */}
-            {/* <SkewChart w={1400} h={1400} /> */}
-            <DraggableZoomableSVG />
-          </CircularPlot>
-          <Downloads $active={view}></Downloads>
-        </Info>
-      </Wrapper>
-    </Container>
+
+          {[
+            radius2 - 50,
+            radius2 - 25,
+            radius2,
+            radius2 + 25,
+            radius2 + 50,
+          ].map((r, i) => (
+            <circle
+              key={i}
+              cx={centerX}
+              cy={centerY}
+              r={r}
+              fill="none"
+              stroke={r === radius2 ? "black" : "#DDDDDD"}
+            />
+          ))}
+        </g>
+      </g>
+      {/* <circle cx={centerX} cy={centerY} r={500} fill="blue" /> */}
+    </SvgContainer>
   );
 };
 
-export default Viewer;
+export default SkewChart;

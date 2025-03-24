@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { proxy } from "../utils/default";
-import CirclePlot from "../components/CirclePlot.jsx";
+// import CirclePlot from "../components/CirclePlot.jsx";
 import Genome from "../components/Genomeviewer.jsx";
 const Container = styled.div`
   width: 100%;
@@ -25,9 +25,9 @@ const MenuItem = styled.div`
   border-radius: 7px 7px 0 0;
   width: 120px;
   display: flex;
-  color: ${(props) => (props.active ? "black" : "#0c49ef")};
+  color: ${(props) => (props.$active ? "black" : "#0c49ef")};
   border: ${(props) =>
-    props.active ? " 0.5px solid black" : "0.5px solid transparent"};
+    props.$active ? " 0.5px solid black" : "0.5px solid transparent"};
   border-bottom: none;
 
   justify-content: center;
@@ -67,7 +67,7 @@ const Info = styled.div`
   min-height: 500px;
 `;
 const JobStatistics = styled.div`
-  display: ${(props) => (props.active === 0 ? "grid" : "none")};
+  display: ${(props) => (props.$active === 0 ? "grid" : "none")};
   grid-template-columns: 1fr 1fr 1fr;
   grid-row: 1fr 1fr 1fr;
   min-height: 500px;
@@ -116,7 +116,7 @@ const BorderTopR = styled.hr`
   border: 0.5px solid black;
 `;
 const AnnotationTable = styled.table`
-  display: ${(props) => (props.active === 1 ? "" : "none")};
+  display: ${(props) => (props.$active === 1 ? "" : "none")};
   border: none;
   border-collapse: collapse;
   margin: auto;
@@ -124,19 +124,19 @@ const AnnotationTable = styled.table`
 `;
 const THead = styled.thead``;
 const TR = styled.tr`
-  background-color: ${(props) => (props.type === 0 ? "#F2F2F2" : "white")};
+  background-color: ${(props) => (props.$type === 0 ? "#F2F2F2" : "white")};
 `;
 const Td = styled.td`
   text-align: center;
 `;
 const Genomeviewer = styled.table`
-  display: ${(props) => (props.active === 2 ? "" : "none")};
+  display: ${(props) => (props.$active === 2 ? "" : "none")};
 `;
 const CircularPlot = styled.table`
-  display: ${(props) => (props.active === 3 ? "" : "none")};
+  display: ${(props) => (props.$active === 3 ? "" : "none")};
 `;
 const Downloads = styled.table`
-  display: ${(props) => (props.active === 4 ? "" : "none")};
+  display: ${(props) => (props.$active === 4 ? "" : "none")};
 `;
 const JobDetail = () => {
   const { currentJob } = useSelector((state) => state.job);
@@ -191,7 +191,7 @@ const JobDetail = () => {
           {menuItems.map((item, index) => (
             <MenuItem
               key={index}
-              active={view === index}
+              $active={view === index}
               onClick={() => setView(index)}
             >
               {item}
@@ -199,7 +199,7 @@ const JobDetail = () => {
           ))}
         </Menu>
         <Info>
-          <JobStatistics active={view}>
+          <JobStatistics $active={view}>
             <Input>
               <Title>Input</Title>
               <Detail>
@@ -300,7 +300,7 @@ const JobDetail = () => {
               </More>
             </Feature>
           </JobStatistics>
-          <AnnotationTable active={view}>
+          <AnnotationTable $active={view}>
             <thead>
               <tr>
                 <th style={{ minWidth: "100px" }}>Sequence Id</th>
@@ -317,7 +317,7 @@ const JobDetail = () => {
             <tbody>
               {Object.entries(job?.annotationTable || {}).map(
                 ([key, value]) => (
-                  <TR key={key} type={key % 2}>
+                  <TR key={key} $type={key % 2}>
                     <Td>{value["#Sequence Id"]}</Td>
                     <Td>{value["Type"]}</Td>
                     <Td>{value["Start"]}</Td>
@@ -340,7 +340,7 @@ const JobDetail = () => {
               )}
             </tbody>
           </AnnotationTable>
-          <Genomeviewer active={view}>
+          <Genomeviewer $active={view}>
             <Genome />
           </Genomeviewer>
           <CircularPlot
@@ -351,9 +351,9 @@ const JobDetail = () => {
               minHeight: "700px",
             }}
           >
-            <CirclePlot />
+            {/* <CirclePlot /> */}
           </CircularPlot>
-          <Downloads active={view}></Downloads>
+          <Downloads $active={view}></Downloads>
         </Info>
       </Wrapper>
     </Container>

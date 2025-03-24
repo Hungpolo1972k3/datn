@@ -3,10 +3,11 @@ import { NavLink } from "react-router-dom";
 
 const Container = styled.div`
   position: sticky;
-  top: 0;
-  background-color: #f0f0f0;
+  background-color: #ffffff;
   height: 56px;
   z-index: 1;
+
+  text-align: center;
 `;
 
 const Wrapper = styled.div`
@@ -23,12 +24,12 @@ const Button = styled.button`
   padding: 5px 15px;
   background-color: transparent;
   border: none;
-  color: ${({ isActive }) => (isActive ? "black" : "#59595e")};
-  font-weight: ${({ isActive }) => (isActive ? 500 : 400)};
+  color: ${({ $isActive }) => ($isActive ? "black" : "#59595e")};
+  font-weight: ${({ $isActive }) => ($isActive ? 500 : 400)};
   cursor: pointer;
 
   &:hover {
-    color: ${({ isActive }) => (isActive ? "black" : "#29292b")};
+    color: ${({ $isActive }) => ($isActive ? "black" : "#29292b")};
   }
 `;
 
@@ -37,19 +38,19 @@ const Navbar = () => {
     <Container>
       <Wrapper>
         <NavLink to="/">
-          {({ isActive }) => <Button isActive={isActive}>Home</Button>}
+          {({ isActive }) => <Button $isActive={isActive}>Home</Button>}
         </NavLink>
         <NavLink to="/submit">
-          {({ isActive }) => <Button isActive={isActive}>Submit</Button>}
+          {({ isActive }) => <Button $isActive={isActive}>Submit</Button>}
         </NavLink>
         <NavLink to="/jobs">
-          {({ isActive }) => <Button isActive={isActive}>Jobs</Button>}
+          {({ isActive }) => <Button $isActive={isActive}>Jobs</Button>}
         </NavLink>
         <NavLink to="/view">
-          {({ isActive }) => <Button isActive={isActive}>Viewer</Button>}
+          {({ isActive }) => <Button $isActive={isActive}>Viewer</Button>}
         </NavLink>
         <NavLink to="/login">
-          {({ isActive }) => <Button isActive={isActive}>Login</Button>}
+          {({ isActive }) => <Button $isActive={isActive}>Login</Button>}
         </NavLink>
       </Wrapper>
     </Container>
