@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { proxy } from "../utils/default";
-// import CirclePlot from "../components/CirclePlot.jsx";
 import Genome from "../components/Genomeviewer.jsx";
+import CircleChart from "../components/Draw.jsx";
 const Container = styled.div`
   width: 100%;
   display: flex;
@@ -23,13 +23,13 @@ const MenuItem = styled.div`
   padding: 6px;
   border-collapse: collapse;
   border-radius: 7px 7px 0 0;
-  width: 120px;
+  width: 180px;
   display: flex;
+  flex-wrap: wrap;
   color: ${(props) => (props.$active ? "black" : "#0c49ef")};
   border: ${(props) =>
     props.$active ? " 0.5px solid black" : "0.5px solid transparent"};
   border-bottom: none;
-
   justify-content: center;
   &:hover {
     cursor: pointer;
@@ -127,7 +127,8 @@ const TR = styled.tr`
   background-color: ${(props) => (props.$type === 0 ? "#F2F2F2" : "white")};
 `;
 const Td = styled.td`
-  text-align: center;
+  text-align: left;
+  padding-left: 20px;
 `;
 const Genomeviewer = styled.table`
   display: ${(props) => (props.$active === 2 ? "" : "none")};
@@ -303,15 +304,15 @@ const JobDetail = () => {
           <AnnotationTable $active={view}>
             <thead>
               <tr>
-                <th style={{ minWidth: "100px" }}>Sequence Id</th>
-                <th style={{ minWidth: "100px" }}>Type</th>
-                <th style={{ minWidth: "50px" }}>Start</th>
-                <th style={{ minWidth: "50px" }}>Stop</th>
-                <th style={{ minWidth: "50px" }}>Strand</th>
-                <th style={{ minWidth: "100px" }}>Locus Tag</th>
-                <th style={{ minWidth: "100px" }}>Gene</th>
-                <th style={{ minWidth: "100px" }}>Product</th>
-                <th style={{ minWidth: "100px" }}>DbXrefs</th>
+                <th>Sequence</th>
+                <th>Type</th>
+                <th>Start</th>
+                <th>Stop</th>
+                <th>Strand</th>
+                <th>Locus Tag</th>
+                <th>Gene</th>
+                <th>Product</th>
+                <th>DbXrefs</th>
               </tr>
             </thead>
             <tbody>
@@ -325,23 +326,33 @@ const JobDetail = () => {
                     <Td>{value["Strand"]}</Td>
                     <Td>{value["Locus Tag"]}</Td>
                     <Td>{value["Gene"]}</Td>
-                    <td style={{ minWidth: "200px" }}>{value["Product"]}</td>
-                    <td
-                      style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}
+                    <Td>{value["Product"]}</Td>
+                    <Td
+                      style={{
+                        display: "flex",
+                        flexWrap: "wrap",
+                        flexDirection: "column",
+                      }}
                     >
-                      {value["DbXrefs"].map((item, index) => (
-                        <a key={index} href="">
-                          {item}
-                        </a>
-                      ))}
-                    </td>
+                      {value["DbXrefs"].map((db, index) => {
+                        return (
+                          <a
+                            key={index}
+                            href="#blank"
+                            style={{ color: "blue" }}
+                          >
+                            <div style={{ margin: "10px 0 10px 0" }}>{db}</div>
+                          </a>
+                        );
+                      })}
+                    </Td>
                   </TR>
                 )
               )}
             </tbody>
           </AnnotationTable>
           <Genomeviewer $active={view}>
-            <Genome />
+            <Genome style={{ with: "100%" }} />
           </Genomeviewer>
           <CircularPlot
             active={view}
@@ -351,7 +362,7 @@ const JobDetail = () => {
               minHeight: "700px",
             }}
           >
-            {/* <CirclePlot /> */}
+            <CircleChart />
           </CircularPlot>
           <Downloads $active={view}></Downloads>
         </Info>

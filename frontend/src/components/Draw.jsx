@@ -5,9 +5,7 @@ import d3 from "../script/d3";
 const SvgContainer = styled.div`
   width: 100%;
   overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+
   background-color: #ffffff;
   user-select: none;
 `;
@@ -24,7 +22,7 @@ const PathHover = styled.path`
     stroke-width: 1;
   }
 `;
-const DraggableZoomableSVG = ({ dataFetch, w, h, windowLength }) => {
+const CircleChart = ({ dataFetch, w, h, windowLength }) => {
   const input = {
     genome: {
       genus: null,
@@ -541,10 +539,11 @@ const DraggableZoomableSVG = ({ dataFetch, w, h, windowLength }) => {
         ref={svgRef}
         width={1400}
         height={1400}
-        viewBox="-100 0 1500 1500"
+        viewBox="0 80 1500 1500"
         style={{
           transform: `translate(${position.x}px, ${position.y}px) scale(${scale}) rotate(-90deg)`,
           transformOrigin: `${centerX}px ${centerY}px`,
+          marginTop: "-200px",
         }}
       >
         <CircularText
@@ -869,12 +868,17 @@ const CircularText = ({ x, y, r, r2, r3, s }) => {
     const xo2 = centerX + radiusin * Math.cos(startAngle + 0.01);
     const yo2 = centerY + radiusin * Math.sin(startAngle + 0.01);
     const pathId = `path-${angle}`;
-    // Tạo đường cong
     const helper = `M ${xo2},${yo2}  L ${xo1}, ${yo1}`;
     const d = `M ${x1},${y1} A ${radius},${radius} 0 0,1 ${x2},${y2}`;
     paths.push(<path key={pathId} id={pathId} d={d} fill="none" />);
     helpers.push(
-      <path d={helper} fill="none" stroke="black" strokeWidth={2} />
+      <path
+        d={helper}
+        key={`hepler-${pathId}`}
+        fill="none"
+        stroke="black"
+        strokeWidth={2}
+      />
     );
     texts.push(
       <text key={`text-${angle}`} fontSize="16" fill="black">
@@ -893,4 +897,4 @@ const CircularText = ({ x, y, r, r2, r3, s }) => {
   );
 };
 
-export default DraggableZoomableSVG;
+export default CircleChart;

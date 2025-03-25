@@ -45,7 +45,7 @@ const Jobs = () => {
   return (
     <Container>
       <Wrapper>
-        <button onClick={fetchJob}>Get all job</button>
+        {/* <button onClick={fetchJob}>Get all job</button> */}
         <Table>
           <thead>
             <tr>

@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import DrawCirclePlot from "../components/DrawCirclePlot";
-import App from "../components/test";
-import DraggableLine from "../components/test";
-import SkewChart from "../components/test";
-import DraggableZoomableSVG from "../components/Draw";
-import DNAViewer from "../components/Genomeviewer";
-import Ge from "../components/Ge";
+import CircleChart from "../components/Draw";
+import Genome from "../components/Genomeviewer";
 const Container = styled.div`
   margin-top: 20px;
   width: 100%; /* Mặc định */
@@ -100,6 +95,20 @@ const JobStatistics = styled.div`
     grid-row: 1fr 1fr 1fr 1fr;
   }
 `;
+const ChooseFile = styled.input`
+  height: 40px;
+  &::-webkit-file-upload-button {
+    height: 40px;
+    border: none;
+    cursor: pointer;
+  }
+  border: 1px solid #6c757d;
+  border-radius: 5px 4px 4px 5px;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 30px;
+  margin-top: 10px;
+`;
 const Input = styled.div`
   grid-column: 1/2;
   grid-row: 1/2;
@@ -178,6 +187,7 @@ const Td = styled.td`
 `;
 const Genomeviewer = styled.div`
   display: ${(props) => (props.$active === 2 ? "" : "none")};
+  /* background-color: ; */
 `;
 const CircularPlot = styled.div`
   display: ${(props) => (props.$active === 3 ? "" : "none")};
@@ -186,267 +196,8 @@ const Downloads = styled.div`
   display: ${(props) => (props.$active === 4 ? "" : "none")};
 `;
 const Viewer = () => {
-  const [fileContent, setFileContent] = useState({
-    genome: {
-      genus: null,
-      species: null,
-      strain: null,
-      taxon: null,
-      complete: true,
-      gram: "+",
-      translation_table: 11,
-    },
-    stats: {
-      size: 3306,
-      gc: 0.4340592861464005,
-      n_ratio: 0.0,
-      n50: 3306,
-      n90: 3306,
-      coding_ratio: 0.7522686025408348,
-    },
-    features: [
-      {
-        type: "cds",
-        sequence: "contig_1",
-        start: 2,
-        stop: 736,
-        strand: "+",
-        frame: 2,
-        gene: "mobA",
-        product: "plasmid mobilization protein MobA",
-        db_xrefs: [
-          "GO:0006355",
-          "SO:0001217",
-          "UniRef:UniRef50_G4VUV6",
-          "UniRef:UniRef90_G4VUV6",
-        ],
-        nt: "TCTTCTGCGAGTTCGTGCAGCTTCTCACACATGGTGGCCTGCTCGTCAGCATCGAGTGCGTCCAGTTTTTCGAGCAGCGTCAGGCTCTGGCTTTTTATGAATCCCGCCATGTTGAGTGCAGTTTGCTGCTGCTTGTTCATCTTTCTGTTTTCTCCGTTCTGTCTGTCATCTGCGTCGTGTGATTATATCGCGCACCACTTTTCGACCGTCTTACCGCCGGTATTCTGCCGACGGACATTTCAGTCAGACAACACTGTCACTGCCAAAAAACAGCAGTGCTTTGTTGGTAATTCGAACTTGCAGACAGGACAGGATGTGCAATTGTTATACCGCGCATACATGCACGCTATTACAATTACCCTGGTCAGGGCTTCGCCCCGACACCCCATGTCAGATACGGAGCCATGTTTTATGACAAAACGAAGTGGAAGTAATACGCGCAGGCGGGCTATCAGTCGCCCTGTTCGTCTGACGGCAGAAGAAGACCAGGAAATCAGAAAAAGGGCTGCTGAATGCGGCAAGACCGTTTCTGGTTTTTTACGGGCGGCAGCTCTCGGTAAGAAAGTTAACTCACTGACTGATGACCGGGTGCTGAAAGAAGTTATGCGACTGGGGGCGTTGCAGAAAAAACTCTTTATCGACGGCAAGCGTGTCGGGGACAGAGAGTATGCGGAGGTGCTGATCGCTATTACGGAGTATCACCGTGCCCTGTTATCCAGGCTTATGGCAGATTAG",
-        aa: "SSASSCSFSHMVACSSASSASSFSSSVRLWLFMNPAMLSAVCCCLFIFLFSPFCLSSASCDYIAHHFSTVLPPVFCRRTFQSDNTVTAKKQQCFVGNSNLQTGQDVQLLYRAYMHAITITLVRASPRHPMSDTEPCFMTKRSGSNTRRRAISRPVRLTAEEDQEIRKRAAECGKTVSGFLRAAALGKKVNSLTDDRVLKEVMRLGALQKKLFIDGKRVGDREYAEVLIAITEYHRALLSRLMAD",
-        aa_hexdigest: "bbb582b0498d5635f931d45732cbfcbb",
-        start_type: "Edge",
-        rbs_motif: null,
-        truncated: "5-prime",
-        psc: {
-          uniref90_id: "UniRef90_G4VUV6",
-          query_cov: 1.0,
-          subject_cov: 0.8970588235294118,
-          identity: 0.992,
-          score: 462.0,
-          evalue: 8.07e-164,
-          valid: true,
-          gene: "mobA",
-          product: "plasmid mobilization protein MobA",
-          uniref50_id: "UniRef50_G4VUV6",
-          go_ids: ["GO:0006355"],
-        },
-        pscc: {
-          uniref50_id: "UniRef50_G4VUV6",
-          db_xrefs: ["SO:0001217", "UniRef:UniRef50_G4VUV6"],
-          product: "Plasmid mobilization protein",
-        },
-        genes: ["mobA"],
-        id: "DOGAIAIOFN_4",
-        locus: "DOGAIA_01",
-      },
-      {
-        type: "oriT",
-        sequence: "contig_1",
-        start: 179,
-        stop: 404,
-        strand: "?",
-        product: "origin of transfer",
-        nt: "TGTGATTATATCGCGCACCACTTTTCGACCGTCTTACCGCCGGTATTCTGCCGACGGACATTTCAGTCAGACAACACTGTCACTGCCAAAAAACAGCAGTGCTTTGTTGGTAATTCGAACTTGCAGACAGGACAGGATGTGCAATTGTTATACCGCGCATACATGCACGCTATTACAATTACCCTGGTCAGGGCTTCGCCCCGACACCCCATGTCAGATACGGAGC",
-        id: "DOGAIAIOFN_5",
-      },
-      {
-        type: "cds",
-        sequence: "contig_1",
-        start: 971,
-        stop: 1351,
-        strand: "-",
-        frame: 3,
-        gene: "lsoB",
-        product: "type II toxin-antitoxin system antitoxin LsoB",
-        db_xrefs: [
-          "BlastRules:WP_000710826",
-          "RefSeq:WP_000710826.1",
-          "SO:0001217",
-          "UniParc:UPI00000BEEC7",
-          "UniRef:UniRef100_Q7DKW4",
-          "UniRef:UniRef50_Q7DKW4",
-          "UniRef:UniRef90_Q7DKW4",
-        ],
-        nt: "ATGAAAAAAGATAAAAAATATCAAATAGAAGCAATAAAAAATAAAGATAAAACTTTATTTATTGTCTATGCTACTGATATTTATAGCCCGAGCGAATTTTTCTCAAAAATCGAATCCGACTTGAAGAAAAAGAAAAGCAAGGGTGATGTTTTTTTTGATTTAATAATTCCTAACGGTGGAAAAAAAGATCGTTACGTCTATACGTCATTTAATGGCGAGAAGTTTTCAAGTTACACATTAAACAAAGTTACGAAAACTGATGAATATAATGATTTATCTGAGCTCTCGGCTTCGTTCTTTAAAAAAAACTTTGATAAGATCAACGTAAACCTTCTATCCAAAGCCACATCATTTGCTTTGAAAAAAGGCATTCCAATATAA",
-        aa: "MKKDKKYQIEAIKNKDKTLFIVYATDIYSPSEFFSKIESDLKKKKSKGDVFFDLIIPNGGKKDRYVYTSFNGEKFSSYTLNKVTKTDEYNDLSELSASFFKKNFDKINVNLLSKATSFALKKGIPI",
-        aa_hexdigest: "ed7e6002701269c907bf57f264e763c1",
-        start_type: "ATG",
-        rbs_motif: "GGA/GAG/AGG",
-        ups: {
-          uniparc_id: "UPI00000BEEC7",
-          ncbi_nrp_id: "WP_000710826.1",
-          uniref100_id: "UniRef100_Q7DKW4",
-          db_xrefs: [
-            "SO:0001217",
-            "UniParc:UPI00000BEEC7",
-            "RefSeq:WP_000710826.1",
-            "UniRef:UniRef100_Q7DKW4",
-          ],
-        },
-        ips: {
-          uniref100_id: "UniRef100_Q7DKW4",
-          uniref90_id: "UniRef90_Q7DKW4",
-        },
-        psc: {
-          uniref90_id: "UniRef90_Q7DKW4",
-          gene: "lsoB",
-          product: "Antitoxin LsoB",
-          uniref50_id: "UniRef50_Q7DKW4",
-        },
-        pscc: {
-          uniref50_id: "UniRef50_Q7DKW4",
-          db_xrefs: ["SO:0001217", "UniRef:UniRef50_Q7DKW4"],
-          product: "Antitoxin LsoB",
-        },
-        expert: [
-          {
-            type: "expert_proteins",
-            source: "BlastRules",
-            rank: 80,
-            id: "WP_000710826",
-            gene: "lsoB",
-            product: "type II toxin-antitoxin system antitoxin LsoB",
-            query_cov: 1.0,
-            subject_cov: 1.0,
-            identity: 1.0,
-            score: 245.0,
-            evalue: 6.31e-86,
-            db_xrefs: ["BlastRules:WP_000710826"],
-          },
-        ],
-        genes: ["lsoB"],
-        id: "DOGAIAIOFN_2",
-        locus: "DOGAIA_02",
-      },
-      {
-        type: "cds",
-        sequence: "contig_1",
-        start: 1348,
-        stop: 2388,
-        strand: "-",
-        frame: 1,
-        gene: "lsoA",
-        product: "type II toxin-antitoxin system mRNA endoribonuclease LsoA",
-        db_xrefs: [
-          "BlastRules:WP_000068433",
-          "EC:3.1.-.-",
-          "GO:0004521",
-          "RefSeq:WP_000068433.1",
-          "SO:0001217",
-          "UniParc:UPI00000B51BA",
-          "UniRef:UniRef100_O82881",
-          "UniRef:UniRef50_O82881",
-          "UniRef:UniRef90_O82881",
-        ],
-        nt: "ATGGCACAGAACCCGTTTAAAGCACTAAATATCAATATTGACAAGATTGAGTCTGCTCTGACGCAGAATGGCGTCACAAACTATTCCTCTAATGTAAAAAACGAAAGAGAAACTCACATATCTGGCACATATAAAGGAATAGACTTCTTAATAAAACTAATGCCATCAGGCGGAAATACCACTATCGGAAGAGCGTCTGGGCAAAATAACACTTACTTTGATGAAATCGCCTTGATTATAAAAGAAAACTGTTTGTATTCAGACACAAAGAACTTTGAATACACCATTCCAAAATTCAGTGATGATGACAGGGCAAATCTATTTGAATTTCTTTCTGAAGAGGGGATAACAATAACAGAAGATAATAATAACGATCCTAATTGTAAACACCAATATATTATGACCACCAGCAATGGTGACAGGGTCAGGGCAAAAATTTACAAGCGCGGCTCTATTCAATTCCAAGGAAAATACCTTCAAATCGCGAGTTTGATTAACGATTTCATGTGCTCAATACTAAACATGAAAGAGATTGTCGAACAAAAAAATAAAGAATTTAATGTTGACATAAAAAAAGAAACTATTGAGTCCGAGTTGCATAGCAAACTACCAAAAAGCATCGATAAAATCCATGAAGATATCAAAAAACAGCTATCATGCTCGCTAATAATGAAAAAAATAGATGTCGAAATGGAAGATTACTCAACATACTGCTTCTCTGCATTAAGAGCCATAGAAGGCTTTATATATCAAATACTTAATGATGTTTGCAATCCATCATCATCAAAGAACCTTGGCGAATACTTCACTGAAAACAAACCCAAATATATAATCAGAGAAATACACCAAGAAACTATAAATGGTGAAATAGCGGAAGTTTTGTGTGAATGCTACACTTACTGGCATGAGAACAGGCATGGTTTGTTTCATATGAAACCAGGAATAGCTGACACGAAGACAATTAACAAATTAGAATCAATCGCAATCATCGATACCGTTTGCCAATTAATAGATGGTGGCGTAGCTAGGTTGAAATTATGA",
-        aa: "MAQNPFKALNINIDKIESALTQNGVTNYSSNVKNERETHISGTYKGIDFLIKLMPSGGNTTIGRASGQNNTYFDEIALIIKENCLYSDTKNFEYTIPKFSDDDRANLFEFLSEEGITITEDNNNDPNCKHQYIMTTSNGDRVRAKIYKRGSIQFQGKYLQIASLINDFMCSILNMKEIVEQKNKEFNVDIKKETIESELHSKLPKSIDKIHEDIKKQLSCSLIMKKIDVEMEDYSTYCFSALRAIEGFIYQILNDVCNPSSSKNLGEYFTENKPKYIIREIHQETINGEIAEVLCECYTYWHENRHGLFHMKPGIADTKTINKLESIAIIDTVCQLIDGGVARLKL",
-        aa_hexdigest: "f38c7538741cc7996a5564ff430abad7",
-        start_type: "ATG",
-        rbs_motif: "GGA/GAG/AGG",
-        ups: {
-          uniparc_id: "UPI00000B51BA",
-          ncbi_nrp_id: "WP_000068433.1",
-          uniref100_id: "UniRef100_O82881",
-          db_xrefs: [
-            "SO:0001217",
-            "UniParc:UPI00000B51BA",
-            "RefSeq:WP_000068433.1",
-            "UniRef:UniRef100_O82881",
-          ],
-        },
-        ips: {
-          uniref100_id: "UniRef100_O82881",
-          uniref90_id: "UniRef90_O82881",
-        },
-        psc: {
-          uniref90_id: "UniRef90_O82881",
-          gene: "lsoA",
-          product: "mRNA endoribonuclease LsoA",
-          ec_ids: ["3.1.-.-"],
-          uniref50_id: "UniRef50_O82881",
-          go_ids: ["GO:0004521"],
-        },
-        pscc: {
-          uniref50_id: "UniRef50_O82881",
-          db_xrefs: ["SO:0001217", "UniRef:UniRef50_O82881"],
-          product: "mRNA endoribonuclease LsoA",
-        },
-        expert: [
-          {
-            type: "expert_proteins",
-            source: "BlastRules",
-            rank: 80,
-            id: "WP_000068433",
-            gene: "lsoA",
-            product:
-              "type II toxin-antitoxin system mRNA endoribonuclease LsoA",
-            query_cov: 1.0,
-            subject_cov: 1.0,
-            identity: 1.0,
-            score: 693.0,
-            evalue: 9.18e-256,
-            db_xrefs: ["BlastRules:WP_000068433"],
-          },
-        ],
-        genes: ["lsoA"],
-        id: "DOGAIAIOFN_3",
-        locus: "DOGAIA_03",
-      },
-      {
-        type: "ncRNA",
-        class: null,
-        sequence: "contig_1",
-        start: 2495,
-        stop: 2598,
-        strand: "-",
-        gene: "RNAI",
-        product: "RNAI",
-        score: 83.3,
-        evalue: 4.3e-14,
-        db_xrefs: ["RFAM:RF00106", "SO:0000655"],
-        nt: "AGATTTTGGTGACTGCGCTCCTCCAAGCCAGTTACCTTGGTTCAAAGAGTTGGTAGCTCAGCGAACCTTGAGAAAACCACCGTTGGTAGCGGTGGTTTTTCTTT",
-        id: "DOGAIAIOFN_1",
-        locus: "DOGAIA_04",
-      },
-    ],
-    sequences: [
-      {
-        id: "contig_1",
-        description:
-          "[gcode=11] [completeness=complete] [topology=circular] [location=chromosome]",
-        nt: "TTCTTCTGCGAGTTCGTGCAGCTTCTCACACATGGTGGCCTGCTCGTCAGCATCGAGTGCGTCCAGTTTTTCGAGCAGCGTCAGGCTCTGGCTTTTTATGAATCCCGCCATGTTGAGTGCAGTTTGCTGCTGCTTGTTCATCTTTCTGTTTTCTCCGTTCTGTCTGTCATCTGCGTCGTGTGATTATATCGCGCACCACTTTTCGACCGTCTTACCGCCGGTATTCTGCCGACGGACATTTCAGTCAGACAACACTGTCACTGCCAAAAAACAGCAGTGCTTTGTTGGTAATTCGAACTTGCAGACAGGACAGGATGTGCAATTGTTATACCGCGCATACATGCACGCTATTACAATTACCCTGGTCAGGGCTTCGCCCCGACACCCCATGTCAGATACGGAGCCATGTTTTATGACAAAACGAAGTGGAAGTAATACGCGCAGGCGGGCTATCAGTCGCCCTGTTCGTCTGACGGCAGAAGAAGACCAGGAAATCAGAAAAAGGGCTGCTGAATGCGGCAAGACCGTTTCTGGTTTTTTACGGGCGGCAGCTCTCGGTAAGAAAGTTAACTCACTGACTGATGACCGGGTGCTGAAAGAAGTTATGCGACTGGGGGCGTTGCAGAAAAAACTCTTTATCGACGGCAAGCGTGTCGGGGACAGAGAGTATGCGGAGGTGCTGATCGCTATTACGGAGTATCACCGTGCCCTGTTATCCAGGCTTATGGCAGATTAGCTTCCCGGAGAGAAACTGTCGAAAACAGACGGTATGAACGCCGTAAGCCCCCAAACCGATCGCCATTCACTTTCATGCATAGCTATGCAGTGAGCTGAAAGCGATCCTGACGCATTTTTCCGGTTTACCCCGGGGAAAACATCTCTTTTTGCGGTGTCTGCGTCAGAATCGCGTTCAGCGCGTTTTGGCGGTGCGCGTAATGAGACGTTATGGTAAATGTCTTCTGGCTTGATATTATATTGGAATGCCTTTTTTCAAAGCAAATGATGTGGCTTTGGATAGAAGGTTTACGTTGATCTTATCAAAGTTTTTTTTAAAGAACGAAGCCGAGAGCTCAGATAAATCATTATATTCATCAGTTTTCGTAACTTTGTTTAATGTGTAACTTGAAAACTTCTCGCCATTAAATGACGTATAGACGTAACGATCTTTTTTTCCACCGTTAGGAATTATTAAATCAAAAAAAACATCACCCTTGCTTTTCTTTTTCTTCAAGTCGGATTCGATTTTTGAGAAAAATTCGCTCGGGCTATAAATATCAGTAGCATAGACAATAAATAAAGTTTTATCTTTATTTTTTATTGCTTCTATTTGATATTTTTTATCTTTTTTCATAATTTCAACCTAGCTACGCCACCATCTATTAATTGGCAAACGGTATCGATGATTGCGATTGATTCTAATTTGTTAATTGTCTTCGTGTCAGCTATTCCTGGTTTCATATGAAACAAACCATGCCTGTTCTCATGCCAGTAAGTGTAGCATTCACACAAAACTTCCGCTATTTCACCATTTATAGTTTCTTGGTGTATTTCTCTGATTATATATTTGGGTTTGTTTTCAGTGAAGTATTCGCCAAGGTTCTTTGATGATGATGGATTGCAAACATCATTAAGTATTTGATATATAAAGCCTTCTATGGCTCTTAATGCAGAGAAGCAGTATGTTGAGTAATCTTCCATTTCGACATCTATTTTTTTCATTATTAGCGAGCATGATAGCTGTTTTTTGATATCTTCATGGATTTTATCGATGCTTTTTGGTAGTTTGCTATGCAACTCGGACTCAATAGTTTCTTTTTTTATGTCAACATTAAATTCTTTATTTTTTTGTTCGACAATCTCTTTCATGTTTAGTATTGAGCACATGAAATCGTTAATCAAACTCGCGATTTGAAGGTATTTTCCTTGGAATTGAATAGAGCCGCGCTTGTAAATTTTTGCCCTGACCCTGTCACCATTGCTGGTGGTCATAATATATTGGTGTTTACAATTAGGATCGTTATTATTATCTTCTGTTATTGTTATCCCCTCTTCAGAAAGAAATTCAAATAGATTTGCCCTGTCATCATCACTGAATTTTGGAATGGTGTATTCAAAGTTCTTTGTGTCTGAATACAAACAGTTTTCTTTTATAATCAAGGCGATTTCATCAAAGTAAGTGTTATTTTGCCCAGACGCTCTTCCGATAGTGGTATTTCCGCCTGATGGCATTAGTTTTATTAAGAAGTCTATTCCTTTATATGTGCCAGATATGTGAGTTTCTCTTTCGTTTTTTACATTAGAGGAATAGTTTGTGACGCCATTCTGCGTCAGAGCAGACTCAATCTTGTCAATATTGATATTTAGTGCTTTAAACGGGTTCTGTGCCATTGGGTCAATCCGTTGTTTTTTTTGAATATGTACAGATCTTGTTTTTTTGTCAACGGAATAGCTGTTCGTTGACTTGATAGACCGATTGATTCATCATCTCATAAATAAAGAAAAACCACCGCTACCAACGGTGGTTTTCTCAAGGTTCGCTGAGCTACCAACTCTTTGAACCAAGGTAACTGGCTTGGAGGAGCGCAGTCACCAAAATCTGTTCTTTCAGTTTAGCCTTAACAGGTGCATAACTTCAAGACAAACTCCTCTAAATCAGTTACCAATGGCTGCTGCCAGTGGCGATAAGTCGTGTCTTACCGGGTTGGACTCAAGACGATAGTTACCGGATAAGGCGCAGCGGTCGGGCTGAACGGGGGGTTCGTGCACACAGCCCAGCTTGGAGCGAACGACCTACACCGAACTGAGATACCAACAGCGTGAGCTATGAGAAAGCGCCACGCTTCCCGAAGGGAGAAAGGCGGACAGGTATCCGGTAAGTGGCAGGGTCGGAACAGGAGAGCGCACGAGGGAGCTTCCGGGGGGAAACGCCTGGTATCTTTATAGTCCTGTCGGGTTTCGCCACCTCTGGCTTGAGCGTCGATTTTTGTGATGCTCGTCAGGGGGGCGGAGCCTATGGAAAAACGCCTGCGGTGCTGGCTTCTTCCGGTGCTTTGCTTTTTGCTCACATGTTCTTTCCGGCTTTATCCCCTGATTCTGTGGATAACCGTATTACCGCCTTTGAGTGAGCTGACACCGCTCGCCGCAGTCGAACGACCGAGCGTAGCGAGTCAGTGAGCGAGGAAGCGGAAGAGCGCCTTATGTGACATTTTCTCCTTACGCTCTGTTGTGCCGTTCGGCATCCTGCCCTGAGCGTTATATCTCTGTGCTATTTTCTACTTCAAAGCGTGTCTGTATGCTGTTCTGGAG",
-        length: 3306,
-        complete: true,
-        type: "chromosome",
-        topology: "circular",
-        orig_id: "NC_002127.1",
-        orig_description:
-          "Escherichia coli O157:H7 str. Sakai plasmid pOSAK1, complete sequence",
-      },
-    ],
-    run: {
-      start: "2025-03-12 05:22:59",
-      end: "2025-03-12 05:25:11",
-      duration: "2.20 min",
-    },
-    version: {
-      bakta: "1.11.0",
-      db: {
-        version: "6.0",
-        type: "full",
-      },
-    },
-  });
-  const [view, setView] = useState(3);
+  const [fileContent, setFileContent] = useState(null);
+  const [view, setView] = useState(2);
   const [genome, setGenome] = useState(null);
   const [stats, setStats] = useState(null);
   const [features, setFeatures] = useState(null);
@@ -463,13 +214,12 @@ const Viewer = () => {
     reader.readAsText(file);
   };
   useEffect(() => {
-    setGenome(fileContent.genome);
-    setFeatures(fileContent.features);
-    setStats(fileContent.stats);
-    setSequences(fileContent.sequences);
-    setRuntime(fileContent.run);
+    setGenome(fileContent?.genome);
+    setFeatures(fileContent?.features);
+    setStats(fileContent?.stats);
+    setSequences(fileContent?.sequences);
+    setRuntime(fileContent?.run);
     return;
-    // loadFeatures();
   }, [fileContent]);
   const menuItems = [
     "JobStatistics",
@@ -496,224 +246,231 @@ const Viewer = () => {
   return (
     <Container>
       <Wrapper>
-        <input
+        <ChooseFile
           type="file"
-          name=""
-          id=""
+          name="file"
+          id="file"
           accept=".json"
           onChange={(e) => handleFile(e)}
         />
-        <Menu>
-          {menuItems.map((item, index) => (
-            <MenuItem
-              key={index}
-              $active={view === index}
-              onClick={() => setView(index)}
-            >
-              {item}
-            </MenuItem>
-          ))}
-        </Menu>
-        <Info>
-          <JobStatistics $active={view}>
-            <Input>
-              <Title>Input</Title>
-              <Detail>
-                <DetailItem>
-                  <Bold>Organism:</Bold> N.A.
-                </DetailItem>
-                <DetailItem>
-                  <Bold>Sequence:</Bold>
-                  {genome?.complete ? (
-                    <p>1 complete chromosome</p>
+        {console.log(fileContent)}
+        {fileContent != null ? (
+          <>
+            <Menu>
+              {menuItems.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  $active={view === index}
+                  onClick={() => setView(index)}
+                >
+                  {item}
+                </MenuItem>
+              ))}
+            </Menu>
+            <Info>
+              <JobStatistics $active={view}>
+                <Input>
+                  <Title>Input</Title>
+                  <Detail>
+                    <DetailItem>
+                      <Bold>Organism:</Bold> N.A.
+                    </DetailItem>
+                    <DetailItem>
+                      <Bold>Sequence:</Bold>
+                      {genome?.complete ? (
+                        <p>1 complete chromosome</p>
+                      ) : (
+                        <p>{sequences?.length} contigs</p>
+                      )}
+                    </DetailItem>
+                    <DetailItem>
+                      <Bold>Genome size:</Bold> {stats?.size} bp
+                    </DetailItem>
+                  </Detail>
+                </Input>
+                <Runtime>
+                  <Title>Runtime</Title>
+                  {runtime ? (
+                    <Detail>
+                      <DetailItem>
+                        <Bold>Start:</Bold> {runtime.start}
+                      </DetailItem>
+                      <DetailItem>
+                        <Bold>Stop:</Bold> {runtime.end}
+                      </DetailItem>
+                      <DetailItem>
+                        <Bold>Duration:</Bold> {runtime.duration}
+                      </DetailItem>
+                    </Detail>
                   ) : (
-                    <p>{sequences?.length} contigs</p>
+                    <></>
                   )}
-                </DetailItem>
-                <DetailItem>
-                  <Bold>Genome size:</Bold> {stats?.size} bp
-                </DetailItem>
-              </Detail>
-            </Input>
-            <Runtime>
-              <Title>Runtime</Title>
-              {runtime ? (
-                <Detail>
-                  <DetailItem>
-                    <Bold>Start:</Bold> {runtime.start}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>Stop:</Bold> {runtime.end}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>Duration:</Bold> {runtime.duration}
-                  </DetailItem>
-                </Detail>
-              ) : (
-                <></>
-              )}
-            </Runtime>
-            <Statistics>
-              <Title>Statistics</Title>
-              {stats ? (
-                <Detail>
-                  <DetailItem>
-                    <Bold>N50</Bold>
-                    {stats.n50}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>N90</Bold>
-                    {stats.n90}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>GC-content</Bold> {stats.gc.toFixed(2)}
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>Coding ratio</Bold> {stats.coding_ratio.toFixed(2)}
-                    bp
-                  </DetailItem>
-                  <DetailItem>
-                    <Bold>N-ratio</Bold> {stats.n_ratio}
-                  </DetailItem>
-                </Detail>
-              ) : (
-                <></>
-              )}
-            </Statistics>
-            {features ? (
-              <Feature>
-                {loadFeatures()}
-                <Title>Feature Count (Total: {features.length})</Title>
-                <More>
-                  <Detail>
-                    <DetailItem>
-                      <Bold>tRNAs:</Bold>
-                      {allFeatures["tRNA"] ? allFeatures["tRNA"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>tmRNAs:</Bold>
-                      {allFeatures["tmRNA"] ? allFeatures["tmRNA"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>rRNAs:</Bold>
-                      {allFeatures["rRNA"] ? allFeatures["rRNA"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>ncRNAs:</Bold>
-                      {allFeatures["ncRNA"] ? allFeatures["ncRNA"].count : 0}
-                    </DetailItem>
-                  </Detail>
+                </Runtime>
+                <Statistics>
+                  <Title>Statistics</Title>
+                  {stats ? (
+                    <Detail>
+                      <DetailItem>
+                        <Bold>N50</Bold>
+                        {stats.n50}
+                      </DetailItem>
+                      <DetailItem>
+                        <Bold>N90</Bold>
+                        {stats.n90}
+                      </DetailItem>
+                      <DetailItem>
+                        <Bold>GC-content</Bold> {stats.gc.toFixed(2)}
+                      </DetailItem>
+                      <DetailItem>
+                        <Bold>Coding ratio</Bold>{" "}
+                        {stats.coding_ratio.toFixed(2)}
+                        bp
+                      </DetailItem>
+                      <DetailItem>
+                        <Bold>N-ratio</Bold> {stats.n_ratio}
+                      </DetailItem>
+                    </Detail>
+                  ) : (
+                    <></>
+                  )}
+                </Statistics>
+                {features ? (
+                  <Feature>
+                    {loadFeatures()}
+                    <Title>Feature Count (Total: {features.length})</Title>
+                    <More>
+                      <Detail>
+                        <DetailItem>
+                          <Bold>tRNAs:</Bold>
+                          {allFeatures["tRNA"] ? allFeatures["tRNA"].count : 0}
+                        </DetailItem>
+                        <DetailItem>
+                          <Bold>tmRNAs:</Bold>
+                          {allFeatures["tmRNA"]
+                            ? allFeatures["tmRNA"].count
+                            : 0}
+                        </DetailItem>
+                        <DetailItem>
+                          <Bold>rRNAs:</Bold>
+                          {allFeatures["rRNA"] ? allFeatures["rRNA"].count : 0}
+                        </DetailItem>
+                        <DetailItem>
+                          <Bold>ncRNAs:</Bold>
+                          {allFeatures["ncRNA"]
+                            ? allFeatures["ncRNA"].count
+                            : 0}
+                        </DetailItem>
+                      </Detail>
 
-                  <Detail>
-                    <DetailItem>
-                      <Bold>ncRNA: </Bold>
-                      {allFeatures["ncRNA"] ? allFeatures["ncRNA"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>CRISPR: </Bold>
-                      {allFeatures["CRISPR"] ? allFeatures["CRISPR"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>CDSs: </Bold>
-                      {allFeatures["CDS"] ? allFeatures["CDS"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>sORFs: </Bold>
-                      {allFeatures["sORF"] ? allFeatures["sORF"].count : 0}
-                    </DetailItem>
-                  </Detail>
-                  <Detail>
-                    <DetailItem>
-                      <Bold>oriCs: </Bold>
-                      {allFeatures["oriC"] ? allFeatures["oriC"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>oriVs: </Bold>
-                      {allFeatures["oriV"] ? allFeatures["oriV"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>oriTs: </Bold>
-                      {allFeatures["oriT"] ? allFeatures["oriT"].count : 0}
-                    </DetailItem>
-                    <DetailItem>
-                      <Bold>gaps: </Bold>
-                      {allFeatures["gap"] ? allFeatures["gap"].count : 0}
-                    </DetailItem>
-                  </Detail>
-                </More>
-              </Feature>
-            ) : (
-              ""
-            )}
-          </JobStatistics>
-          {features ? (
-            <AnnotationTable $active={view}>
-              <thead>
-                <tr>
-                  <th>Sequence</th>
-                  <th>Type</th>
-                  <th>Start</th>
-                  <th>Stop</th>
-                  <th>Strand</th>
-                  <th>Locus Tag</th>
-                  <th>Gene</th>
-                  <th>Product</th>
-                  <th>DbXrefs</th>
-                </tr>
-              </thead>
-              <tbody>
-                {features.map((item, index) => {
-                  return (
-                    <TR key={index} $type={index % 2}>
-                      <Td>{item.sequence}</Td>
-                      <Td>{item.type}</Td>
-                      <Td>{item.start}</Td>
-                      <Td>{item.stop}</Td>
-                      <Td>{item.strand}</Td>
-                      <Td>{item.locus}</Td>
-                      <Td>{item.gene}</Td>
-                      <Td>{item.product}</Td>
-                      <Td>
-                        {item.db_xrefs?.map((db, index) => {
-                          return (
-                            <a
-                              key={index}
-                              href="#blank"
-                              style={{ color: "blue" }}
-                            >
-                              <div style={{ margin: "10px 0 10px 0" }}>
-                                {db}
-                              </div>
-                            </a>
-                          );
-                        })}
-                      </Td>
-                      <Td></Td>
-                    </TR>
-                  );
-                })}
-              </tbody>
-            </AnnotationTable>
-          ) : (
-            <></>
-          )}
-          <Genomeviewer $active={view}>
-            {/* <DNAViewer /> */ <Ge />}
-          </Genomeviewer>
-          <CircularPlot
-            $active={view}
-            style={{
-              justifyContent: "center",
-              width: "100%",
-            }}
-          >
-            {/* <DrawCirclePlot input={fileContent} /> */}
-            {/* <DrawCirclePlot /> */}
-            {/* <SkewChart w={1400} h={1400} /> */}
-            <DraggableZoomableSVG />
-          </CircularPlot>
-          <Downloads $active={view}></Downloads>
-        </Info>
+                      <Detail>
+                        <DetailItem>
+                          <Bold>ncRNA: </Bold>
+                          {allFeatures["ncRNA"]
+                            ? allFeatures["ncRNA"].count
+                            : 0}
+                        </DetailItem>
+                        <DetailItem>
+                          <Bold>CRISPR: </Bold>
+                          {allFeatures["CRISPR"]
+                            ? allFeatures["CRISPR"].count
+                            : 0}
+                        </DetailItem>
+                        <DetailItem>
+                          <Bold>CDSs: </Bold>
+                          {allFeatures["CDS"] ? allFeatures["CDS"].count : 0}
+                        </DetailItem>
+                        <DetailItem>
+                          <Bold>sORFs: </Bold>
+                          {allFeatures["sORF"] ? allFeatures["sORF"].count : 0}
+                        </DetailItem>
+                      </Detail>
+                      <Detail>
+                        <DetailItem>
+                          <Bold>oriCs: </Bold>
+                          {allFeatures["oriC"] ? allFeatures["oriC"].count : 0}
+                        </DetailItem>
+                        <DetailItem>
+                          <Bold>oriVs: </Bold>
+                          {allFeatures["oriV"] ? allFeatures["oriV"].count : 0}
+                        </DetailItem>
+                        <DetailItem>
+                          <Bold>oriTs: </Bold>
+                          {allFeatures["oriT"] ? allFeatures["oriT"].count : 0}
+                        </DetailItem>
+                        <DetailItem>
+                          <Bold>gaps: </Bold>
+                          {allFeatures["gap"] ? allFeatures["gap"].count : 0}
+                        </DetailItem>
+                      </Detail>
+                    </More>
+                  </Feature>
+                ) : (
+                  ""
+                )}
+              </JobStatistics>
+              {features ? (
+                <AnnotationTable $active={view}>
+                  <thead>
+                    <tr>
+                      <th>Sequence</th>
+                      <th>Type</th>
+                      <th>Start</th>
+                      <th>Stop</th>
+                      <th>Strand</th>
+                      <th>Locus Tag</th>
+                      <th>Gene</th>
+                      <th>Product</th>
+                      <th>DbXrefs</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {features.map((item, index) => {
+                      return (
+                        <TR key={index} $type={index % 2}>
+                          <Td>{item.sequence}</Td>
+                          <Td>{item.type}</Td>
+                          <Td>{item.start}</Td>
+                          <Td>{item.stop}</Td>
+                          <Td>{item.strand}</Td>
+                          <Td>{item.locus}</Td>
+                          <Td>{item.gene}</Td>
+                          <Td>{item.product}</Td>
+                          <Td>
+                            {item.db_xrefs?.map((db, index) => {
+                              return (
+                                <a
+                                  key={index}
+                                  href="#blank"
+                                  style={{ color: "blue" }}
+                                >
+                                  <div style={{ margin: "10px 0 10px 0" }}>
+                                    {db}
+                                  </div>
+                                </a>
+                              );
+                            })}
+                          </Td>
+                          <Td></Td>
+                        </TR>
+                      );
+                    })}
+                  </tbody>
+                </AnnotationTable>
+              ) : (
+                <></>
+              )}
+              <Genomeviewer $active={view}>
+                <Genome />
+              </Genomeviewer>
+              <CircularPlot $active={view}>
+                <CircleChart />
+              </CircularPlot>
+              <Downloads $active={view}></Downloads>
+            </Info>
+          </>
+        ) : (
+          ""
+        )}
       </Wrapper>
     </Container>
   );

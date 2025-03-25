@@ -5,7 +5,6 @@ import cors from "cors";
 import JobRoutes from "./routes/Job.js";
 // import ImageRoutes from "./Temp/Image.js";
 import test from "./routes/test.js";
-import fetchJson from "./fecthDataFromJson.js";
 const app = express();
 dotenv.config();
 
@@ -25,7 +24,7 @@ app.use(express.json());
 app.use("/jobs", JobRoutes);
 // app.use("/image", ImageRoutes);
 app.use("/test", test);
-app.use("/fetch", fetchJson);
+// app.use("/fetch", fetchJson);
 app.use((err, req, res, next) => {
   const status = err.status || 500;
   const message = err.message || "Something went wrong!";

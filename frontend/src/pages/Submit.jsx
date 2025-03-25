@@ -194,7 +194,7 @@ const Submit = () => {
   const textArea = useRef("");
   const addExample = async () => {
     if (example != true) {
-      const response = await fetch(test);
+      const response = await fetch("/NC_002127.1.fna");
       const data = await response.text();
       setText(data);
       setVisible(true);
