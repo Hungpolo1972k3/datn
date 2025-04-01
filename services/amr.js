@@ -41,6 +41,7 @@ const runAmrFinderString = (nucleicString, res) => {
 
         exec(command, (error, stdout, stderr) => {
             if (error) {
+                console.error("AMRFinder error:", stderr); 
                 removeFiles([tempFastaFilePath, outputFilePath]);
                 return res.status(500).json({ error: "Lỗi khi chạy AMRFinder" });
             }
