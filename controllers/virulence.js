@@ -9,7 +9,7 @@ const runAbricate = (req, res) => {
 
 const runAbricateString = (req, res) => {
     const { fastaString } = req.body;
-
+    console.log(req.body)
     if (!fastaString || typeof fastaString !== "string") {
         return res.status(400).json({ error: "Chuỗi FASTA không hợp lệ hoặc bị thiếu" });
     }
