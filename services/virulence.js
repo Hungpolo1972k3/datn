@@ -47,7 +47,6 @@ const runAbricateString = (nucleicSequence, res) => {
         }
 
         fs.readFile(outputFilePath, 'utf8', (err, data) => {
-            removeFiles([fastaFilePath, outputFilePath]);
             if (err) {
                 console.error(`Error reading output file: ${err.message}`);
                 return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });

@@ -45,7 +45,6 @@ const runAmrFinderString = (nucleicSequence, res) => {
         }
 
         fs.readFile(outputFilePath, 'utf8', (err, data) => {
-            removeFiles([fastaFilePath, outputFilePath]);
             if (err) {
                 return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });
             }
