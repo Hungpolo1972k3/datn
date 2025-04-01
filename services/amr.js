@@ -32,31 +32,26 @@ const runAmrFinder = (filePath, res) => {
 };
 
 const runAmrFinderString = (nucleicString, res) => {
-    try {
-        const fastaContent = `>temp_sequence\n${nucleicString.replace(/\n/g, "").trim()}`;
-        const tempFastaFilePath = path.resolve(__dirname, "temp_input.fasta");
-        fs.writeFileSync(tempFastaFilePath, fastaContent);
-        const outputFilePath = `${tempFastaFilePath}_amrfinder.tsv`;
-        const command = `amrfinder -n ${tempFastaFilePath} -o ${outputFilePath}`;
+    const fastaContent = `>temp_sequence\n${nucleicString.replace(/\n/g, "").trim()}`;
+    const tempFastaFilePath = path.resolve(__dirname, "temp_input.fasta");
+    fs.writeFileSync(tempFastaFilePath, fastaContent);
+    const outputFilePath = `${tempFastaFilePath}_amrfinder.tsv`;
+    const command = `amrfinder -n ${tempFastaFilePath} -o ${outputFilePath}`;
 
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error("AMRFinder error:", stderr); 
-                removeFiles([tempFastaFilePath, outputFilePath]);
-                return res.status(500).json({ error: "Lỗi khi chạy AMRFinder" });
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error("AMRFinder error:", stderr); 
+            removeFiles([tempFastaFilePath, outputFilePath]);
+            return res.status(500).json({ error: "Lỗi khi chạy AMRFinder" });
+        }
+        fs.readFile(outputFilePath, "utf8", (err, data) => {
+            removeFiles([tempFastaFilePath, outputFilePath]);
+            if (err) {
+                return res.status(500).json({ error: "Lỗi khi đọc kết quả AMRFinder" });
             }
-            fs.readFile(outputFilePath, "utf8", (err, data) => {
-                removeFiles([tempFastaFilePath, outputFilePath]);
-                if (err) {
-                    return res.status(500).json({ error: "Lỗi khi đọc kết quả AMRFinder" });
-                }
-                res.json({ result: data });
-            });
+            res.json({ result: data });
         });
-    } catch (err) {
-        console.error("Lỗi không mong muốn:", err.message);
-        res.status(500).json({ error: "Lỗi server" });
-    }
+    });
 };
 module.exports = {
     runAmrFinder,
