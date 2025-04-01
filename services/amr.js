@@ -31,17 +31,30 @@ const runAmrFinder = (filePath, res) => {
     });
 };
 
-const runAmrFinderString = (fastaString, res) => {
-    const tempFilePath = path.join(os.tmpdir(), `temp_${Date.now()}.fasta`);
-    
-    fs.writeFile(tempFilePath, fastaString, (err) => {
-        if (err) {
-            throw new Error("Lỗi khi ghi file: " + err.message);
+const runAmrFinderString = (nucleicSequence, res) => {
+    const fastaFilePath = path.resolve('amr_sequence.fasta');
+    const fastaContent = `>sequence\n${nucleicSequence.replace(/\n/g, '')}`; 
+    fs.writeFileSync(fastaFilePath, fastaContent); 
+
+    const outputFilePath = `${fastaFilePath}_amrfinder.tsv`;  
+    const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing amrfinder: ${error.message}`);
+            return res.status(500).json({ error: 'Lỗi khi chạy amrfinder' });
         }
-        runAmrFinder(tempFilePath, res);
+        fs.readFile(outputFilePath, 'utf8', (err, data) => {
+            if (err) {
+                console.error(`Error reading output file: ${err.message}`);
+                return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });
+            }
+            fs.unlinkSync(fastaFilePath);
+            fs.unlinkSync(outputFilePath);
+            res.json({ result: data });
+        });
     });
 };
-
 module.exports = {
     runAmrFinder,
     runAmrFinderString

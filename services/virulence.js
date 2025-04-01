@@ -31,14 +31,30 @@ const runAbricate = (filePath, res) => {
     });
 };
 
-const runAbricateString = (fastaString, res) => {
-    const tempFilePath = path.join(os.tmpdir(), `temp_${Date.now()}.fasta`);
-    
-    fs.writeFile(tempFilePath, fastaString, (err) => {
-        if (err) {
-            throw new Error("Lỗi khi ghi file: " + err.message);
+const runAbricateString = (nucleicSequence, res) => {
+    const fastaFilePath = path.resolve('virulence_sequence.fasta');
+    const fastaContent = `>sequence\n${nucleicSequence.replace(/\n/g, '')}`; 
+    fs.writeFileSync(fastaFilePath, fastaContent);  
+
+    const outputFilePath = `${fastaFilePath}.csv`;  
+
+    const command = `abricate --db vfdb --csv ${fastaFilePath} > ${outputFilePath}`;
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing abricate: ${error.message}`);
+            return res.status(500).json({ error: 'Lỗi khi chạy abricate' });
         }
-        runAbricate(tempFilePath, res);
+
+        fs.readFile(outputFilePath, 'utf8', (err, data) => {
+            if (err) {
+                console.error(`Error reading output file: ${err.message}`);
+                return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });
+            }
+            fs.unlinkSync(fastaFilePath);
+            fs.unlinkSync(outputFilePath);
+            res.json({ result: data });
+        });
     });
 };
 
