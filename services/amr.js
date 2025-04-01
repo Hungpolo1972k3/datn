@@ -32,15 +32,19 @@ const runAmrFinder = (filePath, res) => {
 };
 
 const runAmrFinderString = (nucleicSequence, res) => {
-    if (!nucleicSequence || nucleicSequence.trim().length === 0) {
-        return res.status(400).json({ error: 'Chuỗi nucleotide rỗng' });
+    if (!nucleicSequence || typeof nucleicSequence !== 'string' || nucleicSequence.trim().length === 0) {
+        return res.status(400).json({ error: 'Chuỗi nucleotide không hợp lệ hoặc rỗng' });
     }
-    const fastaFilePath = path.resolve('amr_sequence.fasta');
-    const fastaContent = `>NODE_1_length_312632_cov_38_851190\n${nucleicSequence.replace(/(.{60})/g, '$1\n')}`;
+
+    const fastaFilePath = path.resolve('/tmp/amr_sequence.fasta');
+    const fastaContent = `>NODE_1_length_312632_cov_38.851190\n${nucleicSequence.replace(/(.{60})/g, '$1\n')}`;
+
     try {
-        fs.writeFileSync(fastaFilePath, fastaContent);
+        fs.writeFileSync(fastaFilePath, fastaContent, { encoding: 'utf8' });
+        console.log(`FASTA file created: ${fastaFilePath}`);
+        console.log(fastaContent);
     } catch (err) {
-        console.error(`Lỗi khi ghi file: ${err.message}`);
+        console.error(`Lỗi khi ghi file FASTA: ${err.message}`);
         return res.status(500).json({ error: 'Lỗi khi ghi tệp FASTA' });
     }
 
@@ -51,9 +55,9 @@ const runAmrFinderString = (nucleicSequence, res) => {
         if (error) {
             return res.status(500).json({ error: 'Lỗi khi chạy amrfinder', details: stderr });
         }
+
         fs.readFile(outputFilePath, 'utf8', (err, data) => {
             if (err) {
-                console.error(`Error reading output file: ${err.message}`);
                 return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });
             }
             fs.unlinkSync(fastaFilePath);
