@@ -35,7 +35,7 @@ const runAmrFinderString = (nucleicSequence, res) => {
     const fastaContent = `>sequence\n${nucleicSequence.replace(/\n/g, '')}`; 
     fs.writeFileSync(fastaFilePath, fastaContent);  
 
-    const outputFilePath = `${fastaFilePath}.csv`;  
+    const outputFilePath = `${fastaFilePath}_amrfinder.tsv`;  
 
     const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
 
@@ -45,6 +45,7 @@ const runAmrFinderString = (nucleicSequence, res) => {
         }
 
         fs.readFile(outputFilePath, 'utf8', (err, data) => {
+            removeFiles([fastaFilePath, outputFilePath]);
             if (err) {
                 return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });
             }
