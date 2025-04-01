@@ -30,7 +30,14 @@ const runAmrFinder = (filePath, res) => {
         });
     });
 };
-const isValidNucleotide = (str) => /^[ATCGN\n]+$/i.test(str);
+const isValidNucleotide = (str) => {
+    const lines = str.split('\n');
+    if (lines[0].startsWith(">")) {
+        return lines.slice(1).join('').match(/^[ATCGN]+$/i);
+    }
+    return false;
+};
+
 const runAmrFinderString = (nucleicString, res) => {
     if (!isValidNucleotide(nucleicString)) {
         return res.status(400).json({ error: "Chuỗi nucleotide không hợp lệ" });
