@@ -41,6 +41,7 @@ const runAmrFinderString = (nucleicSequence, res) => {
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
+            console.log(nucleicSequence)
             console.log(error)
             return res.status(500).json({ error: 'Lỗi khi chạy amrfinder' });
         }
