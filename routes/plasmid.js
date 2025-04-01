@@ -6,5 +6,4 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 router.post("/plasmid", upload.single("fasta"), plasmidController.runBlastn);
-
 module.exports = router;

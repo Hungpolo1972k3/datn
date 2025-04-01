@@ -7,6 +7,11 @@ const runAbricate = (req, res) => {
     virulenceService.runAbricate(req.file.path, res);
 };
 
+const runAbricateString = (req,res) => {
+    const {string} = req.body;
+    virulenceService.runAbricateString(string, res)
+}
 module.exports = {
-    runAbricate
+    runAbricate, 
+    runAbricateString
 };

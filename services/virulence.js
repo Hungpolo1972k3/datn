@@ -9,21 +9,7 @@ const removeFiles = (files) => {
         }
     });
 };
-const changeVirulenceInfo = (result) => {
-    const lines = result.trim().split('\n');
-    const headers = lines[0].split(',');
-    
-    const data = lines.slice(1).map(line => {
-        const values = line.split(',');
-        let obj = {};
-        headers.forEach((header, index) => {
-            obj[header] = values[index];
-        });
-        return obj;
-    });
-    
-    return JSON.stringify(data, null, 2);
-}
+
 const runAbricate = (filePath, res) => {
     const fastaFilePath = path.resolve(filePath);
     const outputFilePath = `${fastaFilePath}.csv`;
@@ -39,14 +25,25 @@ const runAbricate = (filePath, res) => {
             if (err) {
                 throw new Error("Lỗi" + error.message)
             }
-            return changeVirulenceInfo(data);
+            res.json({ result: data });
         });
     });
 };
 
+const runAbricateString = (fastaString, res) => {
+    const tempFilePath = path.join(os.tmpdir(), `temp_${Date.now()}.fasta`);
+    
+    fs.writeFile(tempFilePath, fastaString, (err) => {
+        if (err) {
+            throw new Error("Lỗi khi ghi file: " + err.message);
+        }
+        runAbricate(tempFilePath, res);
+    });
+};
 
 module.exports = {
-    runAbricate
+    runAbricate,
+    runAbricateString
 };
 
 

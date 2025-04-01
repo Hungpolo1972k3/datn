@@ -17,14 +17,13 @@ const runBlastn = (filePath, res) => {
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error(`Error running BLASTn: ${stderr}`);
-            return res.status(500).json({ error: "Failed to run BLASTn" });
+            throw new Error("Lỗi" + error.message)
         }
 
         fs.readFile(outputFilePath, "utf8", (err, data) => {
             removeFiles([fastaFilePath, outputFilePath]);
             if (err) {
-                return res.status(500).json({ error: "Failed to read BLAST output file" });
+                throw new Error("Lỗi" + error.message)
             }
             res.json({ result: data });
         });
@@ -32,5 +31,5 @@ const runBlastn = (filePath, res) => {
 };
 
 module.exports = {
-    runBlastn
+    runBlastn,
 };

@@ -6,7 +6,11 @@ const runAmrFinder = (req, res) => {
     }
     amrService.runAmrFinder(req.file.path, res);
 };
-
+const runAmrFinderString = (req,res) =>{
+    const {string} = req.body;
+    amrService.runAmrFinderString(string, res)
+}
 module.exports = {
-    runAmrFinder
+    runAmrFinder,
+    runAmrFinderString
 };

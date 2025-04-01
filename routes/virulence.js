@@ -6,5 +6,6 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 router.post("/abricate", upload.single("fasta"), virulenceController.runAbricate);
+router.post("/abricatestring", virulenceController.runAbricateString)
 
 module.exports = router;
