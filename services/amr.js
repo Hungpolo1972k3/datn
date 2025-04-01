@@ -13,7 +13,7 @@ const removeFiles = (files) => {
 
 const runAmrFinder = (filePath, res) => {
     const fastaFilePath = path.resolve(filePath);
-    const outputFilePath = `${fastaFilePath}_amrfinder.tsv`;
+    const outputFilePath = `${fastaFilePath}_amrfinder.csv`;
     const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
 
     exec(command, (error, stdout, stderr) => {
@@ -35,7 +35,7 @@ const runAmrFinderString = (nucleicSequence, res) => {
     const fastaContent = `>sequence\n${nucleicSequence.replace(/\n/g, '')}`; 
     fs.writeFileSync(fastaFilePath, fastaContent);  
 
-    const outputFilePath = `${fastaFilePath}_amrfinder.tsv`;  
+    const outputFilePath = `${fastaFilePath}.csv`;  
 
     const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
 
