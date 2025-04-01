@@ -30,37 +30,31 @@ const runAmrFinder = (filePath, res) => {
         });
     });
 };
-const isValidNucleotide = (str) => {
-    const lines = str.split('\n');
-    if (lines[0].startsWith(">")) {
-        return lines.slice(1).join('').match(/^[ATCGN]+$/i);
-    }
-    return false;
-};
+const runAmrFinderString = (nucleicSequence, res) => {
+    const fastaFilePath = path.resolve('amr_sequence.fasta');
+    const fastaContent = `>sequence\n${nucleicSequence.replace(/\n/g, '')}`; 
+    fs.writeFileSync(fastaFilePath, fastaContent);  
 
-const runAmrFinderString = (nucleicString, res) => {
-    if (!isValidNucleotide(nucleicString)) {
-        return res.status(400).json({ error: "Chuỗi nucleotide không hợp lệ" });
-    }
-    const fastaContent = `>temp_sequence\n${nucleicString.trim()}`;
-    const tempFastaFilePath = path.resolve(__dirname, "temp_sequence_input.fasta");
-    fs.writeFileSync(tempFastaFilePath, fastaContent);
-    const outputFilePath = `${tempFastaFilePath}_amrfinder.tsv`;
-    const command = `amrfinder -n ${tempFastaFilePath} -o ${outputFilePath}`;
+    const outputFilePath = `${fastaFilePath}.csv`;  
+
+    const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
+
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error("AMRFinder error:", stderr); 
-            return res.status(500).json({ error: "Lỗi khi chạy AMRFinder" });
+            return res.status(500).json({ error: 'Lỗi khi chạy amrfinder' });
         }
-        fs.readFile(outputFilePath, "utf8", (err, data) => {
-            removeFiles([tempFastaFilePath, outputFilePath]);
+
+        fs.readFile(outputFilePath, 'utf8', (err, data) => {
             if (err) {
-                return res.status(500).json({ error: "Lỗi khi đọc kết quả AMRFinder" });
+                return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });
             }
+            fs.unlinkSync(fastaFilePath);
+            fs.unlinkSync(outputFilePath);
             res.json({ result: data });
         });
     });
 };
+
 module.exports = {
     runAmrFinder,
     runAmrFinderString
