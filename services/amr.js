@@ -32,36 +32,31 @@ const runAmrFinder = (filePath, res) => {
 };
 
 const runAmrFinderString = (nucleicSequence, res) => {
-    if (!nucleicSequence || typeof nucleicSequence !== 'string' || nucleicSequence.trim().length === 0) {
-        return res.status(400).json({ error: 'Chuỗi nucleotide không hợp lệ hoặc rỗng' });
+    // Kiểm tra chuỗi đầu vào có hợp lệ không
+    if (!nucleicSequence || typeof nucleicSequence !== "string" || !nucleicSequence.includes(">")) {
+        return res.status(400).json({ error: "Chuỗi nucleotide không hợp lệ" });
     }
 
-    const fastaFilePath = path.resolve('/tmp/amr_sequence.fasta');
-    const fastaContent = `>NODE_1_length_312632_cov_38.851190\n${nucleicSequence.replace(/(.{60})/g, '$1\n')}`;
-
-    try {
-        fs.writeFileSync(fastaFilePath, fastaContent, { encoding: 'utf8' });
-        console.log(`FASTA file created: ${fastaFilePath}`);
-        console.log(fastaContent);
-    } catch (err) {
-        console.error(`Lỗi khi ghi file FASTA: ${err.message}`);
-        return res.status(500).json({ error: 'Lỗi khi ghi tệp FASTA' });
-    }
+    // Ghi nội dung vào file FASTA tạm thời
+    const fastaFilePath = path.resolve(`/tmp/amr_sequence_${Date.now()}.fasta`);
+    fs.writeFileSync(fastaFilePath, nucleicSequence.trim() + "\n", { encoding: "utf8" });
 
     const outputFilePath = `${fastaFilePath}_amrfinder.tsv`;
     const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            return res.status(500).json({ error: 'Lỗi khi chạy amrfinder', details: stderr });
+            console.error(`Lỗi khi chạy amrfinder: ${stderr}`);
+            removeFiles([fastaFilePath, outputFilePath]);
+            return res.status(500).json({ error: "Lỗi khi chạy amrfinder", details: stderr });
         }
 
-        fs.readFile(outputFilePath, 'utf8', (err, data) => {
+        fs.readFile(outputFilePath, "utf8", (err, data) => {
+            removeFiles([fastaFilePath, outputFilePath]);
             if (err) {
-                return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });
+                console.error(`Lỗi khi đọc tệp kết quả: ${err.message}`);
+                return res.status(500).json({ error: "Lỗi khi đọc tệp kết quả" });
             }
-            fs.unlinkSync(fastaFilePath);
-            fs.unlinkSync(outputFilePath);
             res.json({ result: data });
         });
     });
