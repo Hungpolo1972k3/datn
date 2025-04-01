@@ -44,10 +44,13 @@ const runBlastn = (filePath, res) => {
                     const subjectstart = parseInt(fields[8]);
                     const subjectstop = parseInt(fields[9]);
                     const nucleicSequence = extractNucleicSequence(fastaData, subjectstart, subjectstop);
-                    sequences.push({ subject, nucleicSequence });
+                    sequences.push({ subject,subjectstart, subjectstop, nucleicSequence});
                 });
                 removeFiles([fastaFilePath, outputFilePath]);
-                res.json({ sequences });
+                res.json({ 
+                    data: blastLines,
+                    sequences 
+                });
             });
         });
     });
