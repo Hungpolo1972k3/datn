@@ -8,8 +8,13 @@ const runAbricate = (req, res) => {
 };
 
 const runAbricateString = (req,res) => {
-    const {string} = req.body;
-    virulenceService.runAbricateString(string, res)
+    const { string: fastaString } = req.body;
+
+    if (!fastaString || typeof fastaString !== "string") {
+        return res.status(400).json({ error: "Chuỗi FASTA không hợp lệ hoặc bị thiếu" });
+    }
+    
+    virulenceService.runAbricateString(fastaString, res);
 }
 module.exports = {
     runAbricate, 
