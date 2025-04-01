@@ -30,14 +30,16 @@ const runAmrFinder = (filePath, res) => {
         });
     });
 };
-
+const isValidNucleotide = (str) => /^[ATCGN\n]+$/i.test(str);
 const runAmrFinderString = (nucleicString, res) => {
-    const fastaContent = `>temp_sequence\n${nucleicString.replace(/\n/g, "").trim()}`;
+    if (!isValidNucleotide(nucleicString)) {
+        return res.status(400).json({ error: "Chuỗi nucleotide không hợp lệ" });
+    }
+    const fastaContent = `>temp_sequence\n${nucleicString.trim()}`;
     const tempFastaFilePath = path.resolve(__dirname, "temp_sequence_input.fasta");
     fs.writeFileSync(tempFastaFilePath, fastaContent);
     const outputFilePath = `${tempFastaFilePath}_amrfinder.tsv`;
     const command = `amrfinder -n ${tempFastaFilePath} -o ${outputFilePath}`;
-
     exec(command, (error, stdout, stderr) => {
         if (error) {
             console.error("AMRFinder error:", stderr); 
