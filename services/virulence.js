@@ -9,7 +9,21 @@ const removeFiles = (files) => {
         }
     });
 };
-
+const changeVirulenceInfo = (result) => {
+    const lines = result.trim().split('\n');
+    const headers = lines[0].split(',');
+    
+    const data = lines.slice(1).map(line => {
+        const values = line.split(',');
+        let obj = {};
+        headers.forEach((header, index) => {
+            obj[header] = values[index];
+        });
+        return obj;
+    });
+    
+    return JSON.stringify(data, null, 2);
+}
 const runAbricate = (filePath, res) => {
     const fastaFilePath = path.resolve(filePath);
     const outputFilePath = `${fastaFilePath}.csv`;
@@ -17,19 +31,19 @@ const runAbricate = (filePath, res) => {
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error(`Error running Abricate: ${stderr}`);
-            return res.status(500).json({ error: "Failed to process FASTA file" });
+            throw new Error("Lỗi" + error.message)
         }
 
         fs.readFile(outputFilePath, "utf8", (err, data) => {
             removeFiles([fastaFilePath, outputFilePath]);
             if (err) {
-                return res.status(500).json({ error: "Failed to read output file" });
+                throw new Error("Lỗi" + error.message)
             }
-            res.json({ result: data });
+            return changeVirulenceInfo(data);
         });
     });
 };
+
 
 module.exports = {
     runAbricate
