@@ -1,4 +1,5 @@
 const { exec } = require("child_process");
+const { error } = require("console");
 const fs = require("fs");
 const path = require("path");
 
@@ -10,23 +11,8 @@ const removeFiles = (files) => {
     });
 };
 
-const cutFastaSequence = (fastaFilePath, start, end, sequenceId) => {
-    return new Promise((resolve, reject) => {
-        fs.readFile(fastaFilePath, 'utf8', (err, data) => {
-            if (err) reject("Lỗi đọc file FASTA: " + err.message);
-            
-            const regex = new RegExp(`^>${sequenceId}[\\s\\S]+?^>`, 'gm'); 
-            const match = data.match(regex);
-
-            if (match && match[0]) {
-                const sequence = match[0].replace(/^>.*\n/, '').replace(/\n/g, ''); 
-                const subSequence = sequence.slice(start - 1, end); 
-                resolve(subSequence);
-            } else {
-                reject("Không tìm thấy chuỗi tương ứng với ID: " + sequenceId);
-            }
-        });
-    });
+const extractNucleicSequence = (fastaData, start, stop) => {
+    return fastaData.substring(start - 1, stop);
 };
 
 const runBlastn = (filePath, res) => {
@@ -36,32 +22,37 @@ const runBlastn = (filePath, res) => {
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            throw new Error("Lỗi " + error.message);
+            throw new Error("Lỗi: " + error.message);
         }
-        fs.readFile(outputFilePath, 'utf8', (err, data) => {
+
+        fs.readFile(outputFilePath, "utf8", (err, blastResult) => {
             if (err) {
-                throw new Error("Lỗi đọc kết quả blastn: " + err.message);
+                throw new Error("Lỗi: " + err.message);
             }
-            const results = data.split('\n').map(line => {
-                const cols = line.split('\t');
-                return {
-                    sequenceId: cols[1],
-                    subjectStart: parseInt(cols[8]),
-                    subjectStop: parseInt(cols[9])
-                };
-            });
-            Promise.all(results.map(result => {
-                return cutFastaSequence(fastaFilePath, result.subjectStart, result.subjectStop, result.sequenceId);
-            }))
-            .then(subSequences => {
-                res.json({ result: subSequences });
-            })
-            .catch(err => {
-                res.status(500).json({ error: err });
+
+            fs.readFile(fastaFilePath, "utf8", (err, fastaData) => {
+                if (err) {
+                    throw new Error("Lỗi: " + err.message);
+                }
+                const blastLines = blastResult.split("\n");
+                const sequences = [];
+
+                blastLines.forEach((line) => {
+                    const fields = line.split("\t");
+                    if (fields.length < 12) return; 
+                    const subject = fields[1];
+                    const subjectstart = parseInt(fields[8]);
+                    const subjectstop = parseInt(fields[9]);
+                    const nucleicSequence = extractNucleicSequence(fastaData, subjectstart, subjectstop);
+                    sequences.push({ subject, nucleicSequence });
+                });
+                removeFiles([fastaFilePath, outputFilePath]);
+                res.json({ sequences });
             });
         });
     });
 };
+
 module.exports = {
     runBlastn,
 };
