@@ -38,7 +38,7 @@ const runAbricateString = (nucleicSequence, res) => {
 
     const outputFilePath = `${fastaFilePath}.csv`;  
 
-    const command = `abricate --db vfdb --mincov 50 --minid 70 --csv ${fastaFilePath} > ${outputFilePath}`;
+    const command = `abricate --db vfdb --csv ${fastaFilePath} > ${outputFilePath}`;
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
