@@ -32,17 +32,24 @@ const runAmrFinder = (filePath, res) => {
 };
 
 const runAmrFinderString = (nucleicSequence, res) => {
+    if (!nucleicSequence || nucleicSequence.trim().length === 0) {
+        return res.status(400).json({ error: 'Chuỗi nucleotide rỗng' });
+    }
     const fastaFilePath = path.resolve('amr_sequence.fasta');
-    const fastaContent = `>sequence\n${nucleicSequence.replace(/\n/g, '')}`; 
-    fs.writeFileSync(fastaFilePath, fastaContent); 
+    const fastaContent = `>NODE_1_length_312632_cov_38_851190\n${nucleicSequence.replace(/(.{60})/g, '$1\n')}`;
+    try {
+        fs.writeFileSync(fastaFilePath, fastaContent);
+    } catch (err) {
+        console.error(`Lỗi khi ghi file: ${err.message}`);
+        return res.status(500).json({ error: 'Lỗi khi ghi tệp FASTA' });
+    }
 
-    const outputFilePath = `${fastaFilePath}_amrfinder.tsv`;  
+    const outputFilePath = `${fastaFilePath}_amrfinder.tsv`;
     const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error(`Error executing amrfinder: ${error.message}`);
-            return res.status(500).json({ error: 'Lỗi khi chạy amrfinder' });
+            return res.status(500).json({ error: 'Lỗi khi chạy amrfinder', details: stderr });
         }
         fs.readFile(outputFilePath, 'utf8', (err, data) => {
             if (err) {
@@ -55,6 +62,7 @@ const runAmrFinderString = (nucleicSequence, res) => {
         });
     });
 };
+
 module.exports = {
     runAmrFinder,
     runAmrFinderString
