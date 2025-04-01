@@ -40,16 +40,15 @@ const runBlastn = (filePath, res) => {
                 blastLines.forEach((line) => {
                     const fields = line.split("\t");
                     if (fields.length < 12) return; 
-                    const subject = fields[1];
-                    const subjectstart = parseInt(fields[8]);
-                    const subjectstop = parseInt(fields[9]);
-                    const nucleicSequence = extractNucleicSequence(fastaData, subjectstart, subjectstop);
-                    sequences.push({ subject,subjectstart, subjectstop, nucleicSequence});
-                });
+                    const query = fields[0]; 
+                    const querystart = parseInt(fields[6]); 
+                    const querystop = parseInt(fields[7]);
+                    const nucleicSequence = extractNucleicSequence(fastaData, querystart, querystop);
+                    sequences.push({ query, querystart, querystop, nucleicSequence });
+                });                
                 removeFiles([fastaFilePath, outputFilePath]);
                 res.json({ 
                     data: blastLines,
-                    blastOutput: stdout,
                     sequences 
                 });
             });
