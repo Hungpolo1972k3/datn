@@ -49,6 +49,7 @@ const runBlastn = (filePath, res) => {
                 removeFiles([fastaFilePath, outputFilePath]);
                 res.json({ 
                     data: blastLines,
+                    blastOutput: stdout,
                     sequences 
                 });
             });
