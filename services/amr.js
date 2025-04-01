@@ -40,14 +40,12 @@ const runAmrFinderString = (nucleicString, res) => {
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error("AMRFinder error:", stderr); 
-            removeFiles([tempFastaFilePath, outputFilePath]);
-            return res.status(500).json({ error: "Lỗi khi chạy AMRFinder" });
+            throw new Error("Lỗi" + error.message)
         }
         fs.readFile(outputFilePath, "utf8", (err, data) => {
             removeFiles([tempFastaFilePath, outputFilePath]);
             if (err) {
-                return res.status(500).json({ error: "Lỗi khi đọc kết quả AMRFinder" });
+                throw new Error("Lỗi" + err.message)
             }
             res.json({ result: data });
         });
