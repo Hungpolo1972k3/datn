@@ -31,37 +31,29 @@ const runAmrFinder = (filePath, res) => {
     });
 };
 
-const runAmrFinderString = (nucleicSequence, res) => {
-    // Kiểm tra chuỗi đầu vào có hợp lệ không
-    if (!nucleicSequence || typeof nucleicSequence !== "string" || !nucleicSequence.includes(">")) {
-        return res.status(400).json({ error: "Chuỗi nucleotide không hợp lệ" });
-    }
-
-    // Ghi nội dung vào file FASTA tạm thời
-    const fastaFilePath = path.resolve(`/tmp/amr_sequence_${Date.now()}.fasta`);
-    fs.writeFileSync(fastaFilePath, nucleicSequence.trim() + "\n", { encoding: "utf8" });
-
-    const outputFilePath = `${fastaFilePath}_amrfinder.tsv`;
-    const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
-
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Lỗi khi chạy amrfinder: ${stderr}`);
-            removeFiles([fastaFilePath, outputFilePath]);
-            return res.status(500).json({ error: "Lỗi khi chạy amrfinder", details: stderr });
+const runAmrFinderString = (nucleicString, res) => {
+    const tempFastaFilePath = path.resolve(__dirname, 'temp_input.fasta');
+    const fastaContent = `>temp_sequence\n${nucleicString}`;
+    fs.writeFile(tempFastaFilePath, fastaContent, (writeErr) => {
+        if (writeErr) {
+            throw new Error("Lỗi khi ghi vào file: " + writeErr.message);
         }
-
-        fs.readFile(outputFilePath, "utf8", (err, data) => {
-            removeFiles([fastaFilePath, outputFilePath]);
-            if (err) {
-                console.error(`Lỗi khi đọc tệp kết quả: ${err.message}`);
-                return res.status(500).json({ error: "Lỗi khi đọc tệp kết quả" });
+        const outputFilePath = `${tempFastaFilePath}_amrfinder.tsv`;
+        const command = `amrfinder -n ${tempFastaFilePath} -o ${outputFilePath}`;
+        exec(command, (error, stdout, stderr) => {
+            if (error) {
+                throw new Error("Lỗi khi chạy amrfinder: " + error.message);
             }
-            res.json({ result: data });
+            fs.readFile(outputFilePath, "utf8", (err, data) => {
+                removeFiles([tempFastaFilePath, outputFilePath]);
+                if (err) {
+                    throw new Error("Lỗi khi đọc file kết quả: " + err.message);
+                }
+                res.json({ result: data });
+            });
         });
     });
 };
-
 module.exports = {
     runAmrFinder,
     runAmrFinderString
