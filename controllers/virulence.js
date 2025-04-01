@@ -7,15 +7,16 @@ const runAbricate = (req, res) => {
     virulenceService.runAbricate(req.file.path, res);
 };
 
-const runAbricateString = (req,res) => {
-    const { string: fastaString } = req.body;
+const runAbricateString = (req, res) => {
+    const { fastaString } = req.body;
 
     if (!fastaString || typeof fastaString !== "string") {
         return res.status(400).json({ error: "Chuỗi FASTA không hợp lệ hoặc bị thiếu" });
     }
     
     virulenceService.runAbricateString(fastaString, res);
-}
+};
+
 module.exports = {
     runAbricate, 
     runAbricateString
