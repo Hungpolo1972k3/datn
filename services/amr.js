@@ -33,7 +33,7 @@ const runAmrFinder = (filePath, res) => {
 
 const runAmrFinderString = (nucleicString, res) => {
     const fastaContent = `>temp_sequence\n${nucleicString.replace(/\n/g, "").trim()}`;
-    const tempFastaFilePath = path.resolve(__dirname, "temp_input.fasta");
+    const tempFastaFilePath = path.resolve(__dirname, "temp_sequence_input.fasta");
     fs.writeFileSync(tempFastaFilePath, fastaContent);
     const outputFilePath = `${tempFastaFilePath}_amrfinder.tsv`;
     const command = `amrfinder -n ${tempFastaFilePath} -o ${outputFilePath}`;
