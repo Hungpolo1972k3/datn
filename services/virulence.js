@@ -5,61 +5,30 @@ const os = require("os");
 
 const removeFiles = (files) => {
     files.forEach((file) => {
-        if (fs.existsSync(file)) {
-            fs.unlinkSync(file);
-        }
+        fs.unlink(file, (err) => {
+            if (err) console.error(`Error deleting file ${file}: ${err.message}`);
+        });
     });
 };
 
 const runAbricate = (filePath, res) => {
     const fastaFilePath = path.resolve(filePath);
-    const outputFilePath = `${fastaFilePath}.csv`;
-    const command = `abricate --db vfdb --csv ${fastaFilePath} > ${outputFilePath}`;
+    const command = `abricate --db vfdb --csv ${fastaFilePath}`;
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            throw new Error("Lỗi" + error.message)
+            return res.status(500).json({ error: `Error executing Abricate: ${error.message}` });
         }
 
-        fs.readFile(outputFilePath, "utf8", (err, data) => {
-            removeFiles([fastaFilePath, outputFilePath]);
-            if (err) {
-                throw new Error("Lỗi" + error.message)
-            }
-            res.json({ result: data });
-        });
-    });
-};
-
-const runAbricateString = (nucleicSequence, res) => {
-    const fastaFilePath = path.resolve('virulence_sequence.fasta');
-    const fastaContent = `>sequence\n${nucleicSequence.replace(/\n/g, '')}`; 
-    fs.writeFileSync(fastaFilePath, fastaContent);  
-
-    const outputFilePath = `${fastaFilePath}.csv`;  
-
-    const command = `abricate --db vfdb --csv ${fastaFilePath} > ${outputFilePath}`;
-
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error executing abricate: ${error.message}`);
-            return res.status(500).json({ error: 'Lỗi khi chạy abricate' });
+        if (stderr) {
+            return res.status(500).json({ error: `Error in Abricate: ${stderr}` });
         }
+        res.json({ result: stdout });
 
-        fs.readFile(outputFilePath, 'utf8', (err, data) => {
-            if (err) {
-                return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });
-            }
-            fs.unlinkSync(fastaFilePath);
-            fs.unlinkSync(outputFilePath);
-            res.json({ result: data });
-        });
+        removeFiles([fastaFilePath]);
     });
 };
 
 module.exports = {
-    runAbricate,
-    runAbricateString
+    runAbricate
 };
-
-

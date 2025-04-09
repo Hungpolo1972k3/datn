@@ -6,6 +6,5 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 router.post("/amrfinder", upload.single("fasta"), amrController.runAmrFinder);
-router.post("/amrfinderstring", amrController.runAmrFinderString)
 
 module.exports = router;

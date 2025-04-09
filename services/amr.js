@@ -16,46 +16,25 @@ const runAmrFinder = (filePath, res) => {
     const outputFilePath = `${fastaFilePath}_amrfinder.csv`;
     const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
 
-    exec(command, (error, stdout, stderr) => {
+    exec(command, async (error, stdout, stderr) => {
         if (error) {
-            throw new Error("Lỗi" + error.message)
+            return res.status(500).json({ error: `Error executing command: ${error.message}` });
         }
 
-        fs.readFile(outputFilePath, "utf8", (err, data) => {
+        if (stderr) {
+            return res.status(500).json({ error: `Error in AMR Finder: ${stderr}` });
+        }
+        try {
+            const data = fs.readFileSync(outputFilePath, "utf8");
+            res.json({ result: data });
+        } catch (err) {
+            res.status(500).json({ error: `Error reading output file: ${err.message}` });
+        } finally {
             removeFiles([fastaFilePath, outputFilePath]);
-            if (err) {
-                throw new Error("Lỗi" + error.message)
-            }
-            res.json({ result: data });
-        });
-    });
-};
-const runAmrFinderString = (nucleicSequence, res) => {
-    const fastaFilePath = path.resolve('amr_sequence.fasta');
-    const fastaContent = `>sequence\n${nucleicSequence.replace(/\n/g, '')}`; 
-    fs.writeFileSync(fastaFilePath, fastaContent);  
-
-    const outputFilePath = `${fastaFilePath}.csv`;  
-
-    const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
-
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            return res.status(500).json({ error: 'Lỗi khi chạy amrfinder' });
         }
-
-        fs.readFile(outputFilePath, 'utf8', (err, data) => {
-            if (err) {
-                return res.status(500).json({ error: 'Lỗi khi đọc tệp kết quả' });
-            }
-            fs.unlinkSync(fastaFilePath);
-            fs.unlinkSync(outputFilePath);
-            res.json({ result: data });
-        });
     });
 };
 
 module.exports = {
-    runAmrFinder,
-    runAmrFinderString
+    runAmrFinder
 };
