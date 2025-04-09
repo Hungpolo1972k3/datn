@@ -1,0 +1,65 @@
+import axiosConfig from "../axiosConfig"
+export const apiUserRegister = async (data) => {
+    try {
+        const response = await axiosConfig.post('/api/user/register', data);
+        return response.data;
+    } catch (error) {
+        throw error.message;
+    }
+};
+
+export const apiUserLogin = async (data) => {
+    try {
+        const response = await axiosConfig.post('/api/user/login', data);
+        return response.data;
+    } catch (error) {
+        throw error.message;
+    }
+};
+
+export const apiGetUserById = async (token) => {
+    try {
+      const response = await axiosConfig.get("/api/user/getuserbyid", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || error.message;
+    }
+  };
+
+  
+  export const apiUpdateUserById = async ( user_id, email, username, phone, address, birthday, gender, career, workplace) => {
+    try {
+      const response = await axiosConfig.put(
+        `/api/user/updateuserinfo`,
+        {
+          email,
+          username,
+          phone,
+          address,
+          birthday,
+          gender,
+          career,
+          workplace,
+        },
+        {
+          params: { user_id },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || error.message;
+    }
+  };
+  
+  export const apiAllUsers = async() => {
+    try {
+      const response = await axiosConfig.get("/api/user/getallusers");
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || error.message;
+    }
+  };
