@@ -2,33 +2,31 @@ const mongoose = require('mongoose');
 const sampleSchema = new mongoose.Schema({
     name:{
         type: String,
-        require: true
+        required: true
     },
-    // Tên loài sinh vật
-    strain: {
-        type: String,
-        require: true
+    experiment_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    code: {
+        type: String
     },
     header: {
-        type: String,
-        require: true
-    },
-    sequence: {
-        type: String,
-        require: true
+        type: String
     },
     length:{
-        type: Number,
-        require: true
+        type: Number
     },
-    user_id: {
-        type: String,
-        require: true,
+    user_id:{
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
     },
-    status: {
-        type: Boolean,
-        default: true,
+    file_name: {
+        type: String
     },
+    fastaFilePath: {
+        type: String
+    }    
 },
 {
     timestamps: true

@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/getplasmidinfo', upload.single('fasta'), plasmidController.getPlasmidInfo);
-router.post('/saveplasmidinfo', plasmidController.savePlasmidInfo)
+// router.post('/saveplasmidinfo', plasmidController.savePlasmidInfo)
 router.get('/getallplasmidsbysampleid', plasmidController.getAllPlasmidBySampleId)
 router.get('/getplasmidbyid', plasmidController.getPlasmidById)
 

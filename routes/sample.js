@@ -3,8 +3,9 @@ const sampleController = require('../controllers/sample');
 const router = express.Router();
 
 router.post('/createsample', sampleController.createSample);
-router.get('/getsamplebyid', sampleController.getSampleById);
-router.put('/updatesamplebyid', sampleController.updateSampleById);
-router.get('/getallsamplesbyuserid', sampleController.getAllSamplesByUserId)
+
+router.get('/getsamplesbyexperimentid', sampleController.getSamplesByExperimentId);
+
+router.put('/editsample', sampleController.editSample)
 
 module.exports = router;

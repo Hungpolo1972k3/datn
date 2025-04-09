@@ -4,8 +4,9 @@ const registerUser = async (req, res) => {
     try {
         const user = await userService.createUser(req.body);
         res.status(201).json({
-            message: "Create user successfully !",
-            data: user.token
+            status: 1,
+            message: user ? "Create user successfully !" : "User is exist !",
+            data: user
         });
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -16,8 +17,9 @@ const loginUser = async (req, res) => {
     try {
         const user = await userService.loginUser(req.body);
         res.status(201).json({
+            status: 1,
             message: "Login successfully !",
-            data: user.token
+            data: user
         });
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -47,14 +49,14 @@ const getUserById = async (req, res) => {
 
 const updateUserInfo = async (req, res) => {
     try {
-        const { user_id } = req.params; // Lấy user_id từ params
-        const { email, username, address, birthday, gender, career, workplace } = req.body;
+        const { user_id } = req.query; 
+        const { email, username, phone, address, birthday, gender, career, workplace } = req.body;
 
         if (!user_id) {
             return res.status(400).json({ message: "Thiếu ID người dùng" });
         }
 
-        const updatedUser = await userService.updateUserInfo(user_id,email,username,address,birthday,gender,career,workplace);
+        const updatedUser = await userService.updateUserInfo(user_id,email,username,phone,address,birthday,gender,career,workplace);
 
         if (!updatedUser) {
             return res.status(404).json({ message: "Không tìm thấy người dùng" });
@@ -69,4 +71,16 @@ const updateUserInfo = async (req, res) => {
         return res.status(500).json({ message: "Lỗi server: " + error.message });
     }
 };
-module.exports = { registerUser, loginUser, getUserById, updateUserInfo };
+
+const getAllUsers = async(req, res) => {
+    try {
+        const users = await userService.getAllUsers();
+        return res.status(200).json({
+            message: "Lấy danh sách người dùng thành công",
+            data: users
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Lỗi: " + error.message });
+    }
+}
+module.exports = { registerUser, loginUser, getUserById, updateUserInfo, getAllUsers };

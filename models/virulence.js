@@ -1,71 +1,68 @@
 const mongoose = require('mongoose');
+
 const virulenceSchema = new mongoose.Schema({
-    // Định danh của trình tự gene
     sequence: {
-        type: String,
-        require: true
+        type: String
     },
     start: {
-        type: Number,
-        require: true
+        type: Number
     },
     stop: {
         type: Number,
-        require: true
+        required: true
     },
-    // Chiều của gene
     strand: {
         type: String,
-        require: true,
         enum: ["+", "-"]
     },
-    // Tên của gene
     gene: {
-        type: String,
-        require: true
+        type: String
     },
-    // Thông tin coverage mới
-    coverage_raw: {
-        type: String, // Dữ liệu này có dạng "1-2169/2169"
-        required: true,
+    coverage: {
+        type: Number
     },
-    coverage_map: {
-        type: String, // Dữ liệu dạng "========/======"
-        required: true,
+    identity: {
+        type: Number
     },
-    gaps: {
-        type: String, // Dữ liệu dạng "1/1"
-        required: true,
-    },
-    coverage:{
-        type: Number,
-        require: true
-    },
-    identity:{
-        type: Number,
-        require: true
-    },
-    // Mã định danh tham chiếu trong CSDL
     accession: {
-        type: String,
-        require: true
+        type: String
     },
-    product: {
-        type: String,
-        require: true
+    database: {
+        type: String
     },
-    // Khả năng kháng thuốc
+    nucleic: {
+        type: String
+    },
     resistance: {
-        type: Boolean,
-        default: true,
+        type: Boolean
     },
     sample_id: {
-        type: String,
-        require: true,
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Sample'
     },
-},
-{
+    description: {
+        type: String
+    },
+    group: {
+        type: String
+    },
+    vfdb_id: {
+        type: String
+    },
+    function_group: {
+        type: String
+    },
+    function_group_id: {
+        type: String
+    },
+    index: {
+        type: [String],
+        default: []
+    }
+}, {
     timestamps: true
 });
+
 const Virulence = mongoose.model('Virulence', virulenceSchema);
 module.exports = Virulence;

@@ -17,24 +17,30 @@ const getPlasmidInfo = async (file) => {
                 ...form.getHeaders(),
             },
         });
-        return response.data;
+        let plasmidResult = await changePlasmidInfo(response.data.data)
+        return {
+            a: response.data.data,
+            plasmid: plasmidResult,
+            plasmidCut: response.data.sequences
+        }
     } catch (error) {
         throw new Error('Failed to send file to the server');
     }
 };
 
-const savePlasmidInfo = async (result, sample_id) => {
+const changePlasmidInfo = async (result) => {
     try {
-        if (!result || typeof result !== 'string') {
-            throw new Error("Dữ liệu đầu vào không hợp lệ");
+        if (!Array.isArray(result)) {
+            throw new Error("Dữ liệu đầu vào không phải là mảng");
         }
 
-        const lines = result.trim().split("\n");
         const plasmidDocs = [];
 
-        for (const line of lines) {
+        for (const line of result) {
+            if (!line.trim()) continue; // Bỏ qua dòng trống
+
             const fields = line.split("\t");
-            if (fields.length < 12) continue; 
+            if (fields.length < 12) continue; // Bỏ qua dòng không đủ cột
 
             const plasmidData = {
                 query_id: fields[0],  
@@ -49,19 +55,17 @@ const savePlasmidInfo = async (result, sample_id) => {
                 subject_stop: parseInt(fields[9]),
                 e_value: fields[10], 
                 score: parseFloat(fields[11]),
-                sample_id: sample_id,
             };
 
             plasmidDocs.push(plasmidData);
         }
-
-        if (plasmidDocs.length > 0) {
-            await Plasmid.insertMany(plasmidDocs);
-        }
+        return plasmidDocs;
     } catch (error) {
-        throw new Error('Lỗi: ' + error.message);
+        console.error('Lỗi:', error.message);
+        throw error;
     }
 };
+
 
 const getAllPlasmidBySampleId = async(sample_id) =>{
     try {
@@ -82,7 +86,6 @@ const getPlasmidById = async(plasmid_id) =>{
 }
 module.exports = { 
     getPlasmidInfo,
-    savePlasmidInfo,
     getAllPlasmidBySampleId,
     getPlasmidById 
 };

@@ -3,7 +3,8 @@ const plasmidService = require('../services/plasmid');
 const getPlasmidInfo = async (req, res) => {
     try {
         const file = req.file;
-        const response = await plasmidService.getPlasmidInfo(file);
+        const {sample_id} = req.query
+        const response = await plasmidService.getPlasmidInfo(file, sample_id);
         return res.status(200).json({
             message: 'File successfully uploaded and processed',
             data: response,
@@ -12,18 +13,20 @@ const getPlasmidInfo = async (req, res) => {
         return res.status(500).json({ message: 'Internal server error', error: error.message });
     }
 };
-const savePlasmidInfo = async(req,res) =>{
-    try {
-        const {result, sample_id}= req.body;
-        const response = await plasmidService.savePlasmidInfo(result, sample_id);
-        return res.status(200).json({
-            message: 'Save Plasmid info successfully',
-            data: response,
-        });
-    } catch (error) {
-        return res.status(500).json({ message: 'Internal server error', error: error.message })
-    }
-}
+// const savePlasmidInfo = async(req,res) =>{
+//     try {
+//         const {result}= req.body;
+//         const {sample_id} = req.query;
+//         const response = await plasmidService.savePlasmidInfo(sample_id, result);
+//         return res.status(200).json({
+//             status: 1,
+//             message: 'Save Plasmid info successfully',
+//             data: response,
+//         });
+//     } catch (error) {
+//         return res.status(500).json({ message: 'Internal server error', error: error.message })
+//     }
+// }
 
 const getAllPlasmidBySampleId = async(req, res) =>{
     try {
@@ -55,7 +58,6 @@ const getPlasmidById = async(req,res) =>{
 }
 module.exports = {
     getPlasmidInfo,
-    savePlasmidInfo,
     getAllPlasmidBySampleId,
     getPlasmidById
 };

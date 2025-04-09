@@ -1,15 +1,18 @@
 const Sample = require('../models/sample');
+const crypto = require('crypto');
 
-const createSample = async (user_id, name, strain, header, sequence, length) => {
+const createSample = async (user_id, experiment_id,name, header, length, file_name, fastaFilePath) => {
     try {
+        const code = crypto.randomBytes(4).toString('hex');
         const newSample = new Sample({
-            user_id,
-            name,
-            strain,
-            header,
-            sequence,
-            length,
-            status: 1
+            user_id: user_id,
+            experiment_id: experiment_id,
+            name: name,
+            header: header,
+            length: length,
+            code: code,
+            file_name: file_name,
+            fastaFilePath: fastaFilePath || ""
         });
         const savedSample = await newSample.save();
         return savedSample;
@@ -18,52 +21,27 @@ const createSample = async (user_id, name, strain, header, sequence, length) => 
     }
 };
 
-const getSampleById = async (sample_id) => {
+const getSamplesByExperimentId = async(experiment_id) =>{
     try {
-        const sample = await Sample.findById(sample_id)
-        if(!sample){
-            throw new Error('Không tồn tại mẫu thí nghiệm tương ứng');
-        }
-        return sample;
-    } catch (error) {
-        throw new Error('Lỗi: ' + error.message);
-    }
-};
-
-
-const updateSampleById = async (sample_id, name, strain, header, sequence, length) => {
-    try {
-        const updatedSample = await Sample.findByIdAndUpdate(
-            sample_id,
-            {
-                name,
-                strain,
-                header,
-                sequence,
-                length,
-                updated_at: new Date()
-            },
-            { new: true } 
-        );
-        if (!updatedSample) {
-            throw new Error('Không tìm thấy mẫu thí nghiệm');
-        }
-
-        return updatedSample;
-    } catch (error) {
-        throw new Error('Lỗi khi cập nhật mẫu thí nghiệm: ' + error.message);
-    }
-};
-
-const getAllSamplesByUserId = async (user_id) => {
-    try {
-        const samples = await Sample.find({user_id: user_id})
-        if(!samples || samples.length > 0){
-            throw new Error('Không tồn tại mẫu thí nghiệm tương ứng');
-        }
+        const samples = await Sample.find({experiment_id: experiment_id});
         return samples;
     } catch (error) {
         throw new Error('Lỗi: ' + error.message);
     }
+}
+
+const editSample = async (experiment_id, name) => {
+    try {
+        const updatedSample = await Sample.findOneAndUpdate(
+            { experiment_id: experiment_id },
+            { name: name },
+            { new: true } 
+        );
+
+        return updatedSample;
+    } catch (error) {
+        throw new Error('Lỗi: ' + error.message);
+    }
 };
-module.exports = { createSample, getSampleById, updateSampleById, getAllSamplesByUserId};
+
+module.exports = { createSample, getSamplesByExperimentId, editSample };

@@ -15,6 +15,7 @@
     "babel": "^5.8.38",
     "bcryptjs": "^3.0.2",
     "body-parser": "^1.20.3",
+    "canvas": "^3.1.0",
     "config": "^3.3.12",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -37,6 +38,8 @@
     "node-cron": "^3.0.3",
     "node-fetch": "^3.3.2",
     "nodemon": "^3.1.9",
+    "plotly": "^1.0.6",
+    "puppeteer": "^24.5.0",
     "socket.io": "^4.8.1",
     "uuid": "^11.1.0"
   }
