@@ -5,58 +5,35 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const createUser = async (userData) => {
-    const { email, password, username, phone, address, birthday, gender, career, workplace } = userData;
-    let user;
-    const existingUser = await User.findOne({ email });
-    if (!existingUser) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        user = new User({
-            email,
-            password: hashedPassword,
-            username,
-            phone,
-            address,
-            birthday,
-            gender,
-            career,
-            workplace: workplace || '',
-        });
-        const token = jwt.sign({ userId: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-        await user.save();
-        return {user, token};
-    }
-};
-
-const loginUser = async ({ email, password }) => {
+const loginUser = async ({ email, password }, res) => {
     const user = await User.findOne({ email });
-
-    if (!user) {
-        throw new Error("Không tồn tại người dùng");
-    }
-
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
         throw new Error("Sai mật khẩu");
     }
 
-    let token = "";
+    const payload = {
+        userId: user._id,
+        role: user.role
+    };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,  
+        secure: process.env.NODE_ENV === "production", 
+        sameSite: "Strict", 
+        maxAge: 7 * 24 * 60 * 60 * 1000 
+    });
 
-    if (user.role === "ADMIN") {
-        token = jwt.sign(
-            { userId: user._id, role: "ADMIN" },  
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
-    } else {
-        token = jwt.sign(
-            { userId: user._id, role: user.role },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        );
-    }
-    return { token, user: { _id: user._id, role: user.role } };
+    return {
+        token,
+        user: {
+            _id: user._id,
+            role: user.role,
+            email: user.email,
+            username: user.username
+        }
+    };
 };
 
 const getUserById = async (token) => {
@@ -115,4 +92,35 @@ const getAllUsers = async () => {
     }
 };
 
-module.exports = { createUser, loginUser, getUserById, updateUserInfo, getAllUsers };
+const checkUser = async (email) => {
+    try {
+        const isExistUser = await User.findOne({email: email});
+        return !!isExistUser;
+    } catch (error) {
+        throw new Error("Lỗi : " + error.message);
+    }
+}
+
+const addUser = async ({ email, password, username, phone, birthday, gender, career, workplace, role }) => {
+    try {
+        const hashedPassword = await bcrypt.hash(password, parseInt(process.env.PASSWORD_HASH_NUMBER));
+        const newUser = new User({
+            email,
+            password: hashedPassword,
+            username,
+            phone,
+            birthday,
+            gender,
+            career,
+            workplace,
+            role,
+            status: true
+        });
+        await newUser.save();
+        return newUser;
+
+    } catch (error) {
+        throw new Error("Lỗi: " + error.message);
+    }
+};
+module.exports = { loginUser, getUserById, updateUserInfo, getAllUsers, checkUser, addUser };

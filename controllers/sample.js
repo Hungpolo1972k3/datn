@@ -46,5 +46,27 @@ const editSample = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+const deleteSample = async (req, res) => {
+    try {
+        const {id} = req.query;
+        await sampleService.deleteSample(id);
+        return res.status(200).json({
+            message: "Xóa mẫu thí nghiệm thành công"
+        })
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
 
-module.exports = { createSample, getSamplesByExperimentId, editSample };
+const getAllSamples = async(req, res) => {
+    try {
+        const samples = await sampleService.getAllSamples();
+        return res.status(200).json({
+            message: "Lấy danh sách mẫu thí nghiệm thành công",
+            data: samples
+        })
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+module.exports = { createSample, getSamplesByExperimentId, editSample, deleteSample, getAllSamples };

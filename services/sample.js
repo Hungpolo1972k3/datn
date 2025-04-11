@@ -44,4 +44,20 @@ const editSample = async (experiment_id, name) => {
     }
 };
 
-module.exports = { createSample, getSamplesByExperimentId, editSample };
+const deleteSample = async (id) => {
+    try {
+      await Sample.deleteOne({ _id: id });
+    } catch (error) {
+      throw new Error('Lỗi: ' + error.message);
+    }
+  };
+  
+const getAllSamples = async () => {
+    try {
+        const samples = await Sample.find();
+        return samples;
+    } catch (error) {
+        throw new Error('Lỗi: ' + error.message);
+    }
+}
+module.exports = { createSample, getSamplesByExperimentId, editSample, deleteSample, getAllSamples };

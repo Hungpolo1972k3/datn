@@ -4,6 +4,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const uploadDir = path.join(__dirname, 'uploads');
+const requireLogin = require('../utils/requireLogin')
 
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true }); 
@@ -20,11 +21,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post('/getvirulenceinfo', upload.single('fasta'), virulenceController.getVirulenceInfo);
+router.post('/getvirulenceinfo', requireLogin, upload.single('fasta'), virulenceController.getVirulenceInfo);
 
-router.get("/findvirulencesbykey", virulenceController.findVirlencesByKey);
-router.get('/getvirulencesbysampleid', virulenceController.getVirulencesBySampleId);
+router.get("/findvirulencesbykey", requireLogin, virulenceController.findVirlencesByKey);
+router.get('/getvirulencesbysampleid', requireLogin, virulenceController.getVirulencesBySampleId);
 
-router.get("/getallvirulencesgroup", virulenceController.getAllVirulenceGroup);
+router.get("/getallvirulencesgroup", requireLogin, virulenceController.getAllVirulenceGroup);
 
 module.exports = router;

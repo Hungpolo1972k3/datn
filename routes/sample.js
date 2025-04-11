@@ -1,11 +1,16 @@
 const express = require('express');
 const sampleController = require('../controllers/sample');
 const router = express.Router();
+const requireLogin = require('../utils/requireLogin')
 
-router.post('/createsample', sampleController.createSample);
+router.post('/createsample', requireLogin, sampleController.createSample);
 
-router.get('/getsamplesbyexperimentid', sampleController.getSamplesByExperimentId);
+router.get('/getsamplesbyexperimentid', requireLogin, sampleController.getSamplesByExperimentId);
 
-router.put('/editsample', sampleController.editSample)
+router.put('/editsample', requireLogin, sampleController.editSample)
 
+router.delete('/deletesample', requireLogin, sampleController.deleteSample);
+
+//ADMIN
+router.get('getallsamples', requireLogin, sampleController.getAllSamples);
 module.exports = router;

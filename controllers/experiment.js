@@ -48,11 +48,27 @@ const editExperiment = async(req, res) =>{
 }
 
 const experimentStatistic = async(req, res) => {
-    const {user_id} = req.query;
-    const data = await experimentService.experimentStatistic(user_id);
-    return res.status(200).json({
-        message: "Thống kê thành công",
-        data: data
-    })
+    try {
+        const {user_id} = req.query;
+        const data = await experimentService.experimentStatistic(user_id);
+        return res.status(200).json({
+            message: "Thống kê thành công",
+            data: data
+        })
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
 }
-module.exports = { createExperiment, getExperimentsByUserId, editExperiment, experimentStatistic };
+
+const getAllExperiments = async(req, res) => {
+    try {
+        const experiments = await experimentService.getAllExperiments();
+        return res.status(200).json({
+            message: "Lấy danh sách thí nghiệm thành công",
+            data: experiments
+        })
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+module.exports = { createExperiment, getExperimentsByUserId, editExperiment, experimentStatistic, getAllExperiments };

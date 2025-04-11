@@ -4,6 +4,7 @@ const router = express.Router();
 const fs = require('fs');
 const path = require('path');
 const uploadDir = path.join(__dirname, 'uploads');
+const requireLogin = require('../utils/requireLogin')
 
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true }); 
@@ -20,7 +21,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post('/getamrinfo', upload.single('fasta'), amrController.getAmrInfo);
+router.post('/getamrinfo', requireLogin, upload.single('fasta'), amrController.getAmrInfo);
 
-router.get('/getamrsbysampleid', amrController.getAmrsBySampleId);
+router.get('/getamrsbysampleid', requireLogin, amrController.getAmrsBySampleId);
 module.exports = router;

@@ -1,28 +1,22 @@
 const userService = require('../services/user');
-
-const registerUser = async (req, res) => {
-    try {
-        const user = await userService.createUser(req.body);
-        res.status(201).json({
-            status: 1,
-            message: user ? "Create user successfully !" : "User is exist !",
-            data: user
-        });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
 const loginUser = async (req, res) => {
     try {
-        const user = await userService.loginUser(req.body);
-        res.status(201).json({
+        const {email, password} = req.body;
+        const isExistUser = await userService.checkUser(email);
+        if(!isExistUser) {
+            return res.status(400).json({
+                message: "Không tồn tại người dùng",
+                data: null
+            })
+        }
+        const user = await userService.loginUser({email, password}, res);
+        return res.status(201).json({
             status: 1,
             message: "Login successfully !",
             data: user
         });
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
     }
 };
 
@@ -43,7 +37,7 @@ const getUserById = async (req, res) => {
             data: user
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 
@@ -83,4 +77,24 @@ const getAllUsers = async(req, res) => {
         return res.status(500).json({ message: "Lỗi: " + error.message });
     }
 }
-module.exports = { registerUser, loginUser, getUserById, updateUserInfo, getAllUsers };
+
+const addUser = async(req, res) => {
+    try {
+        const {email, password, username, phone, birthday, gender, career, workplace, role} = req.body;
+        const isExistUser = await userService.checkUser(email);
+        if(isExistUser) {
+            return res.status(400).json({
+                message: "Đã tồn tại người dùng",
+                data: null
+            })
+        }
+        const newuser = await userService.addUser({email, password, username, phone, birthday, gender, career, workplace, role});
+        return res.status(200).json({
+            message: "Thêm người dùng thành công",
+            data: newuser
+        })
+    } catch (error) {
+        return res.status(500).json({ message: "Lỗi: " + error.message });
+    }
+}
+module.exports = {loginUser, getUserById, updateUserInfo, getAllUsers, addUser };

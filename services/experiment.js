@@ -61,4 +61,13 @@ const experimentStatistic = async(user_id) => {
     }
 }
 
-module.exports = { createExperiment, getExperimentsByUserId , editExperiment, experimentStatistic};
+const getAllExperiments = async () => {
+    try {
+        const experiments = await Experiment.find();
+        return experiments;
+    } catch (error) {
+        throw new Error('Lỗi: ' + error.message);
+    }
+}
+
+module.exports = { createExperiment, getExperimentsByUserId , editExperiment, experimentStatistic, getAllExperiments };
