@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
+import { useTranslation } from "react-i18next";
 
 const slideIn = keyframes`
   from {
@@ -72,6 +73,8 @@ const Progress = styled.div`
 
 const Notice = ({ label, content }) => {
   const [visible, setVisible] = useState(true);
+  const { t } = useTranslation();
+
   const success = label === 1;
   const icon = success ? "✔️" : "❌";
 
@@ -86,7 +89,7 @@ const Notice = ({ label, content }) => {
     <NoticeContainer success={success}>
       <IconRow>
         <Icon>{icon}</Icon>
-        <span>{success ? "Thành công" : "Lỗi"}</span>
+        <span>{success ? t("noticeComponent.success") : t("noticeComponent.error")}</span>
       </IconRow>
       <Content>{content}</Content>
       <ProgressBar>

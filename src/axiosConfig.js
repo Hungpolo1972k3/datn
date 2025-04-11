@@ -1,31 +1,42 @@
 import axios from "axios";
 
 const instance = axios.create({
-    baseURL: process.env.REACT_APP_SERVER_URL
-})
-
-// Add a request interceptor
-instance.interceptors.request.use(function (config) {
-  let tokenRaw = window.localStorage.getItem("persist:auth");
-  let token = tokenRaw ? JSON.parse(tokenRaw)?.token?.replace(/^"|"$/g, "") : null;
-
-  if (token) {
-    config.headers["Authorization"] = `Bearer ${token}`;
-  }
-
-  return config;
-}, function (error) {
-  return Promise.reject(error);
+  baseURL: process.env.REACT_APP_SERVER_URL,
 });
 
+instance.interceptors.request.use(
+  function (config) {
+    const tokenRaw = window.localStorage.getItem("persist:auth");
+    let token = null;
 
-// Add a response interceptor
-instance.interceptors.response.use(function (response) {
-    // refresh token
-    return response;
-}, function (error) {
+    if (tokenRaw) {
+      try {
+        const parsed = JSON.parse(tokenRaw); 
+        const userData = parsed.user ? JSON.parse(parsed.user) : null;
+        token = userData?.token;
+      } catch (err) {
+        console.error("Error parsing token from localStorage:", err);
+      }
+    }
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  function (error) {
     return Promise.reject(error);
-});
+  }
+);
 
+instance.interceptors.response.use(
+  function (response) {
+    return response;
+  },
+  function (error) {
+    return Promise.reject(error);
+  }
+);
 
-export default instance
+export default instance;

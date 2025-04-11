@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 
 const TableContainer = styled.div`
   width: 100%;
@@ -56,6 +57,7 @@ const EyeIcon = styled.span`
 `;
 
 const VirulenceTable = ({ data }) => {
+  const { t } = useTranslation();
   const [visibleRows, setVisibleRows] = useState({});
 
   const toggleNucleic = (index) => {
@@ -66,21 +68,21 @@ const VirulenceTable = ({ data }) => {
   };
 
   const headers = [
-    "Index",
-    "Sequence",
-    "Gene",
-    "Start",
-    "Stop",
-    "Strand",
-    "Identity (%)",
-    "Coverage (%)",
-    "Accession",
-    "Nucleic",
+    t("virulenceComponent.index"),
+    t("virulenceComponent.sequence"),
+    t("virulenceComponent.gene"),
+    t("virulenceComponent.start"),
+    t("virulenceComponent.stop"),
+    t("virulenceComponent.strand"),
+    t("virulenceComponent.identity"),
+    t("virulenceComponent.coverage"),
+    t("virulenceComponent.accession"),
+    t("virulenceComponent.nucleic"),
   ];
 
   return (
     <TableContainer>
-      <Title>Virulence Data</Title>
+      <Title>{t("virulenceComponent.title")}</Title>
       <TableWrapper>
         <Table>
           <thead>

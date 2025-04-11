@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import ResultComponent from './ResultComponent';
 import { apiGetVirulencesBySampleId } from '../service/virulence';
 import { apiGetAmrsBySampleId } from '../service/amr';
+import { useTranslation } from 'react-i18next';
 
 const PopUpContainer = styled.div`
   position: fixed;
@@ -85,6 +86,7 @@ const Icon = styled.span`
 `;
 
 const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
+  const { t } = useTranslation();
   const [virulenceInfo, setVirulenceInfo] = useState([]);
   const [amrInfo, setAmrInfo] = useState([]);
   const [showResultAll, setShowResultAll] = useState(false);
@@ -110,18 +112,18 @@ const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
     <PopUpContainer>
       <PopUpForm>
         <CloseButton onClick={closeModal}>×</CloseButton>
-        <Title>Thông Tin Thí Nghiệm</Title>
+        <Title>{t('experimentInfoComponent.title')}</Title>
         <Table>
           <thead>
             <tr>
-              <TableHeader>STT</TableHeader>
-              <TableHeader>Mẫu Thí Nghiệm</TableHeader>
-              <TableHeader>Mã Code</TableHeader>
-              <TableHeader>Header</TableHeader>
-              <TableHeader>Chiều dài mẫu</TableHeader>
-              <TableHeader>Tên Tệp FASTA</TableHeader>
-              <TableHeader>Thời gian tạo</TableHeader>
-              <TableHeader>Chi Tiết</TableHeader>
+              <TableHeader>{t('experimentInfoComponent.index')}</TableHeader>
+              <TableHeader>{t('experimentInfoComponent.sampleName')}</TableHeader>
+              <TableHeader>{t('experimentInfoComponent.sampleCode')}</TableHeader>
+              <TableHeader>{t('experimentInfoComponent.header')}</TableHeader>
+              <TableHeader>{t('experimentInfoComponent.length')}</TableHeader>
+              <TableHeader>{t('experimentInfoComponent.fileName')}</TableHeader>
+              <TableHeader>{t('experimentInfoComponent.createdTime')}</TableHeader>
+              <TableHeader>{t('experimentInfoComponent.details')}</TableHeader>
             </tr>
           </thead>
           <tbody>
@@ -134,26 +136,34 @@ const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
                 <TableData>{experiment.length}</TableData>
                 <TableData>
                   {experiment.file_name}
-                  <Icon onClick={() => alert('Tải xuống tệp FASTA')}>⤓</Icon>
+                  <Icon onClick={() => alert(t('experimentInfoComponent.downloadFile'))}>⤓</Icon>
                 </TableData>
                 <TableData>
-                  {new Date(experiment.createdAt).toLocaleString("vi-VN", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
+                  {new Date(experiment.createdAt).toLocaleString('vi-VN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
                   })}
                 </TableData>
                 <TableData>
-                  <Icon onClick={() => handleGetResult(index)}>{showResult[index] ? '🧐' : '🔍'}</Icon>
+                  <Icon onClick={() => handleGetResult(index)}>
+                    {showResult[index] ? '🧐' : '🔍'}
+                  </Icon>
                 </TableData>
               </TableRow>
             ))}
           </tbody>
         </Table>
-        {showResultAll && <ResultComponent fastaInfo={fastaInfo} virulenceInfo={virulenceInfo} amrInfo={amrInfo} />}
+        {showResultAll && (
+          <ResultComponent
+            fastaInfo={fastaInfo}
+            virulenceInfo={virulenceInfo}
+            amrInfo={amrInfo}
+          />
+        )}
       </PopUpForm>
     </PopUpContainer>
   );

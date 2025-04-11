@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 
 const TableContainer = styled.div`
   width: 100%;
@@ -38,31 +39,33 @@ const Td = styled.td`
 `;
 
 const FastaTable = ({ sample }) => {
+  const { t } = useTranslation();
+
   return (
     <TableContainer>
-      <Title>Thông tin mẫu thí nghiệm</Title>
+      <Title>{t("fastaComponent.title")}</Title>
       <Table>
         <thead>
           <tr>
-            <Th>Trường dữ liệu</Th>
-            <Th>Giá trị</Th>
+            <Th>{t("fastaComponent.field")}</Th>
+            <Th>{t("fastaComponent.value")}</Th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <Td>Name</Td>
+            <Td>{t("fastaComponent.name")}</Td>
             <Td>{sample.name}</Td>
           </tr>
           <tr>
-            <Td>Header</Td>
+            <Td>{t("fastaComponent.header")}</Td>
             <Td>{sample.header}</Td>
           </tr>
           <tr>
-            <Td>Length</Td>
+            <Td>{t("fastaComponent.length")}</Td>
             <Td>{sample.length}</Td>
           </tr>
           <tr>
-            <Td>Created Time</Td>
+            <Td>{t("fastaComponent.createdTime")}</Td>
             <Td>{new Date(sample.createdAt).toLocaleString()}</Td>
           </tr>
         </tbody>

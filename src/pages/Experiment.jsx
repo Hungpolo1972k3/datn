@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import ExperimentAddPopup from "../components/ExperimentAdd"; 
+import ExperimentAddPopup from "../components/ExperimentAdd";
 import ExperimentInfo from '../components/ExperimentInfo';
 import { useDispatch, useSelector } from "react-redux";
 import { apiGetExperimentsByUserId } from "../service/experiment";
 import { apiGetSamplesByExperimentId } from '../service/sample';
 import ExperimentEdit from '../components/ExperimentEdit';
+import { useTranslation } from "react-i18next";
 
 const Container = styled.div`
   display: flex;
@@ -97,6 +98,7 @@ const EditWrapper = styled.div`
 `;
 
 const ExperimentPage = () => {
+  const { t } = useTranslation();
   const { userId } = useSelector((state) => state.user);
   const [showModal, setShowModal] = useState(false);
   const [experiments, setExperiments] = useState([]);
@@ -106,11 +108,13 @@ const ExperimentPage = () => {
 
   const [showModalInfo, setShowModalInfo] = useState(false);
   const [sampleInfo, setSampleInfo] = useState([]);
+
   const handleViewDetails = async (id) => {
     setShowModalInfo(true);
     let samples = await apiGetSamplesByExperimentId(id);
     setSampleInfo(samples.data);
   };
+
   const closeModalInfo = () => setShowModalInfo(false);
 
   const [showEditPopup, setShowEditPopup] = useState(false);
@@ -143,23 +147,22 @@ const ExperimentPage = () => {
   return (
     <Container>
       <Wrapper>
-        <Title>Danh sách thí nghiệm</Title>
+        <Title>{t('experimentPage.experimentList')}</Title>
 
         <ButtonWrapper>
-          <Button onClick={openModal}>Thêm thí nghiệm</Button>
+          <Button onClick={openModal}>{t('experimentPage.addExperiment')}</Button>
         </ButtonWrapper>
 
-        {/* Table to display experiments */}
         <Table>
           <thead>
             <tr>
-              <TableHeader>STT</TableHeader>
-              <TableHeader>Tên thí nghiệm</TableHeader>
-              <TableHeader>Mã thí nghiệm</TableHeader>
-              <TableHeader>Người thực hiện</TableHeader>
-              <TableHeader>Thời gian tạo</TableHeader>
-              <TableHeader>Chi tiết</TableHeader>
-              <TableHeader>Chỉnh sửa</TableHeader>
+              <TableHeader>{t('experimentPage.no')}</TableHeader>
+              <TableHeader>{t('experimentPage.experimentName')}</TableHeader>
+              <TableHeader>{t('experimentPage.experimentCode')}</TableHeader>
+              <TableHeader>{t('experimentPage.performer')}</TableHeader>
+              <TableHeader>{t('experimentPage.createdTime')}</TableHeader>
+              <TableHeader>{t('experimentPage.detail')}</TableHeader>
+              <TableHeader>{t('experimentPage.edit')}</TableHeader>
             </tr>
           </thead>
           <tbody>
@@ -181,19 +184,20 @@ const ExperimentPage = () => {
                 <TableData>
                   <ViewDetailsWrapper onClick={() => handleViewDetails(experiment._id)}>
                     <span>🔍</span>
-                    <span style={{ marginLeft: '8px' }}>Chi tiết</span>
+                    <span style={{ marginLeft: '8px' }}>{t('experimentPage.detail')}</span>
                   </ViewDetailsWrapper>
                 </TableData>
                 <TableData>
                   <EditWrapper onClick={() => handleEditClick(experiment)}>
                     <span>✏️</span>
-                    <span style={{ marginLeft: '8px' }}>Chỉnh sửa</span>
+                    <span style={{ marginLeft: '8px' }}>{t('experimentPage.edit')}</span>
                   </EditWrapper>
                 </TableData>
               </TableRow>
             ))}
           </tbody>
         </Table>
+
         <ExperimentInfo showModal={showModalInfo} closeModal={closeModalInfo} experiments={sampleInfo} />
         <ExperimentAddPopup showModal={showModal} closeModal={closeModal} />
         {showEditPopup && (

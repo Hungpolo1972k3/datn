@@ -1,8 +1,9 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
 import { Facebook, Twitter, Linkedin } from "lucide-react";
+import { useTranslation } from "react-i18next"; // ⬅ import hook
 
-// Tạo hiệu ứng chuyển động cho background
+// Gradient animation
 const gradientAnimation = keyframes`
   0% {
     background: linear-gradient(135deg, #a7c7e7 0%, #3b7b9e 100%);
@@ -16,7 +17,7 @@ const gradientAnimation = keyframes`
 `;
 
 const FooterContainer = styled.footer`
-  animation: ${gradientAnimation} 8s ease infinite;  /* Chạy chuyển động liên tục */
+  animation: ${gradientAnimation} 8s ease infinite;
   padding: 30px;
   display: flex;
   flex-wrap: wrap;
@@ -112,6 +113,8 @@ const Copyright = styled.div`
 `;
 
 const Footer = () => {
+  const { t } = useTranslation(); // ⬅ dùng hook
+
   return (
     <FooterContainer>
       <LogoSection>
@@ -119,25 +122,25 @@ const Footer = () => {
       </LogoSection>
 
       <Column>
-        <h4>Về chúng tôi</h4>
+        <h4>{t("footerComponent.about_us")}</h4>
         <ul>
-          <li>Giới thiệu</li>
-          <li>Liên hệ</li>
-          <li>Blog</li>
+          <li>{t("footerComponent.introduction")}</li>
+          <li>{t("footerComponent.contact")}</li>
+          <li>{t("footerComponent.blog")}</li>
         </ul>
       </Column>
 
       <Column>
-        <h4>Hỗ trợ</h4>
+        <h4>{t("footerComponent.support")}</h4>
         <ul>
-          <li>FAQs</li>
-          <li>Chính sách bảo mật</li>
-          <li>Điều khoản sử dụng</li>
+          <li>{t("footerComponent.faqs")}</li>
+          <li>{t("footerComponent.privacy_policy")}</li>
+          <li>{t("footerComponent.terms_of_use")}</li>
         </ul>
       </Column>
 
       <Column>
-        <h4>Kết nối với chúng tôi</h4>
+        <h4>{t("footerComponent.connect_with_us")}</h4>
         <SocialIcons>
           <IconWrapper href="https://facebook.com" target="_blank" rel="noopener noreferrer" color="#3b5998">
             <Facebook />
@@ -151,7 +154,7 @@ const Footer = () => {
         </SocialIcons>
       </Column>
 
-      <Copyright>© 2025 Acinetobacter Baumannii. All rights reserved.</Copyright>
+      <Copyright>© 2025 {t("footerComponent.copyright")}</Copyright>
     </FooterContainer>
   );
 };

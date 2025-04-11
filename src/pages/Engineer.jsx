@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { apiAllUsers } from "../service/user";
+import { useTranslation } from "react-i18next"; 
 
 const Container = styled.div`
   margin-top: 50px;
@@ -59,7 +60,7 @@ const EngineerAvatar = styled.div`
 const EngineerRole = styled.div`
   font-size: 25px;
   font-weight: bold;
-  color: ${(props) => (props.role === "ADMIN" ? "#007bff" : "#555")}; // Màu sắc khác cho ADMIN
+  color: ${(props) => (props.role === "ADMIN" ? "#007bff" : "#555")};
   margin-top: 10px;
 `;
 
@@ -94,6 +95,7 @@ const EngineerValue = styled.span`
 
 const Engineers = () => {
   const [engineersData, setEngineersData] = useState([]);
+  const { t } = useTranslation(); 
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -108,11 +110,10 @@ const Engineers = () => {
     fetchUsers();
   }, []);
 
-
   return (
     <Container>
       <Wrapper>
-        <Title>Danh sách người dùng</Title>
+        <Title>{t("engineersPage.title")}</Title>
         <EngineersContainer>
           {engineersData.map((engineer, index) => (
             <EngineerCard key={index} role={engineer.role}>
@@ -123,17 +124,19 @@ const Engineers = () => {
                     : "/default_avatar_female.jpg"
                 }
               />
-              <EngineerRole role={engineer.role}>{engineer.role}</EngineerRole> 
+              <EngineerRole role={engineer.role}>
+                {`${engineer.role}`}
+              </EngineerRole>
               <EngineerField>
-                <EngineerLabel>Họ và tên:</EngineerLabel>
+                <EngineerLabel>{t("engineersPage.full_name")}</EngineerLabel>
                 <EngineerValue>{engineer.username}</EngineerValue>
-                <EngineerLabel1>Giới tính:</EngineerLabel1>
+                <EngineerLabel1>{t("engineersPage.gender")}</EngineerLabel1>
                 <EngineerValue>{engineer.gender}</EngineerValue>
               </EngineerField>
               <EngineerField>
-                <EngineerLabel>Số điện thoại:</EngineerLabel>
+                <EngineerLabel>{t("engineersPage.phone")}</EngineerLabel>
                 <EngineerValue>{engineer.phone}</EngineerValue>
-                <EngineerLabel1>Năm sinh:</EngineerLabel1>
+                <EngineerLabel1>{t("engineersPage.birth_year")}</EngineerLabel1>
                 <EngineerValue>
                   {new Date(engineer.birthday).toLocaleString("vi-VN", {
                     day: "2-digit",
@@ -143,25 +146,25 @@ const Engineers = () => {
                 </EngineerValue>
               </EngineerField>
               <EngineerField>
-                <EngineerLabel>Email:</EngineerLabel>
+                <EngineerLabel>{t("engineersPage.email")}</EngineerLabel>
                 <EngineerValue>{engineer.email}</EngineerValue>
               </EngineerField>
               <EngineerField>
-                <EngineerLabel>Địa chỉ:</EngineerLabel>
+                <EngineerLabel>{t("engineersPage.address")}</EngineerLabel>
                 <EngineerValue>{engineer.address}</EngineerValue>
               </EngineerField>
               <EngineerField>
-                <EngineerLabel>Nghề Nghiệp:</EngineerLabel>
+                <EngineerLabel>{t("engineersPage.career")}</EngineerLabel>
                 <EngineerValue>{engineer.career}</EngineerValue>
               </EngineerField>
               <EngineerField>
-                <EngineerLabel>Nơi làm việc:</EngineerLabel>
+                <EngineerLabel>{t("engineersPage.workplace")}</EngineerLabel>
                 <EngineerValue>{engineer.workplace}</EngineerValue>
               </EngineerField>
               <EngineerField>
-                <EngineerLabel>Thí nghiệm:</EngineerLabel>
+                <EngineerLabel>{t("engineersPage.experiments")}</EngineerLabel>
                 <EngineerValue>{engineer.countExperiment}</EngineerValue>
-                <EngineerLabel>Mẫu thí nghiệm:</EngineerLabel>
+                <EngineerLabel>{t("engineersPage.samples")}</EngineerLabel>
                 <EngineerValue>{engineer.countSample}</EngineerValue>
               </EngineerField>
             </EngineerCard>

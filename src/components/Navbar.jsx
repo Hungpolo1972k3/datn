@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
-import { User } from "lucide-react"; 
+import { User, Settings } from "lucide-react"; 
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/userSlice";
@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import UserInfoPopup from "./UserInfo";
 import { useNotice } from "../context/NoticeContext";
 import { apiGetUserById } from "../service/user";
+import "../i18next";
+import { useTranslation } from "react-i18next";
 // Styles for components
 const Container = styled.div`
   position: sticky;
@@ -151,8 +153,56 @@ const BackgroundOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.3); // màu xám mờ
-  z-index: 999; // nằm dưới popup nhưng trên phần còn lại
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 999; 
+`;
+
+const SettingsIcon = styled(Settings)`
+  width: 30px;
+  height: 30px;
+  color: #59595e;
+  cursor: pointer;
+  margin-left: 20px;
+  padding: 5px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  background-color: #f0f0f0;
+
+  &:hover {
+    color: white;
+    background-color: #5dade2;
+    transform: scale(1.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const LanguageDropdown = styled.div`
+  position: absolute;
+  top: 50px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: ${({ show }) => (show ? "block" : "none")};
+  padding: 10px;
+  border-radius: 4px;
+  z-index: 10;
+`;
+const LanguageItem = styled.div`
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  background-color: ${({ isSelected }) => (isSelected ? "#d6eaf8" : "white")};
+
+  &:hover {
+    background-color: ${({ isSelected }) => (isSelected ? "#d6eaf8" : "#f0f0f0")};
+  }
+
+  img {
+    width: 20px;
+    height: 15px;
+  }
 `;
 
 const Navbar = () => {
@@ -175,7 +225,7 @@ const Navbar = () => {
     dispatch(logout());
     setShowModal(false);
     navigate("/");
-    showNotice(1, "Đăng xuất thành công") 
+    showNotice(1, t('navbarComponent.logoutSuccess')) 
   };
 
   // Cancel logout
@@ -193,64 +243,94 @@ const Navbar = () => {
     setUserInfo(res.data);
   }
   const handleClosePopup = () => setIsPopupOpen(false);
+
+  const { t, i18n } = useTranslation();
+
+  const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  const handleSelectLanguage = (lang) => {
+    i18n.changeLanguage(lang).then(() => {
+      setShowLanguageDropdown(false);
+      window.location.reload(); 
+    });
+  };
+  
+  
   return (
     <Container>
       <Wrapper>
         <NavLink to="/">
-          {({ isActive }) => <Button isActive={isActive}>Trang chủ</Button>}
+          {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.home')}</Button>}
         </NavLink>
         {isLogin && (
-        <NavLink to="/experiment">
-          {({ isActive }) => <Button isActive={isActive}>Thí nghiệm</Button>}
-        </NavLink>
+          <NavLink to="/experiment">
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.experiment')}</Button>}
+          </NavLink>
         )}
-
         {isLogin && (
-         <NavLink to="/submit">
-         {({ isActive }) => <Button isActive={isActive}>Mẫu thí nghiệm</Button>}
-          </NavLink>         
+          <NavLink to="/submit">
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.sample')}</Button>}
+          </NavLink>
         )}
-        {isLogin &&(
-            <NavLink to="/statistic">
-                {({ isActive }) => <Button isActive={isActive}>Thống kê</Button>}
-            </NavLink>
+        {isLogin && (
+          <NavLink to="/statistic">
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.statistic')}</Button>}
+          </NavLink>
         )}
-        {isLogin && isLoginAdmin &&(
-            <NavLink to="/engineer">
-              {({ isActive }) => <Button isActive={isActive}>Người dùng</Button>}
-            </NavLink>
+        {isLogin && isLoginAdmin && (
+          <NavLink to="/engineer">
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.users')}</Button>}
+          </NavLink>
         )}
         {!isLogin && (
           <NavLink to="/login">
-            {({ isActive }) => <Button isActive={isActive}>Đăng nhập</Button>}
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.login')}</Button>}
           </NavLink>
         )}
+        <SettingsIcon onClick={() => setShowLanguageDropdown(!showLanguageDropdown)} title={t('settings')} />
+        <LanguageDropdown show={showLanguageDropdown}>
+          <LanguageItem
+            onClick={() => handleSelectLanguage('vi')}
+            isSelected={i18n.language === 'vi'}
+          >
+            <img src="https://flagcdn.com/w40/vn.png" alt="Vietnamese" />
+            Tiếng Việt
+          </LanguageItem>
+          <LanguageItem
+            onClick={() => handleSelectLanguage('en')}
+            isSelected={i18n.language === 'en'}
+          >
+            <img src="https://flagcdn.com/w40/gb.png" alt="English" />
+            English
+          </LanguageItem>
+        </LanguageDropdown>
 
         {isLogin && (
           <>
             <UserIcon onClick={() => setShowDropdown(!showDropdown)} />
             <DropdownMenu show={showDropdown}>
-              <DropdownItem onClick={() => handleOpenPopup()}>
-                Xem thông tin tài khoản
+              <DropdownItem onClick={handleOpenPopup}>
+                {t('navbarComponent.account_info')}
               </DropdownItem>
-              <DropdownItem onClick={handleLogout}>Đăng Xuất</DropdownItem>
+              <DropdownItem onClick={handleLogout}>{t('navbarComponent.logout')}</DropdownItem>
             </DropdownMenu>
           </>
         )}
       </Wrapper>
+
       {isPopupOpen && <BackgroundOverlay />}
       <UserInfoPopup openPopup={isPopupOpen} closePopup={handleClosePopup} userInfo={userInfo} />
 
 
       <ModalBackground show={showModal}>
         <Modal>
-          <h3>Bạn có chắc chắn muốn đăng xuất?</h3>
+          <h3>{t('navbarComponent.confirm_logout')}</h3>
           <div className="button-container">
-            <button onClick={confirmLogout}>Có</button>
-            <button onClick={cancelLogout}>Hủy</button>
+            <button onClick={confirmLogout}>{t('navbarComponent.yes')}</button>
+            <button onClick={cancelLogout}>{t('navbarComponent.cancel')}</button>
           </div>
         </Modal>
       </ModalBackground>
+
     </Container>
   );
 };

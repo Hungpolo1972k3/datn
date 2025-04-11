@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import {apiUpdateUserById} from "../service/user";
 import { useNotice } from "../context/NoticeContext";
+import { useTranslation } from "react-i18next";
+
 const PopupContainer = styled.div`
   position: fixed;
   top: 50%;
@@ -98,63 +100,66 @@ const Button = styled.button`
 `;
 
 const fieldMap = {
-  email: "Email",
-  username: "Họ và tên",
-  address: "Địa chỉ",
-  phone: "Số điện thoại",
-  birthday: "Ngày sinh",
-  gender: "Giới tính",
-  career: "Nghề nghiệp",
-  workplace: "Địa điểm làm việc",
+  email: "userInfoComponent.email",
+  username: "userInfoComponent.name",
+  address: "userInfoComponent.address",
+  phone: "userInfoComponent.phone",
+  birthday: "userInfoComponent.birthday",
+  gender: "userInfoComponent.gender",
+  career: "userInfoComponent.career",
+  workplace: "userInfoComponent.workplace",
 };
 
 const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
+  const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
   const [editableInfo, setEditableInfo] = useState(userInfo);
   const [errors, setErrors] = useState({});
   const { showNotice } = useNotice();
+
   useEffect(() => {
     setEditableInfo(userInfo);
   }, [userInfo]);
+
   const validateFields = () => {
     const newErrors = {};
-  
+
     if (!editableInfo.email || !/\S+@\S+\.\S+/.test(editableInfo.email)) {
-      newErrors.email = "Email không hợp lệ";
+      newErrors.email = t("userInfoComponent.error.invalid_email");
     }
-  
+
     if (!editableInfo.username) {
-      newErrors.username = "Họ và tên không được để trống";
+      newErrors.username = t("userInfoComponent.error.name_required");
     }
-  
+
     if (!editableInfo.phone || !/^0\d{9}$/.test(editableInfo.phone)) {
-      newErrors.phone = "Số điện thoại không hợp lệ";
+      newErrors.phone = t("userInfoComponent.error.invalid_phone");
     }
-  
+
     if (!editableInfo.address) {
-      newErrors.address = "Địa chỉ không được để trống";
+      newErrors.address = t("userInfoComponent.error.address_required");
     }
-  
+
     if (!editableInfo.birthday) {
-      newErrors.birthday = "Ngày sinh không được để trống";
+      newErrors.birthday = t("userInfoComponent.error.birthday_required");
     }
-  
+
     if (!editableInfo.gender) {
-      newErrors.gender = "Vui lòng chọn giới tính";
+      newErrors.gender = t("userInfoComponent.error.gender_required");
     }
-  
+
     if (!editableInfo.career) {
-      newErrors.career = "Nghề nghiệp không được để trống";
+      newErrors.career = t("userInfoComponent.error.career_required");
     }
-  
+
     if (!editableInfo.workplace) {
-      newErrors.workplace = "Nơi làm việc không được để trống";
+      newErrors.workplace = t("userInfoComponent.error.workplace_required");
     }
-  
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditableInfo((prev) => ({
@@ -165,92 +170,110 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
 
   const handleConfirm = async () => {
     if (!validateFields()) return;
-  
+
     try {
-      const { _id, email, username, phone, address, birthday, gender, career, workplace } = editableInfo;
-      await apiUpdateUserById(_id, email, username, phone, address, birthday, gender, career, workplace);
+      const {
+        _id,
+        email,
+        username,
+        phone,
+        address,
+        birthday,
+        gender,
+        career,
+        workplace,
+      } = editableInfo;
+
+      await apiUpdateUserById(
+        _id,
+        email,
+        username,
+        phone,
+        address,
+        birthday,
+        gender,
+        career,
+        workplace
+      );
       setIsEditing(false);
       closePopup();
-      showNotice(1, "Chỉnh sửa thông tin thành công")
+      showNotice(1, t("userInfoComponent.success.update_user"));
     } catch (error) {
-      alert("Đã xảy ra lỗi khi cập nhật: " + error);
+      alert(`${t("userInfoComponent.error.update_failed")}: ${error}`);
     }
   };
-  
-  
 
   return (
     openPopup && (
       <PopupContainer>
-        <Title>Thông tin người dùng</Title>
+        <Title>{t("userInfoComponent.title")}</Title>
         <CloseButton onClick={closePopup}>×</CloseButton>
         <InfoWrapper>
           {Object.entries(fieldMap).map(([key, label]) => (
             <InfoRow key={key}>
-            <Label>{label}</Label>
-            {isEditing ? (
-            <div style={{ width: "60%" }}>
-              {key === "gender" ? (
-                <>
-                  <select
-                      name="gender"
-                      value={editableInfo.gender || ""}
-                      onChange={handleChange}
-                      style={{
-                        padding: "10px",
-                        margin: "5px 0",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        width: "80px",
-                      }}
-                    >
-                    <option value="">-- Chọn giới tính --</option>
-                    <option value="Nam">Nam</option>
-                    <option value="Nữ">Nữ</option>
-                  </select>
-                  {errors[key] && (
-                    <div style={{ color: "red", fontSize: "13px", marginTop: "-5px" }}>
-                      {errors[key]}
-                    </div>
+              <Label>{t(label)}</Label>
+              {isEditing ? (
+                <div style={{ width: "60%" }}>
+                  {key === "gender" ? (
+                    <>
+                      <select
+                        name="gender"
+                        value={editableInfo.gender || ""}
+                        onChange={handleChange}
+                        style={{
+                          padding: "10px",
+                          margin: "5px 0",
+                          border: "1px solid #ccc",
+                          borderRadius: "4px",
+                          width: "80px",
+                        }}
+                      >
+                        <option value="">{t("userInfoComponent.gender_placeholder")}</option>
+                        <option value="Nam">{t("userInfoComponent.male")}</option>
+                        <option value="Nữ">{t("userInfoComponent.female")}</option>
+                      </select>
+                      {errors[key] && (
+                        <div style={{ color: "red", fontSize: "13px", marginTop: "-5px" }}>
+                          {errors[key]}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <InputField
+                        type={key === "birthday" ? "date" : "text"}
+                        name={key}
+                        value={
+                          key === "birthday" && editableInfo[key]
+                            ? editableInfo[key].slice(0, 10)
+                            : editableInfo?.[key] || ""
+                        }
+                        onChange={handleChange}
+                      />
+                      {errors[key] && (
+                        <div style={{ color: "red", fontSize: "13px", marginTop: "-5px" }}>
+                          {errors[key]}
+                        </div>
+                      )}
+                    </>
                   )}
-                </>
+                </div>
               ) : (
-                <>
-                  <InputField
-                    type={key === "birthday" ? "date" : "text"}
-                    name={key}
-                    value={
-                      key === "birthday" && editableInfo[key]
-                        ? editableInfo[key].slice(0, 10)
-                        : editableInfo?.[key] || ""
-                    }
-                    onChange={handleChange}
-                  />
-                  {errors[key] && (
-                    <div style={{ color: "red", fontSize: "13px", marginTop: "-5px" }}>
-                      {errors[key]}
-                    </div>
-                  )}
-                </>
+                <ValueText>
+                  {key === "birthday" && editableInfo[key]
+                    ? new Date(editableInfo[key]).toISOString().split("T")[0]
+                    : editableInfo?.[key] || ""}
+                </ValueText>
               )}
-            </div>
-          ) : (
-            <ValueText>
-              {key === "birthday" && editableInfo[key]
-                ? new Date(editableInfo[key]).toISOString().split("T")[0]
-                : editableInfo?.[key] || ""}
-            </ValueText>
-          )}
-
-          </InfoRow>          
+            </InfoRow>
           ))}
         </InfoWrapper>
         <ButtonWrapper>
           <Button onClick={() => setIsEditing(true)} disabled={isEditing}>
-            Chỉnh sửa
+            {t("userInfoComponent.edit")}
           </Button>
           <Button onClick={handleConfirm} disabled={!isEditing}>
-            Xác nhận
+            {t("userInfoComponent.confirm")}
           </Button>
         </ButtonWrapper>
       </PopupContainer>

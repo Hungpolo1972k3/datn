@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useDispatch, useSelector } from "react-redux";
 import { createExperiment } from '../service/experiment';
 import { useNotice } from "../context/NoticeContext";
+import { useTranslation } from "react-i18next";
 
 // Styled components for the page layout and form
 const ModalBackground = styled.div`
@@ -115,6 +116,7 @@ const ErrorText = styled.div`
 `;
 
 const ExperimentAddPopup = ({ showModal, closeModal }) => {
+  const { t } = useTranslation();
   const { userId } = useSelector((state) => state.user);
   const { showNotice } = useNotice();
 
@@ -122,14 +124,13 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
   const [experimenter, setExperimenter] = useState('');
   const [experimentCode, setExperimentCode] = useState('');
   const [creationTime, setCreationTime] = useState('');
-
   const [errors, setErrors] = useState({});
 
   const validate = () => {
     const newErrors = {};
-    if (!experimentName.trim()) newErrors.experimentName = 'Tên thí nghiệm không được để trống';
-    if (!experimenter.trim()) newErrors.experimenter = 'Người thêm không được để trống';
-    if (!experimentCode.trim()) newErrors.experimentCode = 'Mã thí nghiệm không được để trống';
+    if (!experimentName.trim()) newErrors.experimentName = t('experimentAddComponent.nameError');
+    if (!experimenter.trim()) newErrors.experimenter = t('experimentAddComponent.engineerError');
+    if (!experimentCode.trim()) newErrors.experimentCode = t('experimentAddComponent.codeError');
     return newErrors;
   };
 
@@ -137,7 +138,6 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
     e.preventDefault();
     const newErrors = validate();
     setErrors(newErrors);
-
     if (Object.keys(newErrors).length > 0) return;
 
     try {
@@ -148,7 +148,7 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
         engineer: experimenter,
         createdTime: creationTime,
       });
-      showNotice(1, "Thêm thí nghiệm thành công");
+      showNotice(1, t("experimentAddComponent.success"));
 
       setExperimentName('');
       setExperimenter('');
@@ -161,7 +161,7 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
       }, 500);
     } catch (err) {
       console.log(err);
-      showNotice(0, "Thêm thí nghiệm thất bại");
+      showNotice(0, t("experimentAddComponent.fail"));
     }
   };
 
@@ -169,56 +169,56 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
     <ModalBackground show={showModal}>
       <ModalContainer>
         <CloseButton onClick={closeModal}>×</CloseButton>
-        <Title>Thêm Thí Nghiệm</Title>
+        <Title>{t('experimentAddComponent.title')}</Title>
         <Form onSubmit={handleSubmit}>
           <div>
-            <Label htmlFor="experimentName">Tên thí nghiệm</Label>
+            <Label htmlFor="experimentName">{t('experimentAddComponent.nameLabel')}</Label>
             <Input
               type="text"
               id="experimentName"
               value={experimentName}
               onChange={(e) => setExperimentName(e.target.value)}
-              placeholder="Nhập tên thí nghiệm"
+              placeholder={t('experimentAddComponent.namePlaceholder')}
             />
             {errors.experimentName && <ErrorText>{errors.experimentName}</ErrorText>}
           </div>
 
           <div>
-            <Label htmlFor="experimenter">Người thêm</Label>
+            <Label htmlFor="experimenter">{t('experimentAddComponent.engineerLabel')}</Label>
             <Input
               type="text"
               id="experimenter"
               value={experimenter}
               onChange={(e) => setExperimenter(e.target.value)}
-              placeholder="Nhập tên người thêm"
+              placeholder={t('experimentAddComponent.engineerPlaceholder')}
             />
             {errors.experimenter && <ErrorText>{errors.experimenter}</ErrorText>}
           </div>
 
           <div>
-            <Label htmlFor="experimentCode">Mã thí nghiệm</Label>
+            <Label htmlFor="experimentCode">{t('experimentAddComponent.codeLabel')}</Label>
             <Input
               type="text"
               id="experimentCode"
               value={experimentCode}
               onChange={(e) => setExperimentCode(e.target.value)}
-              placeholder="Nhập mã thí nghiệm"
+              placeholder={t('experimentAddComponent.codePlaceholder')}
             />
             {errors.experimentCode && <ErrorText>{errors.experimentCode}</ErrorText>}
           </div>
 
           <div>
-            <Label htmlFor="creationTime">Thời gian tạo</Label>
+            <Label htmlFor="creationTime">{t('experimentAddComponent.timeLabel')}</Label>
             <Input
               type="text"
               id="creationTime"
               value={creationTime}
               onChange={(e) => setCreationTime(e.target.value)}
-              placeholder="Nhập thời gian tạo (ví dụ: 2025-04-05 10:00)"
+              placeholder={t('experimentAddComponent.timePlaceholder')}
             />
           </div>
 
-          <Button type="submit">Thêm thí nghiệm</Button>
+          <Button type="submit">{t('experimentAddComponent.submitBtn')}</Button>
         </Form>
       </ModalContainer>
     </ModalBackground>

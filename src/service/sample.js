@@ -23,3 +23,15 @@ export const apiGetSamplesByExperimentId = async (experiment_id) => {
         throw error.message;
     }
 };
+
+export const apiDeleteSampleById = async (id) => {
+    try {
+      const response = await axiosConfig.delete('/api/sample/deletesample', {
+        params: { id }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.message;
+    }
+  };
+  

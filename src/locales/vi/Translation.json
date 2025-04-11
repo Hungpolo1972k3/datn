@@ -1,0 +1,279 @@
+{
+    "navbarComponent":{
+        "home": "Trang chủ",
+        "experiment": "Thí nghiệm",
+        "sample": "Mẫu thí nghiệm",
+        "statistic": "Thống kê",
+        "users": "Người dùng",
+        "login": "Đăng nhập",
+        "logout": "Đăng xuất",
+        "account_info": "Xem thông tin tài khoản",
+        "confirm_logout": "Bạn có chắc chắn muốn đăng xuất?",
+        "yes": "Có",
+        "cancel": "Hủy",
+        "language": "Ngôn ngữ",
+        "logoutSuccess": "Đăng xuất thành công"
+    },
+    "homePage": {
+        "title1": "Acinetobacter baumannii",
+        "content1": "Acinetobacter baumannii là một loại vi khuẩn Gram âm, hiếu khí, thuộc họ Neisseriaceae...",
+        "content2": "Tuy nhiên khi gặp điều kiện thuận lợi như sức đề kháng của cơ thể suy giảm...",
+        "title2": "Ai có nguy cơ bị nhiễm?",
+        "content3": "Bất kỳ ai cũng có thể bị nhiễm, đặc biệt là người:\n– Có hệ miễn dịch yếu\n– Vệ sinh kém\n– Nằm viện dài ngày...",
+        "title3": "Acinetobacter baumannii gây ra bệnh gì?",
+        "content4": "Vi khuẩn này có thể gây nhiều bệnh nghiêm trọng như:\n– Viêm phổi\n– Nhiễm trùng máu...",
+        "title4": "Dấu hiệu và triệu chứng",
+        "content5": "Các triệu chứng phổ biến gồm:\n– Sốt\n– Đau hoặc sưng đỏ tại vết thương...",
+        "title5": "Phòng ngừa lây nhiễm",
+        "content6": "– Rửa tay thường xuyên bằng xà phòng hoặc dung dịch sát khuẩn...\n– Vết thương cần được vệ sinh và băng kín..."
+    },
+    "headerComponent":{
+        "organism_name": "Acinetobacter baumannii",
+        "organism_description": "Một tác nhân gây bệnh kháng thuốc đa dạng thường xuyên gây ra các nhiễm trùng nặng trong bệnh viện"
+    },
+    "footerComponent":{
+        "about_us": "Về chúng tôi",
+        "introduction": "Giới thiệu",
+        "contact": "Liên hệ",
+        "blog": "Blog",
+        "support": "Hỗ trợ",
+        "faqs": "FAQs",
+        "privacy_policy": "Chính sách bảo mật",
+        "terms_of_use": "Điều khoản sử dụng",
+        "connect_with_us": "Kết nối với chúng tôi",
+        "copyright":
+          "Acinetobacter Baumannii. Mọi quyền được bảo lưu."
+      },
+    "engineersPage":{
+        "title": "Danh sách người dùng",
+        "full_name": "Họ và tên:",
+        "gender": "Giới tính:",
+        "phone": "Số điện thoại:",
+        "birth_year": "Năm sinh:",
+        "email": "Email:",
+        "address": "Địa chỉ:",
+        "career": "Nghề nghiệp:",
+        "workplace": "Nơi làm việc:",
+        "experiments": "Thí nghiệm:",
+        "samples": "Mẫu thí nghiệm:"
+      },
+    "experimentPage":{
+        "experimentList": "Danh sách thí nghiệm",
+        "addExperiment": "Thêm thí nghiệm",
+        "no": "STT",
+        "experimentName": "Tên thí nghiệm",
+        "experimentCode": "Mã thí nghiệm",
+        "performer": "Người thực hiện",
+        "createdTime": "Thời gian tạo",
+        "detail": "Chi tiết",
+        "edit": "Chỉnh sửa"
+      },
+    "authForm":{
+        "title": "Đăng nhập",
+        "email_placeholder": "Email",
+        "password_placeholder": "Mật khẩu",
+        "login_button": "Đăng nhập",
+        "invalid_email": "Email không hợp lệ (vd: example@gmail.com)",
+        "login_success": "Đăng nhập thành công",
+        "login_failed": "Đăng nhập thất bại. Hãy kiểm tra lại thông tin.",
+        "system_error": "Đăng nhập thất bại. Hệ thống lỗi."
+    },
+    "statisticPage": {
+        "all": "Tất cả",
+        "account": "Tài khoản",
+        "experiment": "Thí nghiệm",
+        "sample": "Mẫu thí nghiệm"
+      },
+    "submitPage": {
+        "title": "Thêm mẫu thí nghiệm",
+        "selectExperiment": "Chọn thí nghiệm",
+        "sampleNamePlaceholder": "Tên mẫu thí nghiệm",
+        "chooseFile": "Chọn tệp FASTA",
+        "submitBtn": "Gửi",
+        "resetBtn": "Làm lại",
+        "error": {
+        "selectExperiment": "Vui lòng chọn thí nghiệm.",
+        "sampleName": "Vui lòng nhập tên mẫu thí nghiệm.",
+        "file": "Vui lòng chọn tệp FASTA."
+        },
+        "success": "Thêm mẫu thí nghiệm thành công",
+        "fail": "Gặp lỗi khi thêm mẫu"
+    }, 
+    "experimentAddComponent": {
+        "title": "Thêm Thí Nghiệm",
+        "nameLabel": "Tên thí nghiệm",
+        "namePlaceholder": "Nhập tên thí nghiệm",
+        "nameError": "Tên thí nghiệm không được để trống",
+        "engineerLabel": "Người thêm",
+        "engineerPlaceholder": "Nhập tên người thêm",
+        "engineerError": "Người thêm không được để trống",
+        "codeLabel": "Mã thí nghiệm",
+        "codePlaceholder": "Nhập mã thí nghiệm",
+        "codeError": "Mã thí nghiệm không được để trống",
+        "timeLabel": "Thời gian tạo",
+        "timePlaceholder": "Nhập thời gian tạo (ví dụ: 2025-04-05 10:00)",
+        "submitBtn": "Thêm thí nghiệm",
+        "success": "Thêm thí nghiệm thành công",
+        "fail": "Thêm thí nghiệm thất bại"
+      },
+    "experimentEditComponent":{
+        "title": "Chỉnh sửa Thí nghiệm",
+        "codePlaceholder": "Mã thí nghiệm",
+        "namePlaceholder": "Tên thí nghiệm",
+        "engineerPlaceholder": "Kỹ sư thực hiện",
+        "timePlaceholder": "Thời gian tạo",
+        "cancelBtn": "Hủy",
+        "saveBtn": "Lưu",
+        "success": "Chỉnh sửa thí nghiệm thành công",
+        "fail": "Chỉnh sửa thí nghiệm thất bại"
+      },
+    "experimentInfoComponent":{
+        "title": "Thông Tin Thí Nghiệm",
+        "index": "STT",
+        "sampleName": "Mẫu Thí Nghiệm",
+        "sampleCode": "Mã Code",
+        "header": "Header",
+        "length": "Chiều dài mẫu",
+        "fileName": "Tên Tệp FASTA",
+        "createdTime": "Thời gian tạo",
+        "details": "Chi Tiết",
+        "downloadFile": "Tải xuống tệp FASTA"
+      },
+    "fastaComponent":{
+        "title": "Thông tin mẫu thí nghiệm",
+        "field": "Trường dữ liệu",
+        "value": "Giá trị",
+        "name": "Tên mẫu",
+        "header": "Header",
+        "length": "Chiều dài",
+        "createdTime": "Thời gian tạo"
+      },
+    "amrComponent":{
+        "title": "Dữ liệu kháng thuốc (AMR)",
+        "notAvailable": "Không có dữ liệu",
+        "fields": {
+          "Index": "STT",
+          "gene": "Gen",
+          "nucleic": "Chuỗi nucleic",
+          "identity": "Độ giống nhau",
+          "coverage": "Độ phủ",
+          "resistance": "Kháng",
+          "model": "Mô hình",
+          "database": "Cơ sở dữ liệu"
+        }
+      },
+    "noticeComponent": {
+        "success": "Thành công",
+        "error": "Lỗi"
+      },
+    "resultComponent":{
+        "analysisResult": "Kết quả phân tích mẫu",
+        "fasta": "Fasta",
+        "virulence": "Virulence",
+        "amr": "AMR",
+        "nucleoid": "Vùng nhân - DNA",
+        "ribosomes": "Ribosome",
+        "cytoplasm": "Tế bào chất",
+        "plasmid": "Plasmid",
+        "pili": "Pili",
+        "inclusionBodies": "Thể vùi",
+        "flagellum": "Lông roi",
+        "cytoplasmicMembrane": "Màng tế bào chất",
+        "cellWall": "Màng tế bào",
+        "capsule": "Màng nhầy"
+      },
+    "resultPopupComponent": {
+        "analysisResult": "Kết quả phân tích mẫu",
+        "fasta": "Fasta",
+        "virulence": "Virulence",
+        "amr": "AMR",
+        "nucleoid": "Vùng nhân - DNA",
+        "ribosomes": "Ribosome",
+        "cytoplasm": "Tế bào chất",
+        "plasmid": "Plasmid",
+        "pili": "Pili",
+        "inclusionBodies": "Thể vùi",
+        "flagellum": "Lông roi",
+        "cytoplasmicMembrane": "Màng tế bào chất",
+        "cellWall": "Màng tế bào",
+        "capsule": "Màng nhầy"
+      },
+    "userInfoComponent":{
+        "title": "Thông tin người dùng",
+        "edit": "Chỉnh sửa",
+        "confirm": "Xác nhận",
+        "email": "Email",
+        "name": "Họ và tên",
+        "address": "Địa chỉ",
+        "phone": "Số điện thoại",
+        "birthday": "Ngày sinh",
+        "gender": "Giới tính",
+        "career": "Nghề nghiệp",
+        "workplace": "Nơi làm việc",
+        "male": "Nam",
+        "female": "Nữ",
+        "gender_placeholder": "-- Chọn giới tính --",
+        "error": {
+          "invalid_email": "Email không hợp lệ",
+          "name_required": "Họ và tên không được để trống",
+          "invalid_phone": "Số điện thoại không hợp lệ",
+          "address_required": "Địa chỉ không được để trống",
+          "birthday_required": "Ngày sinh không được để trống",
+          "gender_required": "Vui lòng chọn giới tính",
+          "career_required": "Nghề nghiệp không được để trống",
+          "workplace_required": "Nơi làm việc không được để trống",
+          "update_failed": "Đã xảy ra lỗi khi cập nhật"
+        },
+        "success": {
+          "update_user": "Chỉnh sửa thông tin thành công"
+        }
+    },
+    "virulenceComponent":{
+        "title": "Dữ liệu gene độc lực",
+        "index": "STT",
+        "sequence": "Trình tự",
+        "gene": "Gene",
+        "start": "Bắt đầu",
+        "stop": "Kết thúc",
+        "strand": "Chiều",
+        "identity": "Mức độ giống (%)",
+        "coverage": "Độ bao phủ (%)",
+        "accession": "Accession",
+        "nucleic": "Trình tự nucleic"
+      },
+    "virulenceList": {
+        "total": "Tổng số bản ghi",
+        "download_csv": "Tải xuống CSV",
+        "fields": {
+            "index": "Số thứ tự",
+            "sequence": "Chuỗi",
+            "gene": "Gen",
+            "start": "Vị trí bắt đầu",
+            "stop": "Vị trí kết thúc",
+            "strand": "Chuỗi",
+            "identity": "Độ giống nhau (%)",
+            "coverage": "Độ phủ (%)",
+            "accession": "Mã truy xuất",
+            "description": "Mô tả",
+            "group": "Nhóm",
+            "vfdb_id": "Mã VFDB",
+            "function_group": "Nhóm chức năng",
+            "function_group_id": "Mã nhóm chức năng",
+            "nucleic": "Trình tự nucleic",
+            "protein": "Trình tự protein"
+        },
+        "groups": {
+            "nucleoid": "Vùng nhân - DNA",
+            "ribosomes": "Ribosome",
+            "cytoplasm": "Tế bào chất",
+            "plasmid": "Plasmid",
+            "pili": "Pili",
+            "inclusion": "Thể vùi",
+            "flagellum": "Lông roi",
+            "cytoplasmicMembrane": "Màng tế bào chất",
+            "cellWall": "Màng tế bào",
+            "capsule": "Màng nhầy"
+        }
+        }                
+}
+  

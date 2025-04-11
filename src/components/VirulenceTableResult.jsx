@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 
 const ListContainer = styled.div`
   width: 100%;
@@ -89,20 +90,22 @@ const DownloadButton = styled.button`
 `;
 
 const VirulenceListResult = ({ label, data }) => {
+  const { t } = useTranslation();
   const [visibleRows, setVisibleRows] = useState({});
 
   const groups = {
-    "Nucleoid (DNA) (Vùng nhân - DNA)": ["Quorom sensing", "T6SS"],
-    "Ribosomes (Ribosome)": ["Capsule", "Phospholipase C"],
-    "Cytoplasm (Tế bào chất)": ["LPS", "HemO cluster"],
-    "Plasmid (Plasmid)": ["TFP", "T2SS"],
-    "Pili (Pili)": ["PbpG", "Acinetobactin"],
-    "Inclusion Bodies (Thể vùi)": ["Csu fimbriae", "Phospholipase D"],
-    "Flagellum (Lông roi)": ["PNAG", "Bap"],
-    "Cytoplasmic Membrane (Màng tế bào chất)": ["BfmRS", "AdeFGH efflux pump"],
-    "Cell Wall (Màng tế bào)": ["OmpA"]
+    [t("virulenceList.groups.nucleoid")]: ["Quorum sensing", "BfmRS"], 
+    [t("virulenceList.groups.ribosomes")]: [],
+    [t("virulenceList.groups.cytoplasm")]: ["HemO cluster", "AdeFGH efflux pump"], 
+    [t("virulenceList.groups.plasmid")]: ["T2SS", "TFP"],
+    [t("virulenceList.groups.pili")]: ["Csu fimbriae", "TFP"],
+    [t("virulenceList.groups.inclusion")]: [], 
+    [t("virulenceList.groups.flagellum")]: [], 
+    [t("virulenceList.groups.cytoplasmicMembrane")]: ["AdeFGH efflux pump", "Phospholipase D", "Phospholipase C", "OmpA"], 
+    [t("virulenceList.groups.cellWall")]: ["OmpA", "PNAG"], 
+    [t("virulenceList.groups.capsule")]: ["Capsule", "Bap", "PNAG", "Acinetobactin", "LPS"]
   };
-  
+
   const group = groups[label] || [];
   const filterdata = group.flatMap((item) =>
     data.filter((dataItem) => dataItem.group === item)
@@ -116,26 +119,31 @@ const VirulenceListResult = ({ label, data }) => {
   };
 
   const downloadCSV = (item, index) => {
+    const protein = translateDNAtoProtein(item.nucleic);
+  
     const fields = [
-      ["Index", index + 1],
-      ["Sequence", item.sequence],
-      ["Gene", item.gene],
-      ["Start", item.start],
-      ["Stop", item.stop],
-      ["Strand", item.strand],
-      ["Identity", item.identity],
-      ["Coverage", item.coverage],
-      ["Accession", item.accession],
-      ["Description", item.description || "N/A"],
-      ["Group", item.group || "N/A"],
-      ["VFDB ID", item.vfdb_id || "N/A"],
-      ["Function Group", item.function_group || "N/A"],
-      ["Function Group ID", item.function_group_id || "N/A"],
-      ["Nucleic", item.nucleic || "N/A"],
+      [t("virulenceList.fields.index"), index + 1],
+      [t("virulenceList.fields.sequence"), item.sequence],
+      [t("virulenceList.fields.gene"), item.gene],
+      [t("virulenceList.fields.start"), item.start],
+      [t("virulenceList.fields.stop"), item.stop],
+      [t("virulenceList.fields.strand"), item.strand],
+      [t("virulenceList.fields.identity"), item.identity],
+      [t("virulenceList.fields.coverage"), item.coverage],
+      [t("virulenceList.fields.accession"), item.accession],
+      [t("virulenceList.fields.description"), item.description || "N/A"],
+      [t("virulenceList.fields.group"), item.group || "N/A"],
+      [t("virulenceList.fields.vfdb_id"), item.vfdb_id || "N/A"],
+      [t("virulenceList.fields.function_group"), item.function_group || "N/A"],
+      [t("virulenceList.fields.function_group_id"), item.function_group_id || "N/A"],
+      [t("virulenceList.fields.nucleic"), item.nucleic || "N/A"],
+      [t("virulenceList.fields.protein"), protein || "N/A"],
     ];
+  
     const csvContent =
       "data:text/csv;charset=utf-8," +
       fields.map(([k, v]) => `"${k}","${v}"`).join("\n");
+  
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -144,45 +152,109 @@ const VirulenceListResult = ({ label, data }) => {
     link.click();
     document.body.removeChild(link);
   };
+  
+  const [visibleProteinRows, setVisibleProteinRows] = useState({});
 
+  const geneticCode = {
+    TTT: 'Phenylalanine', TTC: 'Phenylalanine',
+    TTA: 'Leucine', TTG: 'Leucine',
+    CTT: 'Leucine', CTC: 'Leucine', CTA: 'Leucine', CTG: 'Leucine',
+    ATT: 'Isoleucine', ATC: 'Isoleucine', ATA: 'Isoleucine',
+    ATG: 'Methionine',
+    GTT: 'Valine', GTC: 'Valine', GTA: 'Valine', GTG: 'Valine',
+    TCT: 'Serine', TCC: 'Serine', TCA: 'Serine', TCG: 'Serine',
+    AGT: 'Serine', AGC: 'Serine',
+    CCT: 'Proline', CCC: 'Proline', CCA: 'Proline', CCG: 'Proline',
+    ACT: 'Threonine', ACC: 'Threonine', ACA: 'Threonine', ACG: 'Threonine',
+    GCT: 'Alanine', GCC: 'Alanine', GCA: 'Alanine', GCG: 'Alanine',
+    TAT: 'Tyrosine', TAC: 'Tyrosine',
+    TAA: 'Stop', TAG: 'Stop', TGA: 'Stop',
+    CAT: 'Histidine', CAC: 'Histidine',
+    CAA: 'Glutamine', CAG: 'Glutamine',
+    AAT: 'Asparagine', AAC: 'Asparagine',
+    AAA: 'Lysine', AAG: 'Lysine',
+    GAT: 'Aspartic acid', GAC: 'Aspartic acid',
+    GAA: 'Glutamic acid', GAG: 'Glutamic acid',
+    TGT: 'Cysteine', TGC: 'Cysteine',
+    TGG: 'Tryptophan',
+    CGT: 'Arginine', CGC: 'Arginine', CGA: 'Arginine', CGG: 'Arginine',
+    AGA: 'Arginine', AGG: 'Arginine',
+    GGT: 'Glycine', GGC: 'Glycine', GGA: 'Glycine', GGG: 'Glycine',
+  };
+  
+  const translateDNAtoProtein = (dna) => {
+    if (!dna) return '';
+    const sequence = dna.toUpperCase().replace(/[^ATCG]/g, '');
+    let protein = [];
+    for (let i = 0; i < sequence.length - 2; i += 3) {
+      const codon = sequence.slice(i, i + 3);
+      const amino = geneticCode[codon] || '?';
+      protein.push(amino);
+    }
+    return protein.join(' - '); 
+  };
+  
+
+  const toggleProtein = (index) => {
+    setVisibleProteinRows((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+  
+  
   return (
     <ListContainer>
       <Title>{label}</Title>
-      <TotalText>Tổng số bản ghi: {filterdata.length}</TotalText>
+      <TotalText>
+        {t("virulenceList.total")}: {filterdata.length}
+      </TotalText>
       {filterdata.map((item, index) => (
         <RecordContainer key={index}>
           <RecordGrid>
-            <RecordField><strong>Index (Số thứ tự):</strong> {index + 1}</RecordField>
-            <RecordField><strong>Sequence (Chuỗi):</strong> {item.sequence}</RecordField>
-            <RecordField><strong>Gene (Gen):</strong> {item.gene}</RecordField>
-            <RecordField><strong>Start (Vị trí bắt đầu):</strong> {item.start}</RecordField>
-            <RecordField><strong>Stop (Vị trí kết thúc):</strong> {item.stop}</RecordField>
-            <RecordField><strong>Strand (Chuỗi):</strong> {item.strand}</RecordField>
-            <RecordField><strong>Identity (%) (Độ giống nhau):</strong> {item.identity}</RecordField>
-            <RecordField><strong>Coverage (%) (Độ phủ):</strong> {item.coverage}</RecordField>
-            <RecordField><strong>Accession (Mã truy xuất):</strong> {item.accession}</RecordField>
-            <RecordField><strong>Description (Mô tả):</strong> {item.description || "N/A"}</RecordField>
-            <RecordField><strong>Group (Nhóm):</strong> {item.group || "N/A"}</RecordField>
-            <RecordField><strong>VFDB ID (Mã VFDB):</strong> {item.vfdb_id || "N/A"}</RecordField>
-            <RecordField><strong>Function Group (Nhóm chức năng):</strong> {item.function_group || "N/A"}</RecordField>
-            <RecordField><strong>Function Group ID (Mã nhóm chức năng):</strong> {item.function_group_id || "N/A"}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.index")}:</strong> {index + 1}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.sequence")}:</strong> {item.sequence}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.gene")}:</strong> {item.gene}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.start")}:</strong> {item.start}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.stop")}:</strong> {item.stop}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.strand")}:</strong> {item.strand}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.identity")}:</strong> {item.identity}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.coverage")}:</strong> {item.coverage}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.accession")}:</strong> {item.accession}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.description")}:</strong> {item.description || "N/A"}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.group")}:</strong> {item.group || "N/A"}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.vfdb_id")}:</strong> {item.vfdb_id || "N/A"}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.function_group")}:</strong> {item.function_group || "N/A"}</RecordField>
+            <RecordField><strong>{t("virulenceList.fields.function_group_id")}:</strong> {item.function_group_id || "N/A"}</RecordField>
 
             <FullWidthField>
-              <strong>Nucleic (Trình tự nucleic):</strong>
+              <strong>{t("virulenceList.fields.nucleic")}:</strong>
               <EyeIcon onClick={() => toggleNucleic(index)}>
                 {visibleRows[index] ? "🙈" : "👁️"}
               </EyeIcon>
               {visibleRows[index] && (
-                <NucleicContainer>{item.nucleic || "N/A"}</NucleicContainer>
+                <>
+                  <NucleicContainer>{item.nucleic || "N/A"}</NucleicContainer>
+
+                  <strong style={{ display: 'block', marginTop: 8 }}>
+                    {t("virulenceList.fields.protein")}:
+                    <EyeIcon onClick={() => toggleProtein(index)}>
+                      {visibleProteinRows[index] ? "🙈" : "👁️"}
+                    </EyeIcon>
+                  </strong>
+
+                  {visibleProteinRows[index] && (
+                    <NucleicContainer>
+                      {translateDNAtoProtein(item.nucleic)}
+                    </NucleicContainer>
+                  )}
+                </>
               )}
             </FullWidthField>
-
-            <FullWidthField>
-              <DownloadButton onClick={() => downloadCSV(item, index)}>
-                Tải xuống CSV
-              </DownloadButton>
-            </FullWidthField>
           </RecordGrid>
+          <DownloadButton onClick={() => downloadCSV(item, index)}>
+            {t("virulenceList.download_csv")}
+          </DownloadButton>
         </RecordContainer>
       ))}
     </ListContainer>

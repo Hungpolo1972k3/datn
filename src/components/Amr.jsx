@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 
 const TableContainer = styled.div`
   width: 100%;
@@ -55,16 +56,17 @@ const EyeIcon = styled.span`
   }
 `;
 
-const AmrTable = ({ data }) => {
+const AmrTable = ({ data = []}) => {
+  const { t } = useTranslation();
   const [visibleRows, setVisibleRows] = useState({});
 
-  // Danh sách cột cần loại bỏ
-  const hiddenFields = ["sample_id", "protein_identifier", "_id", "__v", "createdAt","updatedAt"];
+  const hiddenFields = ["sample_id", "protein_identifier", "_id", "__v", "createdAt", "updatedAt"];
 
-  // Tạo danh sách cột hiển thị
   const headers = [
     "Index",
-    ...Object.keys(data[0]).filter((key) => !hiddenFields.includes(key)),
+    ...(Array.isArray(data) && data.length > 0
+      ? Object.keys(data[0]).filter((key) => !hiddenFields.includes(key))
+      : []),
   ];
 
   const toggleNucleic = (index) => {
@@ -76,7 +78,7 @@ const AmrTable = ({ data }) => {
 
   return (
     <TableContainer>
-      <Title>AMR Data</Title>
+      <Title>{t("amrComponent.title")}</Title>
       <TableWrapper>
         <Table>
           <thead>
@@ -99,12 +101,12 @@ const AmrTable = ({ data }) => {
                         </EyeIcon>
                         {visibleRows[rowIndex] && (
                           <div style={{ marginTop: "8px", maxWidth: "400px", wordBreak: "break-word" }}>
-                            {row[key] || "N/A"}
+                            {row[key] || t("amrComponent.notAvailable")}
                           </div>
                         )}
                       </>
                     ) : (
-                      row[key] || "N/A"
+                      row[key] || t("amrComponent.notAvailable")
                     )}
                   </Td>
                 ))}

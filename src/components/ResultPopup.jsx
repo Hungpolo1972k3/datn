@@ -4,6 +4,7 @@ import FastaTable from "./Fasta";
 import VirulenceTable from "./Virulence";
 import AmrTable from "./Amr";
 import VirulenceListResult from "./VirulenceTableResult";
+import { useTranslation } from "react-i18next";
 
 const PopUpContainer = styled.div`
   position: fixed;
@@ -110,7 +111,8 @@ const ClickArea = styled.div`
 
 const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal }) => {
   const [selectedTab, setSelectedTab] = useState("Fasta");
-  const [label, setLabel] = useState("")
+  const [label, setLabel] = useState("");
+  const { t } = useTranslation();
 
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
@@ -123,25 +125,16 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
         <CloseButton onClick={closeModal}>×</CloseButton>
         <Container>
           <Wrapper>
-            <Title>Kết quả phân tích mẫu</Title>
+            <Title>{t("resultPopupComponent.analysisResult")}</Title>
             <ButtonGroup>
-              <Button
-                selected={selectedTab === "Fasta"}
-                onClick={() => handleTabClick("Fasta")}
-              >
-                Fasta
+              <Button selected={selectedTab === "Fasta"} onClick={() => handleTabClick("Fasta")}>
+                {t("resultPopupComponent.fasta")}
               </Button>
-              <Button
-                selected={selectedTab === "Virulence"}
-                onClick={() => handleTabClick("Virulence")}
-              >
-                Virulence
+              <Button selected={selectedTab === "Virulence"} onClick={() => handleTabClick("Virulence")}>
+                {t("resultPopupComponent.virulence")}
               </Button>
-              <Button
-                selected={selectedTab === "AMR"}
-                onClick={() => handleTabClick("AMR")}
-              >
-                AMR
+              <Button selected={selectedTab === "AMR"} onClick={() => handleTabClick("AMR")}>
+                {t("resultPopupComponent.amr")}
               </Button>
             </ButtonGroup>
 
@@ -150,19 +143,20 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
             {selectedTab === "AMR" && <AmrTable data={amrInfo} />}
 
             <ImageWrapper>
-          <Image src="/Bacteria-Cell.jpg" alt="Bacteria" />
-            <ClickArea style={{ top: "17%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel("Nucleoid (DNA) (Vùng nhân - DNA)")} />
-            <ClickArea style={{ top: "15%", left: "0%", width: "20%", height: "10%" }} onClick={() => setLabel("Ribosomes (Ribosome)")} />
-            <ClickArea style={{ top: "10%", left: "27%", width: "20%", height: "8%" }} onClick={() => setLabel("Cytoplasm (Tế bào chất)")} />
-            <ClickArea style={{ top: "40%", left: "82%", width: "20%", height: "12%" }} onClick={() => setLabel("Plasmid (Plasmid)")} />
-            <ClickArea style={{ top: "23%", left: "80%", width: "15%", height: "10%" }} onClick={() => setLabel("Pili (Pili)")} />
-            <ClickArea style={{ top: "62%", left: "70%", width: "25%", height: "15%" }} onClick={() => setLabel("Inclusion Bodies (Thể vùi)")} />
-            <ClickArea style={{ top: "80%", left: "57%", width: "25%", height: "12%" }} onClick={() => setLabel("Flagellum (Lông roi)")} />
-            <ClickArea style={{ top: "79%", left: "29%", width: "25%", height: "12%" }} onClick={() => setLabel("Cytoplasmic Membrane (Màng tế bào chất)")} />
-            <ClickArea style={{ top: "76%", left: "8%", width: "20%", height: "10%" }} onClick={() => setLabel("Cell Wall (Màng tế bào)")} />
-            <ClickArea style={{ top: "66%", left: "3%", width: "20%", height: "10%" }} onClick={() => setLabel("Capsule (Màng nhầy)")} />
-          </ImageWrapper>
-          {label && <VirulenceListResult label={label} data={virulenceInfo}/> }
+              <Image src="/Bacteria-Cell.jpg" alt="Bacteria" />
+              <ClickArea style={{ top: "17%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.nucleoid"))} />
+              <ClickArea style={{ top: "15%", left: "0%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.ribosomes"))} />
+              <ClickArea style={{ top: "10%", left: "27%", width: "20%", height: "8%" }} onClick={() => setLabel(t("resultPopupComponent.cytoplasm"))} />
+              <ClickArea style={{ top: "40%", left: "82%", width: "20%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.plasmid"))} />
+              <ClickArea style={{ top: "23%", left: "80%", width: "15%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.pili"))} />
+              <ClickArea style={{ top: "62%", left: "70%", width: "25%", height: "15%" }} onClick={() => setLabel(t("resultPopupComponent.inclusionBodies"))} />
+              <ClickArea style={{ top: "80%", left: "57%", width: "25%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.flagellum"))} />
+              <ClickArea style={{ top: "79%", left: "29%", width: "25%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.cytoplasmicMembrane"))} />
+              <ClickArea style={{ top: "76%", left: "8%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.cellWall"))} />
+              <ClickArea style={{ top: "66%", left: "3%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.capsule"))} />
+            </ImageWrapper>
+
+            {label && <VirulenceListResult label={label} data={virulenceInfo} />}
           </Wrapper>
         </Container>
       </PopUpForm>

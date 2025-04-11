@@ -1,14 +1,14 @@
 import React, { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
-import { apiCreateSample } from "../service/sample";
+import { apiCreateSample, apiDeleteSampleById } from "../service/sample";
 import { apiGetVirulenceInfo } from "../service/virulence";
 import { apiGetAmrInfo } from "../service/amr";
-import { apiGetPlasmidInfo } from "../service/plasmid";
 import ResultPopup from "../components/ResultPopup";
 import { useDispatch, useSelector } from "react-redux";
 import { apiGetExperimentsByUserId } from "../service/experiment";
 import { useNotice } from "../context/NoticeContext";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { useTranslation } from "react-i18next";
 
 const Container = styled.div`
   margin-top: 10px;
@@ -157,9 +157,12 @@ const ErrorText = styled.p`
   margin: 0;
 `;
 
+
 const Submit = () => {
+  const { t } = useTranslation(); 
   const { userId } = useSelector((state) => state.user);
   const { showNotice } = useNotice();
+
   const [selectedExperiment, setSelectedExperiment] = useState("");
   const [header, setHeader] = useState("");
   const [length, setLength] = useState(0);
@@ -172,8 +175,9 @@ const Submit = () => {
   const [amrInfo, setAmrInfo] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const closeModal = () => setShowModal(false);
   const [experiments, setExperiments] = useState([]);
+
+  const closeModal = () => setShowModal(false);
 
   useEffect(() => {
     const fetchExperiments = async () => {
@@ -198,21 +202,14 @@ const Submit = () => {
       reader.onload = function (event) {
         const text = event.target.result;
         const lines = text.split(/\r?\n/);
-
-        const headerLine = lines.find(line => line.startsWith(">"));
+        const headerLine = lines.find((line) => line.startsWith(">"));
         setHeader(headerLine || "");
-
-        const sequenceLines = lines.filter(line => !line.startsWith(">") && line.trim() !== "");
+        const sequenceLines = lines.filter((line) => !line.startsWith(">") && line.trim() !== "");
         const totalLength = sequenceLines.join("").length;
         setLength(totalLength);
       };
-
       reader.readAsText(uploadedFile);
     }
-  };
-
-  const handleExperimentChange = (e) => {
-    setSelectedExperiment(e.target.value);
   };
 
   const [errors, setErrors] = useState({
@@ -230,17 +227,17 @@ const Submit = () => {
     let isValid = true;
 
     if (!selectedExperiment) {
-      newErrors.selectedExperiment = "Vui lòng chọn thí nghiệm.";
+      newErrors.selectedExperiment = t("submitPage.error.selectExperiment");
       isValid = false;
     }
 
     if (!sampleName.trim()) {
-      newErrors.sampleName = "Vui lòng nhập tên mẫu thí nghiệm.";
+      newErrors.sampleName = t("submitPage.error.sampleName");
       isValid = false;
     }
 
     if (!file) {
-      newErrors.file = "Vui lòng chọn tệp FASTA.";
+      newErrors.file = t("submitPage.error.file");
       isValid = false;
     }
 
@@ -252,32 +249,39 @@ const Submit = () => {
     e.preventDefault();
     if (!validateForm()) return;
     setIsLoading(true);
+    let sampleId = "";
     try {
-      const result = await apiCreateSample(
-        userId,
-        selectedExperiment,
-        sampleName,
-        header,
-        length,
-        fastaFilePath
-      );
-  
-      const sampleId = result.data._id;
+      const result = await apiCreateSample(userId, selectedExperiment, sampleName, header, length, fastaFilePath);
+      sampleId = result.data._id;
       setFastaInfo(result.data);
-      const [virulenceRes, amrRes] = await Promise.all([
-        apiGetVirulenceInfo(file, sampleId),
-        apiGetAmrInfo(file, sampleId)
-      ]);
-      setVirulenceInfo(virulenceRes.data);
-      setAmrInfo(amrRes.data);
-      showNotice(1, "Thêm mẫu thí nghiệm thành công");
-      setShowModal(true);
+  
+      try {
+        const [virulenceRes, amrRes] = await Promise.all([
+          apiGetVirulenceInfo(file, sampleId),
+          apiGetAmrInfo(file, sampleId),
+        ]);
+        setVirulenceInfo(virulenceRes.data);
+        setAmrInfo(amrRes.data);
+  
+        showNotice(1, t("submitPage.success"));
+        setShowModal(true);
+      } catch (infoError) {
+        if (sampleId) {
+          try {
+            await apiDeleteSampleById(sampleId);
+          } catch (deleteErr) {
+            console.error("Lỗi khi xoá sample:", deleteErr);
+          }
+        }
+        showNotice(0, t("submitPage.fail"));
+      }
     } catch (error) {
-      showNotice(0, "Gặp lỗi khi thêm mẫu");
+      showNotice(0, t("submitPage.fail"));
     } finally {
       setIsLoading(false);
     }
   };
+  
   const handleReset = () => {
     setSelectedExperiment("");
     setSampleName("");
@@ -295,10 +299,10 @@ const Submit = () => {
   return (
     <Container>
       <Wrapper>
-        <Title>Thêm mẫu thí nghiệm</Title>
+        <Title>{t("submitPage.title")}</Title>
         <DropdownWrapper>
-          <Dropdown value={selectedExperiment} onChange={handleExperimentChange}>
-            <option value="">Chọn thí nghiệm</option>
+          <Dropdown value={selectedExperiment} onChange={(e) => setSelectedExperiment(e.target.value)}>
+            <option value="">{t("submitPage.selectExperiment")}</option>
             {experiments.map((experiment) => (
               <option key={experiment._id} value={experiment._id}>
                 {experiment.name}
@@ -311,19 +315,14 @@ const Submit = () => {
               type="text"
               value={sampleName}
               onChange={(e) => setSampleName(e.target.value)}
-              placeholder="Tên mẫu thí nghiệm"
+              placeholder={t("submitPage.sampleNamePlaceholder")}
             />
             {errors.sampleName && <ErrorText>{errors.sampleName}</ErrorText>}
             <ChooseFileButtonWrapper>
               <ChooseFileButton>
                 <UploadIcon />
-                Chọn tệp FASTA
-                <input
-                  type="file"
-                  accept=".fa, .fas, .fna, .fasta"
-                  onChange={handleFileChange}
-                  ref={fileInputRef}
-                />
+                {t("submitPage.chooseFile")}
+                <input type="file" accept=".fa,.fas,.fna,.fasta" onChange={handleFileChange} ref={fileInputRef} />
               </ChooseFileButton>
               {file && <FileName>{file.name}</FileName>}
             </ChooseFileButtonWrapper>
@@ -332,10 +331,10 @@ const Submit = () => {
         </DropdownWrapper>
         <ButtonWrapper>
           <ButtonSubmit type="button" onClick={handleSubmit}>
-            Submit
+            {t("submitPage.submitBtn")}
           </ButtonSubmit>
           <ButtonReset type="button" onClick={handleReset}>
-            Reset
+            {t("submitPage.resetBtn")}
           </ButtonReset>
         </ButtonWrapper>
         {isLoading && <LoadingSpinner />}
@@ -352,3 +351,4 @@ const Submit = () => {
 };
 
 export default Submit;
+

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { apiEditExperiment } from '../service/experiment';
 import { useNotice } from "../context/NoticeContext";
+import { useTranslation } from "react-i18next";
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -83,8 +84,8 @@ const CloseIcon = styled.div`
 
 const ExperimentEdit = ({ showModal, closeModal, experimentInfo }) => {
   const { showNotice } = useNotice();
+  const { t } = useTranslation();
 
-  // Define state for the fields
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [engineer, setEngineer] = useState('');
@@ -92,21 +93,21 @@ const ExperimentEdit = ({ showModal, closeModal, experimentInfo }) => {
 
   useEffect(() => {
     if (experimentInfo) {
-      setCode(experimentInfo.code || ''); 
-      setName(experimentInfo.name || ''); 
-      setEngineer(experimentInfo.engineer || ''); 
-      setCreatedTime(experimentInfo.createdTime || ''); 
+      setCode(experimentInfo.code || '');
+      setName(experimentInfo.name || '');
+      setEngineer(experimentInfo.engineer || '');
+      setCreatedTime(experimentInfo.createdTime || '');
     }
   }, [experimentInfo]);
 
   const handleSave = async () => {
     try {
       await apiEditExperiment(experimentInfo._id, name, code, engineer, createdTime);
-      showNotice(1, "Chỉnh sửa thí nghiệm thành công");
+      showNotice(1, t('experimentEditComponent.success'));
       closeModal();
       window.location.reload();
     } catch (error) {
-      showNotice(2, "Chỉnh sửa thí nghiệm thất bại"); 
+      showNotice(2, t('experimentEditComponent.fail'));
     }
   };
 
@@ -115,36 +116,36 @@ const ExperimentEdit = ({ showModal, closeModal, experimentInfo }) => {
       <ModalContainer>
         <CloseIcon onClick={closeModal}>×</CloseIcon>
 
-        <ModalHeader>Chỉnh sửa Thí nghiệm</ModalHeader>
+        <ModalHeader>{t('experimentEditComponent.title')}</ModalHeader>
         <ModalBody>
           <Input
             type="text"
-            value={code} 
-            onChange={(e) => setCode(e.target.value)} 
-            placeholder="Mã thí nghiệm"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            placeholder={t('experimentEditComponent.codePlaceholder')}
           />
           <Input
             type="text"
-            value={name}  
-            onChange={(e) => setName(e.target.value)}  
-            placeholder="Tên thí nghiệm"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={t('experimentEditComponent.namePlaceholder')}
           />
           <Input
             type="text"
-            value={engineer} 
-            onChange={(e) => setEngineer(e.target.value)} 
-            placeholder="Kỹ sư thực hiện"
+            value={engineer}
+            onChange={(e) => setEngineer(e.target.value)}
+            placeholder={t('experimentEditComponent.engineerPlaceholder')}
           />
           <Input
             type="text"
-            value={createdTime}  
-            onChange={(e) => setCreatedTime(e.target.value)} 
-            placeholder="Thời gian tạo"
+            value={createdTime}
+            onChange={(e) => setCreatedTime(e.target.value)}
+            placeholder={t('experimentEditComponent.timePlaceholder')}
           />
         </ModalBody>
         <ModalFooter>
-          <Button onClick={closeModal}>Hủy</Button>
-          <Button primary onClick={handleSave}>Lưu</Button>
+          <Button onClick={closeModal}>{t('experimentEditComponent.cancelBtn')}</Button>
+          <Button primary onClick={handleSave}>{t('experimentEditComponent.saveBtn')}</Button>
         </ModalFooter>
       </ModalContainer>
     </ModalOverlay>
