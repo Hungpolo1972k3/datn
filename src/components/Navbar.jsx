@@ -261,12 +261,12 @@ const Navbar = () => {
         <NavLink to="/">
           {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.home')}</Button>}
         </NavLink>
-        {isLogin && (
+        {isLogin && !isLoginAdmin && (
           <NavLink to="/experiment">
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.experiment')}</Button>}
           </NavLink>
         )}
-        {isLogin && (
+        {isLogin && !isLoginAdmin && (
           <NavLink to="/submit">
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.sample')}</Button>}
           </NavLink>
@@ -284,6 +284,11 @@ const Navbar = () => {
         {!isLogin && (
           <NavLink to="/login">
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.login')}</Button>}
+          </NavLink>
+        )}
+        {isLogin && isLoginAdmin && (
+          <NavLink to="/experiment-management">
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.experiment-management')}</Button>}
           </NavLink>
         )}
         <SettingsIcon onClick={() => setShowLanguageDropdown(!showLanguageDropdown)} title={t('settings')} />

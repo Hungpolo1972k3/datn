@@ -12,7 +12,8 @@
         "yes": "Có",
         "cancel": "Hủy",
         "language": "Ngôn ngữ",
-        "logoutSuccess": "Đăng xuất thành công"
+        "logoutSuccess": "Đăng xuất thành công",
+        "experiment-management": "Thí nghiệm"
     },
     "homePage": {
         "title1": "Acinetobacter baumannii",
@@ -55,7 +56,11 @@
         "career": "Nghề nghiệp:",
         "workplace": "Nơi làm việc:",
         "experiments": "Thí nghiệm:",
-        "samples": "Mẫu thí nghiệm:"
+        "samples": "Mẫu thí nghiệm:",
+        "adduser": "Thêm người dùng",
+        "selectGender": "Lựa chọn giới tính",
+        "delete_user": "Xóa người dùng",
+        "total_users": "Tổng số người dùng"
       },
     "experimentPage":{
         "experimentList": "Danh sách thí nghiệm",
@@ -66,7 +71,9 @@
         "performer": "Người thực hiện",
         "createdTime": "Thời gian tạo",
         "detail": "Chi tiết",
-        "edit": "Chỉnh sửa"
+        "edit": "Chỉnh sửa",
+        "username": "Tác giả",
+        "delete": "Xóa"
       },
     "authForm":{
         "title": "Đăng nhập",
@@ -213,6 +220,8 @@
         "male": "Nam",
         "female": "Nữ",
         "gender_placeholder": "-- Chọn giới tính --",
+        "role": "Vai trò",
+        "username": "Họ và tên",
         "error": {
           "invalid_email": "Email không hợp lệ",
           "name_required": "Họ và tên không được để trống",
@@ -274,6 +283,44 @@
             "cellWall": "Màng tế bào",
             "capsule": "Màng nhầy"
         }
-        }                
+    },
+"addUserComponent": {
+    "title": "Thêm người dùng",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "username": "Tên người dùng",
+    "phone": "Số điện thoại",
+    "address": "Địa chỉ",
+    "birthday": "Ngày sinh",
+    "gender": "Giới tính",
+    "career": "Nghề nghiệp",
+    "workplace": "Nơi làm việc",
+    "confirm": "Xác nhận",
+    "errorEmail": "Email không hợp lệ",
+    "errorPassword": "Mật khẩu ít nhất 6 ký tự",
+    "errorUsername": "Tên người dùng không được để trống",
+    "errorPhone": "Số điện thoại không hợp lệ",
+    "errorBirthday": "Vui lòng chọn ngày sinh",
+    "addUserSuccess": "Thêm người dùng thành công",
+    "addUserFail": "Người dùng đã tồn tại trên hệ thống",
+    "passwordPlaceholder": "Mật khẩu chứa ít nhất 6 ký tự",
+    "male": "Nam",
+    "female": "Nữ",
+    "selectGender": "Lựa chọn giới tính"
+  },
+  "ConfirmDeleteUserComponent": {
+    "title": "Bạn có chắc chắn muốn xóa người dùng này không ?",
+    "confirm": "Xác nhận",
+    "cancel": "Hủy",
+    "delete_user_success": "Xóa người dùng thành công",
+    "delete_user_fail": "Lỗi xóa người dùng"
+  },
+  "deleteExperimentPopup":{
+    "confirmDelete": "Bạn có chắc chắn muốn xóa thí nghiệm này không?",
+    "cancel": "Hủy",
+    "delete": "Xác nhận",
+    "success": "Xóa thí nghiệm thành công",
+    "fail": "Lỗi khi xóa thí nghiệm"
+  }                    
 }
   

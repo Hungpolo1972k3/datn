@@ -7,6 +7,7 @@ import { apiGetExperimentsByUserId } from "../service/experiment";
 import { apiGetSamplesByExperimentId } from '../service/sample';
 import ExperimentEdit from '../components/ExperimentEdit';
 import { useTranslation } from "react-i18next";
+import ConfirmDeleteExperimentPopup from '../components/ConfirmDeleteExperiment';
 
 const Container = styled.div`
   display: flex;
@@ -97,6 +98,17 @@ const EditWrapper = styled.div`
   }
 `;
 
+const DeleteWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #ff4d4d;
+
+  &:hover {
+    color: #cc0000;
+  }
+`;
+
 const ExperimentPage = () => {
   const { t } = useTranslation();
   const { userId } = useSelector((state) => state.user);
@@ -129,6 +141,15 @@ const ExperimentPage = () => {
     setShowEditPopup(false);
     setSelectedExperiment(null);
   };
+
+    const [showDeletePopup, setShowDeletePopup] = useState(false);
+    const [experimentToDelete, setExperimentToDelete] = useState(null);
+  
+    const handleDeleteClick = (experiment) => {
+      setExperimentToDelete(experiment);
+      setShowDeletePopup(true);
+      console.log(experiment)
+    };
 
   useEffect(() => {
     const fetchExperiments = async () => {
@@ -163,6 +184,7 @@ const ExperimentPage = () => {
               <TableHeader>{t('experimentPage.createdTime')}</TableHeader>
               <TableHeader>{t('experimentPage.detail')}</TableHeader>
               <TableHeader>{t('experimentPage.edit')}</TableHeader>
+              <TableHeader>{t('experimentPage.delete')}</TableHeader>
             </tr>
           </thead>
           <tbody>
@@ -193,7 +215,13 @@ const ExperimentPage = () => {
                     <span style={{ marginLeft: '8px' }}>{t('experimentPage.edit')}</span>
                   </EditWrapper>
                 </TableData>
-              </TableRow>
+                <TableData>
+                  <DeleteWrapper onClick={() => handleDeleteClick(experiment)}>
+                    <span>❌</span>
+                    <span style={{ marginLeft: '8px' }}>{t('experimentPage.delete')}</span>
+                  </DeleteWrapper>
+                </TableData>
+              </TableRow>   
             ))}
           </tbody>
         </Table>
@@ -205,6 +233,12 @@ const ExperimentPage = () => {
             showModal={showEditPopup}
             closeModal={closeEditPopup}
             experimentInfo={selectedExperiment}
+          />
+        )}
+        {showDeletePopup && (
+          <ConfirmDeleteExperimentPopup
+            closeModal={() => setShowDeletePopup(false)}
+            id={experimentToDelete._id}
           />
         )}
       </Wrapper>

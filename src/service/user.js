@@ -1,13 +1,4 @@
 import axiosConfig from "../axiosConfig"
-export const apiUserRegister = async (data) => {
-    try {
-        const response = await axiosConfig.post('/api/user/register', data);
-        return response.data;
-    } catch (error) {
-        throw error.message;
-    }
-};
-
 export const apiUserLogin = async (data) => {
     try {
         const response = await axiosConfig.post('/api/user/login', data);
@@ -63,3 +54,24 @@ export const apiGetUserById = async (token) => {
       throw error.response?.data?.message || error.message;
     }
   };
+
+  export const apiAddUser = async (formData) => {
+    try {
+      const response = await axiosConfig.post("/api/user/adduser", formData);
+      return response.data; 
+    } catch (error) {
+      throw error.response?.data?.message || error.message;
+    }
+  };
+  
+  export const apiDeleteUser = async (id) => {
+    try {
+      const response = await axiosConfig.delete(`/api/user/deleteuser?id=${id}`);
+      return response.data; 
+    } catch (error) {
+      throw error.response?.data?.message || error.message;
+    }
+  };
+  
+   
+  

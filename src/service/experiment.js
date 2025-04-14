@@ -47,3 +47,24 @@ export const apiExperimentStatistic = async (user_id) => {
   }
 };
 
+export const apiGetAllExperiments = async () => {
+  try {
+      const response = await axiosConfig.get('/api/experiment/getallexperiments');
+      return response.data;
+  } catch (error) {
+      throw error.message;
+  }
+};
+
+export const apiDeleteExperiment = async (id) => {
+  try {
+      const response = await axiosConfig.delete('/api/experiment/deleteexperiment',
+        {params: {id}}
+      );
+      return response.data;
+  } catch (error) {
+      throw error.message;
+  }
+};
+
+

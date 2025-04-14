@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import ExperimentPage from "./pages/Experiment";
 import Statistic from "./pages/Statistic";
 import ProtectedRoute from "./utils/ProtectedRoute";
+import ExperimentManagement from "./pages/ExperimentManagement"
 
 const Container = styled.div`
   display: flex;
@@ -60,6 +61,14 @@ function App() {
                 element={
                   <ProtectedRoute requireAdmin>
                     <Engineer />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/experiment-management"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <ExperimentManagement />
                   </ProtectedRoute>
                 }
               />

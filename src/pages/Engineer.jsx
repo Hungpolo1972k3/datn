@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { apiAllUsers } from "../service/user";
 import { useTranslation } from "react-i18next"; 
+import AddUserPopup from "../components/AddUser";
+import ConfirmDeleteUser from "../components/ConfirmDeleteUser";
 
 const Container = styled.div`
   margin-top: 50px;
@@ -25,7 +27,7 @@ const Title = styled.h2`
 `;
 
 const EngineersContainer = styled.div`
-  margin-top: 50px;
+  margin-top: 70px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
@@ -65,11 +67,13 @@ const EngineerRole = styled.div`
 `;
 
 const EngineerField = styled.div`
-  margin: 8px 0;
+  padding: 5px;
+  margin-left: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
+
 
 const EngineerLabel = styled.span`
   font-weight: bold;
@@ -78,19 +82,45 @@ const EngineerLabel = styled.span`
   text-align: left;
 `;
 
-const EngineerLabel1 = styled.span`
-  font-weight: bold;
-  color: #555;
-  width: 80px;
-  margin: 0 0 0 20px;
-  text-align: left;
-`;
-
 const EngineerValue = styled.span`
   color: #333;
   flex: 1;
   text-align: left;
   width: 200px;
+`;
+
+const AddButton = styled.button`
+  padding: 10px 20px;
+  background-color: #007bff; 
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  position: absolute;
+  top: 40px;
+  right: 15px;
+  font-size: 20px
+`;
+
+const TotalLabel = styled.div`
+  font-size: 25px;
+  color: #333;
+  font-weight: bold;
+  color: #1e3a8a;
+`;
+
+const DeleteButton = styled.button`
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  align-self: center;
+  font-weight: bold;
+  font-size: 16px;
 `;
 
 const Engineers = () => {
@@ -110,16 +140,35 @@ const Engineers = () => {
     fetchUsers();
   }, []);
 
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const handleOpenPopup = () => setIsPopupOpen(true);
+  const handleClosePopup = () => {
+    setIsPopupOpen(false)
+  };
+
+  const [userToDelete, setUserToDelete] = useState(null);
+  const cancelDelete = () => {
+    setUserToDelete(null);
+  };
+
+  const handleDeleteUser = (id) => {
+    setUserToDelete(id);
+  };
+  
   return (
     <Container>
       <Wrapper>
         <Title>{t("engineersPage.title")}</Title>
+        <TotalLabel>
+          {t("engineersPage.total_users")}: {engineersData.length}
+        </TotalLabel>
+        <AddButton onClick={handleOpenPopup}>{t("engineersPage.adduser")}</AddButton>
         <EngineersContainer>
           {engineersData.map((engineer, index) => (
             <EngineerCard key={index} role={engineer.role}>
               <EngineerAvatar
                 src={
-                  engineer.gender === "Nam"
+                  ["Nam", "Male"].includes(engineer.gender)
                     ? "/default_avatar_male.jpg"
                     : "/default_avatar_female.jpg"
                 }
@@ -130,13 +179,21 @@ const Engineers = () => {
               <EngineerField>
                 <EngineerLabel>{t("engineersPage.full_name")}</EngineerLabel>
                 <EngineerValue>{engineer.username}</EngineerValue>
-                <EngineerLabel1>{t("engineersPage.gender")}</EngineerLabel1>
+              </EngineerField>
+              <EngineerField>
+                <EngineerLabel>{t("engineersPage.gender")}</EngineerLabel>
                 <EngineerValue>{engineer.gender}</EngineerValue>
               </EngineerField>
               <EngineerField>
                 <EngineerLabel>{t("engineersPage.phone")}</EngineerLabel>
                 <EngineerValue>{engineer.phone}</EngineerValue>
-                <EngineerLabel1>{t("engineersPage.birth_year")}</EngineerLabel1>
+              </EngineerField>
+              <EngineerField>
+                <EngineerLabel>{t("engineersPage.email")}</EngineerLabel>
+                <EngineerValue>{engineer.email}</EngineerValue>
+              </EngineerField>
+              <EngineerField>
+              <EngineerLabel>{t("engineersPage.birth_year")}</EngineerLabel>
                 <EngineerValue>
                   {new Date(engineer.birthday).toLocaleString("vi-VN", {
                     day: "2-digit",
@@ -144,10 +201,6 @@ const Engineers = () => {
                     year: "numeric",
                   })}
                 </EngineerValue>
-              </EngineerField>
-              <EngineerField>
-                <EngineerLabel>{t("engineersPage.email")}</EngineerLabel>
-                <EngineerValue>{engineer.email}</EngineerValue>
               </EngineerField>
               <EngineerField>
                 <EngineerLabel>{t("engineersPage.address")}</EngineerLabel>
@@ -167,10 +220,22 @@ const Engineers = () => {
                 <EngineerLabel>{t("engineersPage.samples")}</EngineerLabel>
                 <EngineerValue>{engineer.countSample}</EngineerValue>
               </EngineerField>
+              {engineer.role == "USER" && (
+                <DeleteButton onClick={() => handleDeleteUser(engineer._id)}>
+                {t("engineersPage.delete_user")}
+              </DeleteButton>              
+              )}
             </EngineerCard>
           ))}
+          {userToDelete && (
+          <ConfirmDeleteUser
+            id={userToDelete}
+            onCancel={cancelDelete}
+            />
+          )}
         </EngineersContainer>
       </Wrapper>
+      {isPopupOpen && <AddUserPopup onClose={handleClosePopup} />}
     </Container>
   );
 };

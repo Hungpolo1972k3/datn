@@ -8,10 +8,9 @@ instance.interceptors.request.use(
   function (config) {
     const tokenRaw = window.localStorage.getItem("persist:auth");
     let token = null;
-
     if (tokenRaw) {
       try {
-        const parsed = JSON.parse(tokenRaw); 
+        const parsed = JSON.parse(tokenRaw);
         const userData = parsed.user ? JSON.parse(parsed.user) : null;
         token = userData?.token;
       } catch (err) {
@@ -24,15 +23,6 @@ instance.interceptors.request.use(
     }
 
     return config;
-  },
-  function (error) {
-    return Promise.reject(error);
-  }
-);
-
-instance.interceptors.response.use(
-  function (response) {
-    return response;
   },
   function (error) {
     return Promise.reject(error);

@@ -12,7 +12,8 @@
         "yes": "Yes",
         "cancel": "Cancel",
         "language": "Language",
-        "logoutSuccess": "Logout successfully"
+        "logoutSuccess": "Logout successfully",
+        "experiment-management": "Experiments"
     },
     "homePage": {
         "title1": "Acinetobacter baumannii",
@@ -55,7 +56,11 @@
         "career": "Career:",
         "workplace": "Workplace:",
         "experiments": "Experiments:",
-        "samples": "Samples:"
+        "samples": "Samples:",
+        "adduser": "Add user",
+        "selectGender": "Select gender",
+        "delete_user": "Delete user",
+        "total_users": "Total users"
       },
     "experimentPage":{
         "experimentList": "Experiment List",
@@ -66,7 +71,9 @@
         "performer": "Performer",
         "createdTime": "Created Time",
         "detail": "Detail",
-        "edit": "Edit"
+        "edit": "Edit",
+        "username": "Author",
+        "delete": "Delete"
       },
     "authForm": {
         "title": "Login",
@@ -213,6 +220,8 @@
         "male": "Male",
         "female": "Female",
         "gender_placeholder": "-- Select gender --",
+        "role": "Role",
+        "username": "Full name",
         "error": {
             "invalid_email": "Invalid email address",
             "name_required": "Full name is required",
@@ -274,6 +283,44 @@
             "cellWall": "Cell Wall",
             "capsule": "Capsule"
         }
-        }                                   
-  }
+    },
+    "addUserComponent": {
+    "title": "Add User",
+    "email": "Email",
+    "password": "Password",
+    "username": "Username",
+    "phone": "Phone Number",
+    "address": "Address",
+    "birthday": "Birthday",
+    "gender": "Gender",
+    "career": "Career",
+    "workplace": "Workplace",
+    "confirm": "Confirm",
+    "errorEmail": "Invalid email",
+    "errorPassword": "Password must be at least 6 characters",
+    "errorUsername": "Username is required",
+    "errorPhone": "Invalid phone number",
+    "errorBirthday": "Please select a birth date",
+    "addUserSuccess": "User added successfully",
+    "addUserFail": "User already exists in the system",
+    "passwordPlaceholder": "Password must be at least 6 characters",
+    "male": "Male",
+    "female": "Female",
+    "selectGender": "Select gender"
+  },
+  "ConfirmDeleteUserComponent": {
+    "title": "Are you sure you want to delete this user ?",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "delete_user_success": "User deleted successfully",
+    "delete_user_fail": "Failed to delete user"
+  },
+  "deleteExperimentPopup": {
+    "confirmDelete": "Are you sure you want to delete this experiment?",
+    "cancel": "Cancel",
+    "delete": "Confirm",
+    "success": "Experiment deleted successfully",
+    "fail": "Error deleting experiment"
+  }                
+}
   
