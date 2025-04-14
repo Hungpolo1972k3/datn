@@ -1,5 +1,7 @@
 const User = require('../models/user');
 const Experiment = require('../models/experiment');
+const Virulence = require('../models/virulence');
+const Amr = require('../models/amr');
 const Sample = require('../models/sample');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -16,7 +18,7 @@ const loginUser = async ({ email, password }, res) => {
         userId: user._id,
         role: user.role
     };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "10h" });
     const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,  
@@ -101,13 +103,14 @@ const checkUser = async (email) => {
     }
 }
 
-const addUser = async ({ email, password, username, phone, birthday, gender, career, workplace, role }) => {
+const addUser = async ({ email, password, username, address, phone, birthday, gender, career, workplace, role }) => {
     try {
         const hashedPassword = await bcrypt.hash(password, parseInt(process.env.PASSWORD_HASH_NUMBER));
         const newUser = new User({
             email,
             password: hashedPassword,
             username,
+            address,
             phone,
             birthday,
             gender,
@@ -118,9 +121,29 @@ const addUser = async ({ email, password, username, phone, birthday, gender, car
         });
         await newUser.save();
         return newUser;
-
     } catch (error) {
         throw new Error("Lỗi: " + error.message);
     }
 };
-module.exports = { loginUser, getUserById, updateUserInfo, getAllUsers, checkUser, addUser };
+
+const deleteUser = async (id) => {
+    try {
+        const sample = await Sample.findOne({ user_id: id });
+        const deletionPromises = [
+            User.deleteOne({ _id: id }),
+            Experiment.deleteMany({ user_id: id }),
+            Sample.deleteMany({ user_id: id }),
+        ];
+        if (sample) {
+            deletionPromises.push(
+                Virulence.deleteMany({ sample_id: sample._id }),
+                Amr.deleteMany({ sample_id: sample._id })
+            );
+        }
+        await Promise.all(deletionPromises);
+    } catch (error) {
+        throw new Error("Lỗi: " + error.message);
+    }
+};
+
+module.exports = { loginUser, getUserById, updateUserInfo, getAllUsers, checkUser, addUser, deleteUser };

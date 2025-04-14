@@ -71,4 +71,16 @@ const getAllExperiments = async(req, res) => {
         res.status(400).json({ message: error.message });
     }
 }
-module.exports = { createExperiment, getExperimentsByUserId, editExperiment, experimentStatistic, getAllExperiments };
+
+const deleteExperiment = async (req, res) => {
+    try {
+        const {id} = req.query;
+        await experimentService.deleteExperiment(id);
+        return res.status(200).json({
+            message: "Xóa thí nghiệm thành công"
+        })
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+module.exports = { createExperiment, getExperimentsByUserId, editExperiment, experimentStatistic, getAllExperiments, deleteExperiment };

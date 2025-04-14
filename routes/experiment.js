@@ -12,6 +12,8 @@ router.put('/editexperiment', requireLogin, experimentController.editExperiment)
 router.get('/experimentstatistic', requireLogin, experimentController.experimentStatistic);
 
 // ADMIN
-router.get('/getallexperiments', requireLogin, experimentController.getAllExperiments)
+router.get('/getallexperiments', requireLogin, experimentController.getAllExperiments);
+
+router.delete('/deleteexperiment', requireLogin, experimentController.deleteExperiment)
 
 module.exports = router;

@@ -1,5 +1,8 @@
 const Experiment = require('../models/experiment');
-const Sample = require('../models/sample')
+const Sample = require('../models/sample');
+const User = require('../models/user');
+const Virulence = require('../models/virulence');
+const Amr = require('../models/amr')
 
 const createExperiment = async ({user_id,name, code, engineer, createdTime}) => {
     try {
@@ -63,11 +66,39 @@ const experimentStatistic = async(user_id) => {
 
 const getAllExperiments = async () => {
     try {
-        const experiments = await Experiment.find();
-        return experiments;
+      const experiments = await Experiment.find();
+      const experimentsWithUser = await Promise.all(
+        experiments.map(async (item) => {
+          const user = await User.findOne({ _id: item.user_id }); 
+          return {
+            ...item.toObject(),
+            username: user?.username || "Unknown",
+          };
+        })
+      );
+  
+      return experimentsWithUser;
     } catch (error) {
-        throw new Error('Lỗi: ' + error.message);
+      throw new Error("Lỗi: " + error.message);
     }
-}
-
-module.exports = { createExperiment, getExperimentsByUserId , editExperiment, experimentStatistic, getAllExperiments };
+  };
+  
+  const deleteExperiment = async (id) => {
+    try {
+      let samples = await Experiment.find({ experiment_id: id });
+      await Experiment.deleteOne({ _id: id });
+      await Sample.deleteMany({ experiment_id: id });
+      const deletePromises = samples.map(async (item) => {
+        await Promise.all([
+          Virulence.deleteMany({ sample_id: item._id }),
+          Amr.deleteMany({ sample_id: item._id }),
+        ]);
+      });
+      await Promise.all(deletePromises);
+  
+    } catch (error) {
+      throw new Error("Error: " + error.message);
+    }
+  };
+  
+module.exports = { createExperiment, getExperimentsByUserId , editExperiment, experimentStatistic, getAllExperiments, deleteExperiment };

@@ -1,5 +1,7 @@
 const Sample = require('../models/sample');
 const crypto = require('crypto');
+const Virulence = require('../models/virulence');
+const Amr = require('../models/amr');
 
 const createSample = async (user_id, experiment_id,name, header, length, file_name, fastaFilePath) => {
     try {
@@ -46,11 +48,16 @@ const editSample = async (experiment_id, name) => {
 
 const deleteSample = async (id) => {
     try {
-      await Sample.deleteOne({ _id: id });
+      await Promise.all([
+        Sample.deleteOne({ _id: id }),
+        Virulence.deleteMany({ sample_id: id }),
+        Amr.deleteMany({ sample_id: id })
+      ]);
     } catch (error) {
       throw new Error('Lỗi: ' + error.message);
     }
   };
+  
   
 const getAllSamples = async () => {
     try {
