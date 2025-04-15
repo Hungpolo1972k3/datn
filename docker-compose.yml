@@ -38,7 +38,7 @@ services:
       - "8081:8080" 
     volumes:
       - ./biotools/abricate-db:/db 
-    command: ["abricate", "--db", "/db/vfdb", "--csv", "/input.fasta", ">", "/output.csv"]
+    command: ["abricate", "--db", "/db/vfdb", "--csv", "/input.fasta", "/output.csv"]
     networks:
       - app-network
 
