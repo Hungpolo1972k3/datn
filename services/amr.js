@@ -3,6 +3,39 @@ const FormData = require('form-data');
 const Amr = require('../models/amr');
 const fs = require('fs');
 const { default: mongoose } = require('mongoose');
+const path = require('path');
+const { exec } = require('child_process');
+
+const removeFiles = (files) => {
+    files.forEach(file => {
+        if (fs.existsSync(file)) {
+            fs.unlinkSync(file);
+        }
+    });
+};
+
+const runAmrFinder = (filePath) => {
+    return new Promise((resolve, reject) => {
+        const fastaFilePath = path.resolve(filePath);
+        const outputFilePath = `${fastaFilePath}_amrfinder.csv`;
+        const command = `amrfinder -n ${fastaFilePath} -o ${outputFilePath}`;
+
+        exec(command, (error) => {
+            if (error) {
+                removeFiles([fastaFilePath, outputFilePath]);
+                return reject(new Error(`Error executing AMRFinder: ${error.message}`));
+            }
+
+            fs.readFile(outputFilePath, 'utf8', (err, data) => {
+                removeFiles([fastaFilePath, outputFilePath]);
+                if (err) {
+                    return reject(new Error('Lỗi khi đọc tệp kết quả'));
+                }
+                resolve(data);
+            });
+        });
+    });
+};
 
 const changeAmrInfo = (result) => {
     try {
@@ -77,60 +110,21 @@ const parseFasta = (fastaContent) => {
     return sequences;
 };
 
-// const saveAmr = async (amrList, sample_id) => {
-//     try {
-//         for (const amr of amrList) {
-//             const newAmr = new Amr({
-//                 sample_id: sample_id, 
-//                 protein_identifier: amr.protein_identifier,
-//                 contig_id: amr.contig_id,
-//                 start: amr.start,
-//                 stop: amr.stop,
-//                 strand: amr.strand,
-//                 gene_symbol: amr.gene_symbol,
-//                 element_name: amr.element_name,
-//                 closest_reference_name: amr.closest_reference_name,
-//                 scope: amr.scope,
-//                 element_type: amr.element_type,
-//                 class: amr.class,
-//                 subclass: amr.subclass,
-//                 method: amr.method,
-//                 length: amr.length,
-//                 reference_length: amr.reference_length,
-//                 alignment_length: amr.alignment_length,
-//                 coverage: amr.coverage,
-//                 identity: amr.identity,
-//                 accession: amr.accession,
-//                 nucleic: amr.nucleic
-//             });
-//             await newAmr.save();
-//         }
-//     } catch (error) {
-//         throw new Error('Failed to save amr records: ' + error.message);
-//     }
-// };
-
-
 const getAmrInfo = async (file, sample_id) => {
     if (!file || !file.path || !fs.existsSync(file.path)) {
         throw new Error('File not found or invalid path');
     }
 
-    const form = new FormData();
-    form.append('fasta', fs.createReadStream(file.path), file.originalname);
-
     try {
         const fastaContent = await fs.promises.readFile(file.path, 'utf8');
-        const amrResponse = await axios.post('http://localhost:5000/api/amrfinder/amrfinder', form, {
-            headers: { ...form.getHeaders() },
-        });
+        const amrResultCsv = await runAmrFinder(file.path); 
 
-        if (!amrResponse.data || !amrResponse.data.result) {
-            throw new Error('Invalid response from AMRFinder');
+        if (!amrResultCsv) {
+            throw new Error('Empty result from AMRFinder');
         }
 
         const fastaData = parseFasta(fastaContent);
-        const amrList = changeAmrInfo(amrResponse.data.result);
+        const amrList = changeAmrInfo(amrResultCsv);
 
         const amrDocs = amrList.map((v) => {
             const seq = fastaData[v.contig_id];
@@ -170,6 +164,7 @@ const getAmrInfo = async (file, sample_id) => {
         throw new Error('Failed to process AMR data: ' + error.message);
     }
 };
+
 
 const getAmrsBySampleId = async(sample_id) => {
     try {

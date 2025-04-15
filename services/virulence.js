@@ -4,6 +4,37 @@ const Virulence = require('../models/virulence');
 const fs = require('fs');
 const { default: mongoose } = require('mongoose');
 const { group } = require('console');
+const { exec } = require('child_process');
+
+const removeFiles = (paths) => {
+    paths.forEach((file) => {
+        if (fs.existsSync(file)) {
+            fs.unlinkSync(file);
+        }
+    });
+}
+const runAbricate = (filePath) => {
+    return new Promise((resolve, reject) => {
+        const fastaFilePath = path.resolve(filePath);
+        const outputFilePath = `${fastaFilePath}.csv`;
+        const command = `abricate --db vfdb --csv ${fastaFilePath} > ${outputFilePath}`;
+
+        exec(command, (error) => {
+            if (error) {
+                removeFiles([fastaFilePath, outputFilePath]);
+                return reject(new Error(`Error executing Abricate: ${error.message}`));
+            }
+
+            fs.readFile(outputFilePath, 'utf8', (err, data) => {
+                removeFiles([fastaFilePath, outputFilePath]);
+                if (err) {
+                    return reject(new Error('Lỗi khi đọc tệp kết quả'));
+                }
+                resolve(data);
+            });
+        });
+    });
+};
 
 const changleVirulenceInfo = async (result) => {
     try {
@@ -127,35 +158,6 @@ const getIndexSearchByProductInfo = (gene, description, group, function_group) =
     
     return indexsearch;
 };
-// const saveVirulence = async (virulenceList, sample_id) => {
-//     try {
-//         for (const virulence of virulenceList) {
-//             const newVirulence = new Virulence({
-//                 sample_id: sample_id, 
-//                 sequence: virulence.sequence,
-//                 start: virulence.start,
-//                 stop: virulence.stop,
-//                 strand: virulence.strand,
-//                 gene: virulence.gene,
-//                 coverage: virulence.coverage,
-//                 identity: virulence.identity,
-//                 accession: virulence.accession,
-//                 database: virulence.database,
-//                 nucleic: virulence.nucleic,
-//                 resistance: virulence.resistance,
-//                 description: virulence.productInfo.description,
-//                 group: virulence.productInfo.group,
-//                 vfdb_id: virulence.productInfo.vfdb_id,
-//                 function_group: virulence.productInfo.function_group,
-//                 function_group_id: virulence.productInfo.function_group_id,
-//                 index: virulence.index
-//             });
-//             await newVirulence.save();
-//         }
-//     } catch (error) {
-//         throw new Error('Failed to save virulence records');
-//     }
-// };
 
 const getVirulenceInfo = async (file, sample_id) => {
     if (!file || !file.path || !fs.existsSync(file.path)) {
@@ -167,16 +169,11 @@ const getVirulenceInfo = async (file, sample_id) => {
 
     try {
         const fastaContent = await fs.promises.readFile(file.path, 'utf8');
-        const abricateResponse = await axios.post('http://localhost:5000/api/virulence/abricate', form, {
-            headers: {
-                ...form.getHeaders(),
-            },
-        });
-
-        if (!abricateResponse.data || !abricateResponse.data.result) {
-            throw new Error('Invalid response from the server');
+        const abricateResultCsv = await runAbricate(file.path);
+        if (!abricateResultCsv) {
+            throw new Error('Empty result from Abricate');
         }
-        const virulenceList = await changleVirulenceInfo(abricateResponse.data.result);
+        const virulenceList = await changleVirulenceInfo(abricateResultCsv);
         const fastaData = parseFasta(fastaContent);
         const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
             const seq = fastaData[v.sequence];
