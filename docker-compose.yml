@@ -1,62 +1,30 @@
-version: '3.7'
+version: '3.8'
 
 services:
-  nodejs:
+  app:
     build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: nodejs-app
+      context: . 
+      dockerfile: Dockerfile 
+    container_name: node-app
     ports:
-      - "8080:8080"
+      - "8080:8080" 
+    volumes:
+      - .:/usr/src/app
     environment:
-      - MONGODB_CONNECT_URI=mongodb://mongodb:27017/
+      - MONGODB_CONNECT_URI=mongodb://mongodb:27017
       - PORT=8080
       - JWT_SECRET=19072003
       - PASSWORD_HASH_NUMBER=12
       - JWT_REFRESH_SECRET=20210392
     depends_on:
       - mongodb
-      - abricate
-      - amrfinder
-    networks:
-      - app-network
+    restart: always
 
   mongodb:
-    image: mongo:latest
+    image: mongo:latest 
     container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
-      - mongodb-data:/data/db
-    networks:
-      - app-network
-
-  abricate:
-    image: staphb/abricate:latest
-    container_name: abricate
-    ports:
-      - "8081:8080" 
-    volumes:
-      - ./biotools/abricate-db:/db 
-    command: ["abricate", "--db", "/db/vfdb", "--csv", "/input.fasta", "/output.csv"]
-    networks:
-      - app-network
-
-  amrfinder:
-    image: ncbi/amr:latest
-    container_name: amrfinder
-    ports:
-      - "8082:8080"  
-    volumes:
-      - ./biotools/amrfinder-db:/db 
-    command: ["amrfinder", "-n", "/input.fasta", "-o", "/output.csv"]
-    networks:
-      - app-network
-
-volumes:
-  mongodb-data:
-    driver: local
-
-networks:
-  app-network:
-    driver: bridge
+      - ./data/db:/data/db 
+    restart: always
