@@ -3,8 +3,8 @@ version: '3.7'
 services:
   nodejs:
     build:
-      context: .
-      dockerfile: Dockerfile 
+      context: ./server
+      dockerfile: Dockerfile
     container_name: nodejs-app
     ports:
       - "8080:8080"
@@ -15,7 +15,9 @@ services:
       - PASSWORD_HASH_NUMBER=12
       - JWT_REFRESH_SECRET=20210392
     depends_on:
-      - mongodb  
+      - mongodb
+      - abricate
+      - amrfinder
     networks:
       - app-network
 
@@ -35,7 +37,7 @@ services:
     ports:
       - "8081:8080" 
     volumes:
-      - ./biotools/abricate-db:/db  
+      - ./biotools/abricate-db:/db 
     command: ["abricate", "--db", "/db/vfdb", "--csv", "/input.fasta", ">", "/output.csv"]
     networks:
       - app-network
