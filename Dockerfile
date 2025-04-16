@@ -26,21 +26,10 @@ RUN curl -sL https://github.com/tseemann/abricate/archive/refs/heads/master.zip 
     && ln -s /opt/abricate/bin/abricate /usr/local/bin/abricate \
     && abricate --setupdb
 
-# Cài đặt AMRFinderPlus từ GitHub
-RUN git clone https://github.com/ncbi/amr.git /opt/amrfinder \
-    && cd /opt/amrfinder \
-    && git checkout master \
-    && make -C stx || true \
-    && make \
-    && make install
+RUN wget https://github.com/ncbi/amr/releases/download/amrfinder_v4.0.19/amrfinder_binaries_v4.0.19.tar.gz -O /tmp/amrfinder_binaries.tar.gz && \
+tar -xvzf /tmp/amrfinder_binaries.tar.gz -C /opt && \
+rm /tmp/amrfinder_binaries.tar.gz
 
-# Tải cơ sở dữ liệu AMRFinderPlus
-RUN mkdir /data && cd /data \
-    && wget https://zenodo.org/record/14916843/files/db-light.tar.xz \
-    && tar -xvf db-light.tar.xz \
-    && rm db-light.tar.xz
-
-# Cập nhật cơ sở dữ liệu (nếu cần)
 RUN amrfinder_update --force_update --database /data/db-light/amrfinderplus-db/
 
 WORKDIR /usr/src/app
