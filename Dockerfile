@@ -18,9 +18,10 @@ RUN wget https://zenodo.org/record/10522951/files/db-light.tar.gz -O /opt/db-lig
 
 RUN amrfinder --update
 
-RUN conda install abricate &&\
-conda activate abricate &&\
-abricate-get_db --db vfdb --force
+RUN conda install -y -n base -c conda-forge mamba
+
+RUN mamba create -n abricate_env -c bioconda -c conda-forge abricate && \
+    /bin/bash -c "source activate abricate_env && abricate-get_db --db vfdb --force"
 
 WORKDIR /usr/src/app
 COPY package*.json ./
