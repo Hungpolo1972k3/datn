@@ -35,7 +35,7 @@ rm /tmp/amrfinder_binaries.tar.gz
 ENV PATH="/opt/amrfinder/amrfinder_v4.0.19:$PATH"
 
 # Cập nhật cơ sở dữ liệu AMRFinder
-RUN /opt/amrfinder/amrfinder_v4.0.19/amrfinder_update --force_update --database /data/db-light/amrfinderplus-db/
+RUN amrfinder --update
 
 WORKDIR /usr/src/app
 COPY package*.json ./
