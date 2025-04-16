@@ -26,11 +26,16 @@ RUN curl -sL https://github.com/tseemann/abricate/archive/refs/heads/master.zip 
     && ln -s /opt/abricate/bin/abricate /usr/local/bin/abricate \
     && abricate --setupdb
 
+# Tải và giải nén AMRFinder binaries
 RUN wget https://github.com/ncbi/amr/releases/download/amrfinder_v4.0.19/amrfinder_binaries_v4.0.19.tar.gz -O /tmp/amrfinder_binaries.tar.gz && \
 tar -xvzf /tmp/amrfinder_binaries.tar.gz -C /opt && \
 rm /tmp/amrfinder_binaries.tar.gz
 
-RUN amrfinder_update --force_update --database /data/db-light/amrfinderplus-db/
+# Thiết lập biến môi trường PATH
+ENV PATH="/opt/amrfinder/amrfinder_v4.0.19:$PATH"
+
+# Cập nhật cơ sở dữ liệu AMRFinder
+RUN /opt/amrfinder/amrfinder_v4.0.19/amrfinder_update --force_update --database /data/db-light/amrfinderplus-db/
 
 WORKDIR /usr/src/app
 COPY package*.json ./
