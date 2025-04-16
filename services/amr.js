@@ -83,7 +83,7 @@ const getAmrInfo = async (file, sample_id) => {
     }
 
     const form = new FormData();
-    form.append('file', fs.createReadStream(file.path));
+    form.append('fasta', fs.createReadStream(file.path));
     try {
         const fastaContent = await fs.promises.readFile(file.path, 'utf8');
         const response = await axios.post(`${process.env.BIOTOOL_URL}/api/amrfinder/amrfinder`, form, {
@@ -93,7 +93,7 @@ const getAmrInfo = async (file, sample_id) => {
         });
         
         const fastaData = parseFasta(fastaContent);
-        const amrList = changeAmrInfo(response.data);
+        const amrList = changeAmrInfo(response.data.result);
 
         const amrDocs = amrList.map((v) => {
             const seq = fastaData[v.contig_id];

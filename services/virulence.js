@@ -132,7 +132,7 @@ const getVirulenceInfo = async (file, sample_id) => {
         throw new Error('File not found or invalid path');
     }
     const form = new FormData();
-    form.append('file', fs.createReadStream(file.path));
+    form.append('fasta', fs.createReadStream(file.path));
     try {
         const fastaContent = await fs.promises.readFile(file.path, 'utf8');
         const response = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
@@ -140,7 +140,7 @@ const getVirulenceInfo = async (file, sample_id) => {
                 ...form.getHeaders(),
             },
         });
-        const virulenceList = await changleVirulenceInfo(response.data);
+        const virulenceList = await changleVirulenceInfo(response.data.result);
         const fastaData = parseFasta(fastaContent);
         const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
             const seq = fastaData[v.sequence];
@@ -181,7 +181,7 @@ const getVirulenceInfo = async (file, sample_id) => {
         return virulenceDocs;
     } catch (error) {
         console.error(error);
-        throw new Error('Failed to process and save virulence data:' + error);
+        throw new Error('Failed to process and save virulence data:' + error.message);
     }
 };
 
