@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  backend:
+    build: ./               
+    container_name: node_backend
+    ports:
+      - "8080:8080"
+    restart: always
+    environment:
+      MONGODB_CONNECT_URI: mongodb://103.159.50.207:27017/Acinetobacter_Baumannii
+      PORT: 8080
+      JWT_SECRET: 19072003
+      PASSWORD_HASH_NUMBER: 12
+      JWT_REFRESH_SECRET: 20210392
