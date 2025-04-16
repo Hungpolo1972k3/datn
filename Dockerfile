@@ -14,7 +14,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/tseemann/any2fasta.git /opt/any2fasta \
-    && ln -s /opt/any2fasta/any2fasta.pl /usr/local/bin/any2fasta
+    && ln -s /opt/any2fasta/any2fasta.pl /usr/local/bin/any2fasta \
+    && chmod +x /opt/any2fasta/any2fasta.pl
 
 RUN curl -sL https://github.com/tseemann/abricate/archive/refs/heads/master.zip -o abricate.zip \
     && unzip abricate.zip && rm abricate.zip \
