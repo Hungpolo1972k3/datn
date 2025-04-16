@@ -15,7 +15,7 @@ RUN apk add --no-cache \
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm install
+RUN npm install --loglevel=error
 
 COPY . .
 
