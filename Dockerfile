@@ -34,23 +34,21 @@ RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -
 # Cập nhật PATH để có thể sử dụng Conda
 ENV PATH=/opt/conda/bin:$PATH
 
-# Cài đặt AMRFinder qua Conda
-RUN conda config --add channels bioconda && \
-    conda config --add channels conda-forge && \
-    conda config --set channel_priority strict && \
-    conda install -y amrfinder
+RUN conda config --add channels conda-forge && \
+    conda config --add channels bioconda && \
+    conda config --set channel_priority strict
 
-# Tạo một môi trường conda cho AMRFinder (không bắt buộc, nhưng tốt nhất là tách biệt môi trường)
-RUN conda create -n amrfinder_env python=3.8 amrfinder
+# Cài đặt amrfinder và bakta từ Conda
+RUN conda install -y amrfinder bakta
 
-# Kích hoạt môi trường
-RUN echo "conda activate amrfinder_env" >> ~/.bashrc
+# Tạo thư mục cho dữ liệu
+RUN mkdir -p /data/db-light
 
-# Cập nhật cơ sở dữ liệu của AMRFinder
-RUN conda activate amrfinder_env && amrfinder --update
+# Tải cơ sở dữ liệu Bakta light
+RUN bakta_db download --type light --output /data/db-light
 
-# Lệnh để kiểm tra xem AMRFinder có cài đặt thành công không
-RUN conda activate amrfinder_env && amrfinder --version
+# Cập nhật cơ sở dữ liệu AMRFinder
+RUN amrfinder --update
 
 WORKDIR /usr/src/app
 COPY package*.json ./
