@@ -16,17 +16,17 @@ const removeFiles = (paths) => {
 }
 const runAbricate = (filePath) => {
     return new Promise((resolve, reject) => {
-        const fastaFilePath = path.resolve(filePath); 
-        const filename = path.basename(filePath);    
+        const fastaFilePath = path.resolve(filePath);
+        const filename = path.basename(filePath);   
         const outputFilename = `${filename}.csv`;   
-        const outputFilePath = path.join(path.dirname(filePath), outputFilename); 
+        const outputFilePath = path.join(path.dirname(filePath), outputFilename);
 
-        const command = `docker run --rm -v $(pwd)/data:/data staphb/abricate abricate --db vfdb --csv "/data/${filename}" > "/data/${outputFilename}"`
+        const command = `docker run --rm -v ${process.cwd()}/data:/data staphb/abricate abricate --db vfdb --csv "/data/${filename}" > "/data/${outputFilename}"`;
 
-        exec(command, (error) => {
+        exec(command, (error, stdout, stderr) => {
             if (error) {
                 removeFiles([fastaFilePath, outputFilePath]);
-                return reject(new Error(`Error executing Abricate: ${error.message}`));
+                return reject(new Error(`Error executing Abricate: ${stderr || error.message}`));
             }
 
             fs.readFile(outputFilePath, 'utf8', (err, data) => {
@@ -39,6 +39,7 @@ const runAbricate = (filePath) => {
         });
     });
 };
+
 
 const changleVirulenceInfo = async (result) => {
     try {

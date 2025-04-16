@@ -16,17 +16,19 @@ const removeFiles = (files) => {
 
 const runAmrFinder = (filePath) => {
     return new Promise((resolve, reject) => {
-        const fastaFilePath = path.resolve(filePath); 
-        const filename = path.basename(filePath); 
-        const outputFilename = `${filename}_amrfinder.csv`; 
-        const outputFilePath = path.join(path.dirname(filePath), outputFilename);
+        const fastaFilePath = path.resolve(filePath);
+        const filename = path.basename(filePath);   
+        const outputFilename = `${filename}_amrfinder.csv`;
+        const outputFilePath = path.join(path.dirname(filePath), outputFilename); 
 
-        const command = `docker run --rm -v $(pwd)/data:/data ncbi/amr amrfinder -n "/data/${filename}" -o "/data/${outputFilename}"`;
+        const dataDirectory = path.resolve(__dirname, 'data'); 
 
-        exec(command, (error) => {
+        const command = `docker run --rm -v ${dataDirectory}:/data ncbi/amr amrfinder -n "/data/${filename}" -o "/data/${outputFilename}"`;
+
+        exec(command, (error, stdout, stderr) => {
             if (error) {
                 removeFiles([fastaFilePath, outputFilePath]);
-                return reject(new Error(`Error executing AMRFinder: ${error.message}`));
+                return reject(new Error(`Error executing AMRFinder: ${stderr || error.message}`));
             }
 
             fs.readFile(outputFilePath, 'utf8', (err, data) => {
@@ -39,6 +41,7 @@ const runAmrFinder = (filePath) => {
         });
     });
 };
+
 
 const changeAmrInfo = (result) => {
     try {
