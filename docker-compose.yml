@@ -13,6 +13,7 @@ services:
       JWT_SECRET: 19072003
       PASSWORD_HASH_NUMBER: 12
       JWT_REFRESH_SECRET: 20210392
+      BIOTOOL_URL: http://103.159.50.207:5000
     volumes:
       - ./data:/data
     depends_on:
