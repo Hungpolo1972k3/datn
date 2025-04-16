@@ -18,7 +18,7 @@ const runAbricate = (filePath) => {
     return new Promise((resolve, reject) => {
         const fastaFilePath = path.resolve(filePath);
         const outputFilePath = `${fastaFilePath}.csv`;
-        const command = `abricate --db vfdb --csv "${fastaFilePath}" > "${outputFilePath}"`;
+        const command = `docker exec abricate_tool sh -c 'abricate --db vfdb --csv "/data/${filename}" > "/data/${outputFilename}"'`;
 
         exec(command, (error) => {
             if (error) {

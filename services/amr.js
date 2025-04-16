@@ -18,7 +18,7 @@ const runAmrFinder = (filePath) => {
     return new Promise((resolve, reject) => {
         const fastaFilePath = path.resolve(filePath);
         const outputFilePath = `${fastaFilePath}_amrfinder.csv`;
-        const command = `amrfinder -n "${fastaFilePath}" -o "${outputFilePath}"`;
+        const command = `docker exec amrfinder_tool amrfinder -n "/data/${filename}" -o "/data/${outputFilename}"`;
 
         exec(command, (error) => {
             if (error) {
