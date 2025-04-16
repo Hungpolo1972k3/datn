@@ -26,17 +26,19 @@ RUN curl -sL https://github.com/tseemann/abricate/archive/refs/heads/master.zip 
     && ln -s /opt/abricate/bin/abricate /usr/local/bin/abricate \
     && abricate --setupdb
 
-# Cài amrfinder
-RUN curl -O https://ftp.ncbi.nlm.nih.gov/pathogen/Antimicrobial_resistance/AMRFinder/latest/amrfinder-linux-latest.tar.gz \
-    && curl -I https://ftp.ncbi.nlm.nih.gov/pathogen/Antimicrobial_resistance/AMRFinder/latest/amrfinder-linux-latest.tar.gz \
-    && tar -xzf amrfinder-linux-latest.tar.gz \
-    && rm amrfinder-linux-latest.tar.gz \
-    && cd amrfinder-* \
+# Cài đặt AMRFinderPlus từ GitHub
+RUN git clone https://github.com/ncbi/amr.git /opt/amrfinder \
+    && cd /opt/amrfinder \
+    && git checkout master \
     && ./configure \
     && make \
-    && make install \
-    && cd .. \
-    && rm -rf amrfinder-*
+    && make install
+
+# Tải cơ sở dữ liệu AMRFinderPlus
+RUN mkdir /data && cd /data \
+    && wget https://zenodo.org/record/14916843/files/db-light.tar.xz \
+    && tar -xvf db-light.tar.xz \
+    && rm db-light.tar.xz
 
 WORKDIR /usr/src/app
 COPY package*.json ./
