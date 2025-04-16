@@ -3,47 +3,7 @@ const FormData = require('form-data');
 const Virulence = require('../models/virulence');
 const fs = require('fs');
 const { default: mongoose } = require('mongoose');
-const { group } = require('console');
-const path = require('path');
-const { exec } = require('child_process');
-
-const removeFiles = (paths) => {
-    paths.forEach((file) => {
-        if (fs.existsSync(file)) {
-            fs.unlinkSync(file);
-        }
-    });
-}
-const runAbricate = (filePath) => {
-    return new Promise((resolve, reject) => {
-        const fastaFilePath = path.resolve(filePath);
-        const filename = path.basename(filePath);
-        const outputFilename = `${filename}.csv`;
-        const outputFilePath = path.join(path.dirname(filePath), outputFilename);
-
-        const command = `docker-compose exec abricate_tool abricate --db vfdb --csv "/data/${filename}"`;
-        exec(command, (error, stdout, stderr) => {
-
-            if (error) {
-                console.error('Error executing Abricate:', stderr || error.message);
-                removeFiles([fastaFilePath, outputFilePath]); 
-                return reject(new Error(`Error executing Abricate: ${stderr || error.message}`));
-            }
-
-            fs.readFile(outputFilePath, 'utf8', (err, data) => {
-                removeFiles([fastaFilePath, outputFilePath]);
-
-                if (err) {
-                    console.error('Lỗi khi đọc tệp kết quả:', err);
-                    return reject(new Error('Lỗi khi đọc tệp kết quả'));
-                }
-                resolve(data);
-            });
-        });
-    });
-};
-
-
+require('dotenv').config();
 
 const changleVirulenceInfo = async (result) => {
     try {
@@ -172,17 +132,14 @@ const getVirulenceInfo = async (file, sample_id) => {
     if (!file || !file.path || !fs.existsSync(file.path)) {
         throw new Error('File not found or invalid path');
     }
-
-    const form = new FormData();
-    form.append('fasta', fs.createReadStream(file.path), file.originalname);
-
     try {
         const fastaContent = await fs.promises.readFile(file.path, 'utf8');
-        const abricateResultCsv = await runAbricate(file.path);
-        if (!abricateResultCsv) {
-            throw new Error('Empty result from Abricate');
-        }
-        const virulenceList = await changleVirulenceInfo(abricateResultCsv);
+        const response = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
+            headers: {
+                ...form.getHeaders(),
+            },
+        });
+        const virulenceList = await changleVirulenceInfo(response.data);
         const fastaData = parseFasta(fastaContent);
         const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
             const seq = fastaData[v.sequence];

@@ -1,46 +1,7 @@
 const axios = require('axios');
-const FormData = require('form-data');
 const Amr = require('../models/amr');
 const fs = require('fs');
-const { default: mongoose } = require('mongoose');
-const path = require('path');
-const { exec } = require('child_process');
-
-const removeFiles = (files) => {
-    files.forEach(file => {
-        if (fs.existsSync(file)) {
-            fs.unlinkSync(file);
-        }
-    });
-};
-
-const runAmrFinder = (filePath) => {
-    return new Promise((resolve, reject) => {
-        const fastaFilePath = path.resolve(filePath);
-        const filename = path.basename(filePath);   
-        const outputFilename = `${filename}_amrfinder.csv`;
-        const outputFilePath = path.join(path.dirname(filePath), outputFilename);
-
-        const command = `docker-compose exec amrfinder_tool amrfinder -n "/data/${filename}" -o "/data/${outputFilename}"`;
-        exec(command, (error, stdout, stderr) => {
-            if (error) {
-                console.error('Error executing AMRFinder:', stderr || error.message);  
-                removeFiles([fastaFilePath, outputFilePath]);
-                return reject(new Error(`Error executing AMRFinder: ${stderr || error.message}`));
-            }
-
-            fs.readFile(outputFilePath, 'utf8', (err, data) => {
-                removeFiles([fastaFilePath, outputFilePath]);
-                if (err) {
-                    return reject(new Error('Lỗi khi đọc tệp kết quả'));
-                }
-                resolve(data);
-            });
-        });
-    });
-};
-
-
+require('dotenv').config();
 
 const changeAmrInfo = (result) => {
     try {
@@ -122,14 +83,14 @@ const getAmrInfo = async (file, sample_id) => {
 
     try {
         const fastaContent = await fs.promises.readFile(file.path, 'utf8');
-        const amrResultCsv = await runAmrFinder(file.path); 
-
-        if (!amrResultCsv) {
-            throw new Error('Empty result from AMRFinder');
-        }
-
+        const response = await axios.post(`${process.env.BIOTOOL_URL}/api/amrfinder/amrfinder`, form, {
+            headers: {
+                ...form.getHeaders(),
+            },
+        });
+        
         const fastaData = parseFasta(fastaContent);
-        const amrList = changeAmrInfo(amrResultCsv);
+        const amrList = changeAmrInfo(response.data);
 
         const amrDocs = amrList.map((v) => {
             const seq = fastaData[v.contig_id];
