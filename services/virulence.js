@@ -21,7 +21,7 @@ const runAbricate = (filePath) => {
         const outputFilename = `${filename}.csv`;   
         const outputFilePath = path.join(path.dirname(filePath), outputFilename); 
 
-        const command = `docker exec abricate_tool sh -c 'abricate --db vfdb --csv "/data/${filename}" > "/data/${outputFilename}"'`;
+        const command = `docker run --rm -v $(pwd)/data:/data staphb/abricate abricate --db vfdb --csv "/data/${filename}" > "/data/${outputFilename}"`
 
         exec(command, (error) => {
             if (error) {

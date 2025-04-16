@@ -21,7 +21,7 @@ const runAmrFinder = (filePath) => {
         const outputFilename = `${filename}_amrfinder.csv`; 
         const outputFilePath = path.join(path.dirname(filePath), outputFilename);
 
-        const command = `docker exec amrfinder_tool amrfinder -n "/data/${filename}" -o "/data/${outputFilename}"`;
+        const command = `docker run --rm -v $(pwd)/data:/data ncbi/amr amrfinder -n "/data/${filename}" -o "/data/${outputFilename}"`;
 
         exec(command, (error) => {
             if (error) {
