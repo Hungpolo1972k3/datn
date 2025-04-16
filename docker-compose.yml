@@ -9,7 +9,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - MONGODB_CONNECT_URI=mongodb://mongodb:27017/Acinetobacter_Baumannii
+      - MONGODB_CONNECT_URI=mongodb://localhost:27017/Acinetobacter_Baumannii
       - PORT=8080
       - JWT_SECRET=19072003
       - PASSWORD_HASH_NUMBER=12
