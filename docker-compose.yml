@@ -3,15 +3,15 @@ version: '3.8'
 services:
   app:
     build:
-      context: . 
-      dockerfile: Dockerfile 
+      context: .
+      dockerfile: Dockerfile
     container_name: node-app
     ports:
-      - "8080:8080" 
+      - "8080:8080"        
     volumes:
       - .:/usr/src/app
     environment:
-      - MONGODB_CONNECT_URI=mongodb://mongodb:27017
+      - MONGODB_CONNECT_URI=mongodb://mongodb:27017/Acinetobacter_Baumannii
       - PORT=8080
       - JWT_SECRET=19072003
       - PASSWORD_HASH_NUMBER=12
@@ -19,12 +19,19 @@ services:
     depends_on:
       - mongodb
     restart: always
+    networks:
+      - backend
 
   mongodb:
-    image: mongo:latest 
+    image: mongo:latest
     container_name: mongodb
     ports:
-      - "27017:27017"
+      - "27017:27017"        
     volumes:
-      - ./data/db:/data/db 
+      - ./data/db:/data/db
     restart: always
+    networks:
+      - backend
+
+networks:
+  backend:                   
