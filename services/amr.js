@@ -1,6 +1,7 @@
 const axios = require('axios');
 const Amr = require('../models/amr');
 const fs = require('fs');
+const FormData = require('form-data');
 require('dotenv').config();
 
 const changeAmrInfo = (result) => {
@@ -81,6 +82,8 @@ const getAmrInfo = async (file, sample_id) => {
         throw new Error('File not found or invalid path');
     }
 
+    const form = new FormData();
+    form.append('file', fs.createReadStream(file.path));
     try {
         const fastaContent = await fs.promises.readFile(file.path, 'utf8');
         const response = await axios.post(`${process.env.BIOTOOL_URL}/api/amrfinder/amrfinder`, form, {

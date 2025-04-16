@@ -93,7 +93,6 @@ const parseProductInfo = (productString) => {
         result.function_group_id = infoMatch[4];
     }
 
-    // Tách tên loài vi khuẩn
     const organismMatch = productString.match(/\[([^\[\]]+?)\]$/);
     if (organismMatch) {
         result.organism = organismMatch[1].trim();
@@ -132,6 +131,8 @@ const getVirulenceInfo = async (file, sample_id) => {
     if (!file || !file.path || !fs.existsSync(file.path)) {
         throw new Error('File not found or invalid path');
     }
+    const form = new FormData();
+    form.append('file', fs.createReadStream(file.path));
     try {
         const fastaContent = await fs.promises.readFile(file.path, 'utf8');
         const response = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
