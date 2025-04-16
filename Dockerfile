@@ -26,22 +26,19 @@ RUN curl -sL https://github.com/tseemann/abricate/archive/refs/heads/master.zip 
     && ln -s /opt/abricate/bin/abricate /usr/local/bin/abricate \
     && abricate --setupdb
 
-# Tải và giải nén AMRFinder binaries
+# Tải AMRFinder binaries từ GitHub Releases và giải nén
 RUN wget https://github.com/ncbi/amr/releases/download/amrfinder_v4.0.19/amrfinder_binaries_v4.0.19.tar.gz -O /tmp/amrfinder_binaries.tar.gz && \
-tar -xvzf /tmp/amrfinder_binaries.tar.gz -C /opt && \
-rm /tmp/amrfinder_binaries.tar.gz
+    tar -xvzf /tmp/amrfinder_binaries.tar.gz -C /opt/amrfinder && \
+    rm /tmp/amrfinder_binaries.tar.gz
 
-# Cập nhật biến môi trường PATH để Docker có thể tìm thấy amrfinder
+# Cập nhật PATH để Docker có thể tìm thấy amrfinder
 ENV PATH="/opt/amrfinder/amrfinder_v4.0.19:${PATH}"
 
-# Kiểm tra xem tệp amrfinder có tồn tại trong thư mục /opt/amrfinder/amrfinder_v4.0.19
-RUN ls -l /opt/amrfinder/amrfinder_v4.0.19
+# Kiểm tra xem amrfinder đã có thể chạy được chưa
+RUN amrfinder --version
 
-# Cấp quyền thực thi cho tệp amrfinder
-RUN chmod +x /opt/amrfinder/amrfinder_v4.0.19/amrfinder
-
-# Cập nhật cơ sở dữ liệu với amrfinder
-RUN /opt/amrfinder/amrfinder_v4.0.19/amrfinder --update
+# Chạy AMRFinder Update
+RUN amrfinder --update
 
 WORKDIR /usr/src/app
 COPY package*.json ./
