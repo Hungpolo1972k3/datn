@@ -28,8 +28,15 @@ RUN curl -sL https://github.com/tseemann/abricate/archive/refs/heads/master.zip 
 
 # Cài amrfinder
 RUN curl -O https://ftp.ncbi.nlm.nih.gov/pathogen/Antimicrobial_resistance/AMRFinder/latest/amrfinder-linux-latest.tar.gz \
-    && tar -xzf amrfinder-linux-latest.tar.gz && rm amrfinder-linux-latest.tar.gz \
-    && cd amrfinder-* && ./configure && make && make install && cd .. && rm -rf amrfinder-*
+    && curl -I https://ftp.ncbi.nlm.nih.gov/pathogen/Antimicrobial_resistance/AMRFinder/latest/amrfinder-linux-latest.tar.gz \
+    && tar -xzf amrfinder-linux-latest.tar.gz \
+    && rm amrfinder-linux-latest.tar.gz \
+    && cd amrfinder-* \
+    && ./configure \
+    && make \
+    && make install \
+    && cd .. \
+    && rm -rf amrfinder-*
 
 WORKDIR /usr/src/app
 COPY package*.json ./
