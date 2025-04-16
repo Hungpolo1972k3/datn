@@ -4,6 +4,7 @@ const Virulence = require('../models/virulence');
 const fs = require('fs');
 const { default: mongoose } = require('mongoose');
 const { group } = require('console');
+const path = require('path');
 const { exec } = require('child_process');
 
 const removeFiles = (paths) => {
@@ -17,7 +18,7 @@ const runAbricate = (filePath) => {
     return new Promise((resolve, reject) => {
         const fastaFilePath = path.resolve(filePath);
         const outputFilePath = `${fastaFilePath}.csv`;
-        const command = `abricate --db vfdb --csv ${fastaFilePath} > ${outputFilePath}`;
+        const command = `abricate --db vfdb --csv "${fastaFilePath}" > "${outputFilePath}"`;
 
         exec(command, (error) => {
             if (error) {
