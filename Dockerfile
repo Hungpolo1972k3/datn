@@ -1,24 +1,11 @@
-FROM node:18-alpine
+FROM node:18
 
-RUN apk add --no-cache \
-  python3 \
-  make \
-  g++ \
-  cairo-dev \
-  jpeg-dev \
-  pango-dev \
-  giflib-dev \
-  pixman-dev \
-  pangomm-dev \
-  musl-dev
-
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
-RUN npm install --loglevel=error
+RUN npm install
 
 COPY . .
 
 EXPOSE 8080
-
 CMD ["npm", "start"]
