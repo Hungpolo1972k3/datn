@@ -15,10 +15,9 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Cài any2fasta
-RUN git clone https://github.com/tseemann/any2fasta.git /opt/any2fasta \
-    # Kiểm tra vị trí chính xác của any2fasta.pl và tạo symlink
-    && ln -s /opt/any2fasta/any2fasta/any2fasta.pl /usr/local/bin/any2fasta \
-    && chmod +x /opt/any2fasta/any2fasta/any2fasta.pl
+RUN cd /usr/local/bin \
+    && wget https://raw.githubusercontent.com/tseemann/any2fasta/master/any2fasta \
+    && chmod +x any2fasta
 
 # Cài abricate
 RUN curl -sL https://github.com/tseemann/abricate/archive/refs/heads/master.zip -o abricate.zip \
