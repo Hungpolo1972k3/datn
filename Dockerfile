@@ -39,8 +39,9 @@ RUN conda config --add channels conda-forge && \
     conda config --set channel_priority strict
 
 # Cài đặt amrfinder và bakta từ Conda
-RUN conda install -c conda-forge -c bioconda bakta &&\
-bakta_db download --type light &&\
+RUN conda install -c conda-forge -c bioconda bakta
+
+RUN bakta_db download --type light &&\
 amrfinder --update
 
 WORKDIR /usr/src/app
