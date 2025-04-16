@@ -20,8 +20,9 @@ RUN amrfinder --update
 
 RUN conda install -y -n base -c conda-forge mamba
 
-RUN mamba create -n abricate_env -c bioconda -c conda-forge abricate && \
-    /bin/bash -c "source activate abricate_env && abricate-get_db --db vfdb --force"
+RUN conda run -n abricate_env abricate-get_db --db vfdb --force
+
+ENV PATH /opt/conda/envs/abricate_env/bin:$PATH
 
 WORKDIR /usr/src/app
 COPY package*.json ./
