@@ -41,8 +41,12 @@ RUN conda config --add channels conda-forge && \
 # Cài đặt amrfinder và bakta từ Conda
 RUN conda install -c conda-forge -c bioconda bakta
 
-RUN bakta_db download --type light &&\
-amrfinder --update
+# Tải DB trước rồi COPY vào image
+RUN wget https://zenodo.org/record/10522951/files/db-light.tar.gz -O /opt/db-light.tar.gz && \
+    mkdir -p /data/db-light && \
+    tar -xzf /opt/db-light.tar.gz -C /data/db-light
+
+RUN amrfinder --update
 
 WORKDIR /usr/src/app
 COPY package*.json ./
