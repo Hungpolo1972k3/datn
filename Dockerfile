@@ -30,6 +30,7 @@ RUN curl -sL https://github.com/tseemann/abricate/archive/refs/heads/master.zip 
 RUN git clone https://github.com/ncbi/amr.git /opt/amrfinder \
     && cd /opt/amrfinder \
     && git checkout master \
+    && make -C stx clean || true \
     && make \
     && make install
 
