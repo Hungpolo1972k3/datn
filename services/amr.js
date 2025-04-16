@@ -19,14 +19,12 @@ const runAmrFinder = (filePath) => {
         const fastaFilePath = path.resolve(filePath);
         const filename = path.basename(filePath);   
         const outputFilename = `${filename}_amrfinder.csv`;
-        const outputFilePath = path.join(path.dirname(filePath), outputFilename); 
+        const outputFilePath = path.join(path.dirname(filePath), outputFilename);
 
-        const dataDirectory = path.resolve(__dirname, 'data'); 
-
-        const command = `docker run --rm -v ${dataDirectory}:/data ncbi/amr amrfinder -n "/data/${filename}" -o "/data/${outputFilename}"`;
-
+        const command = `docker-compose exec amrfinder_tool amrfinder -n "/data/${filename}" -o "/data/${outputFilename}"`;
         exec(command, (error, stdout, stderr) => {
             if (error) {
+                console.error('Error executing AMRFinder:', stderr || error.message);  
                 removeFiles([fastaFilePath, outputFilePath]);
                 return reject(new Error(`Error executing AMRFinder: ${stderr || error.message}`));
             }
@@ -41,6 +39,7 @@ const runAmrFinder = (filePath) => {
         });
     });
 };
+
 
 
 const changeAmrInfo = (result) => {

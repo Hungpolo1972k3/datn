@@ -17,21 +17,24 @@ const removeFiles = (paths) => {
 const runAbricate = (filePath) => {
     return new Promise((resolve, reject) => {
         const fastaFilePath = path.resolve(filePath);
-        const filename = path.basename(filePath);   
-        const outputFilename = `${filename}.csv`;   
+        const filename = path.basename(filePath);
+        const outputFilename = `${filename}.csv`;
         const outputFilePath = path.join(path.dirname(filePath), outputFilename);
 
-        const command = `docker run --rm -v ${process.cwd()}/data:/data staphb/abricate abricate --db vfdb --csv "/data/${filename}" > "/data/${outputFilename}"`;
-
+        const command = `docker-compose exec abricate_tool abricate --db vfdb --csv "/data/${filename}"`;
         exec(command, (error, stdout, stderr) => {
+
             if (error) {
-                removeFiles([fastaFilePath, outputFilePath]);
+                console.error('Error executing Abricate:', stderr || error.message);
+                removeFiles([fastaFilePath, outputFilePath]); 
                 return reject(new Error(`Error executing Abricate: ${stderr || error.message}`));
             }
 
             fs.readFile(outputFilePath, 'utf8', (err, data) => {
                 removeFiles([fastaFilePath, outputFilePath]);
+
                 if (err) {
+                    console.error('Lỗi khi đọc tệp kết quả:', err);
                     return reject(new Error('Lỗi khi đọc tệp kết quả'));
                 }
                 resolve(data);
@@ -39,6 +42,7 @@ const runAbricate = (filePath) => {
         });
     });
 };
+
 
 
 const changleVirulenceInfo = async (result) => {
