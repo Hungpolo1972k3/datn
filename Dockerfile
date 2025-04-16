@@ -40,10 +40,8 @@ RUN conda config --add channels conda-forge && \
 
 # Cài đặt amrfinder và bakta từ Conda
 RUN conda install -c conda-forge -c bioconda bakta &&\
-bakta_db download --type light \
-
-# Cập nhật cơ sở dữ liệu AMRFinder
-RUN amrfinder --update
+bakta_db download --type light &&\
+amrfinder --update
 
 WORKDIR /usr/src/app
 COPY package*.json ./
