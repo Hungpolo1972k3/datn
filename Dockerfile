@@ -39,6 +39,9 @@ RUN mkdir /data && cd /data \
     && tar -xvf db-light.tar.xz \
     && rm db-light.tar.xz
 
+# Cập nhật cơ sở dữ liệu (nếu cần)
+RUN amrfinder_update --force_update --database /data/db-light/amrfinderplus-db/
+
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install
