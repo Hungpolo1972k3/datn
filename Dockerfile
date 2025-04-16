@@ -26,19 +26,31 @@ RUN curl -sL https://github.com/tseemann/abricate/archive/refs/heads/master.zip 
     && ln -s /opt/abricate/bin/abricate /usr/local/bin/abricate \
     && abricate --setupdb
 
-# Tải AMRFinder binaries từ GitHub Releases và giải nén
-RUN wget https://github.com/ncbi/amr/releases/download/amrfinder_v4.0.19/amrfinder_binaries_v4.0.19.tar.gz -O /tmp/amrfinder_binaries.tar.gz && \
-    tar -xvzf /tmp/amrfinder_binaries.tar.gz -C /opt/amrfinder && \
-    rm /tmp/amrfinder_binaries.tar.gz
+# Cài đặt Miniconda
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
+    bash /tmp/miniconda.sh -b -f -p /opt/conda && \
+    rm /tmp/miniconda.sh
 
-# Cập nhật PATH để Docker có thể tìm thấy amrfinder
-ENV PATH="/opt/amrfinder/amrfinder_v4.0.19:${PATH}"
+# Cập nhật PATH để có thể sử dụng Conda
+ENV PATH=/opt/conda/bin:$PATH
 
-# Kiểm tra xem amrfinder đã có thể chạy được chưa
-RUN amrfinder --version
+# Cài đặt AMRFinder qua Conda
+RUN conda config --add channels bioconda && \
+    conda config --add channels conda-forge && \
+    conda config --set channel_priority strict && \
+    conda install -y amrfinder
 
-# Chạy AMRFinder Update
-RUN amrfinder --update
+# Tạo một môi trường conda cho AMRFinder (không bắt buộc, nhưng tốt nhất là tách biệt môi trường)
+RUN conda create -n amrfinder_env python=3.8 amrfinder
+
+# Kích hoạt môi trường
+RUN echo "conda activate amrfinder_env" >> ~/.bashrc
+
+# Cập nhật cơ sở dữ liệu của AMRFinder
+RUN conda activate amrfinder_env && amrfinder --update
+
+# Lệnh để kiểm tra xem AMRFinder có cài đặt thành công không
+RUN conda activate amrfinder_env && amrfinder --version
 
 WORKDIR /usr/src/app
 COPY package*.json ./
