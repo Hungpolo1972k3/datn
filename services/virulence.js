@@ -214,7 +214,7 @@ const getVirulenceInfo = async (file, sample_id) => {
         return virulenceDocs;
     } catch (error) {
         console.error(error);
-        throw new Error('Failed to process and save virulence data');
+        throw new Error('Failed to process and save virulence data:' + error);
     }
 };
 
