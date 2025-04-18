@@ -8,7 +8,7 @@ services:
       - "8080:8080"
     restart: always
     environment:
-      MONGODB_CONNECT_URI: mongodb://103.159.50.207:27017/Acinetobacter_Baumannii
+      MONGODB_CONNECT_URI: mongodb://acinetobacter_baumannii:XrH92dfL7i8zDqfsTnM4@103.159.50.207:27017/Acinetobacter_Baumannii?authSource=admin
       PORT: 8080
       JWT_SECRET: 19072003
       PASSWORD_HASH_NUMBER: 12
