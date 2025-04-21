@@ -261,6 +261,9 @@ const Navbar = () => {
         <NavLink to="/">
           {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.home')}</Button>}
         </NavLink>
+        <NavLink to="/dataset">
+          {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.abdataset')}</Button>}
+        </NavLink>
         {isLogin && !isLoginAdmin && (
           <NavLink to="/experiment">
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.experiment')}</Button>}

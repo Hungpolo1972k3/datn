@@ -13,7 +13,8 @@
         "cancel": "Cancel",
         "language": "Language",
         "logoutSuccess": "Logout successfully",
-        "experiment-management": "Experiments"
+        "experiment-management": "Experiments",
+        "abdataset": "AB Dataset"
     },
     "homePage": {
         "title1": "Acinetobacter baumannii",

@@ -13,7 +13,8 @@
         "cancel": "Hủy",
         "language": "Ngôn ngữ",
         "logoutSuccess": "Đăng xuất thành công",
-        "experiment-management": "Thí nghiệm"
+        "experiment-management": "Thí nghiệm",
+        "abdataset": "AB Dataset"
     },
     "homePage": {
         "title1": "Acinetobacter baumannii",

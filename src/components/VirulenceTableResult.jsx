@@ -220,7 +220,16 @@ const VirulenceListResult = ({ label, data }) => {
             <RecordField><strong>{t("virulenceList.fields.strand")}:</strong> {item.strand}</RecordField>
             <RecordField><strong>{t("virulenceList.fields.identity")}:</strong> {item.identity}</RecordField>
             <RecordField><strong>{t("virulenceList.fields.coverage")}:</strong> {item.coverage}</RecordField>
-            <RecordField><strong>{t("virulenceList.fields.accession")}:</strong> {item.accession}</RecordField>
+            <RecordField>
+              <strong>{t("virulenceList.fields.accession")}:</strong> {item.accession}{" "}
+              <a
+                href={`https://www.ncbi.nlm.nih.gov/protein/${item.accession}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                [NCBI]
+              </a>
+            </RecordField>
             <RecordField><strong>{t("virulenceList.fields.description")}:</strong> {item.description || "N/A"}</RecordField>
             <RecordField><strong>{t("virulenceList.fields.group")}:</strong> {item.group || "N/A"}</RecordField>
             <RecordField><strong>{t("virulenceList.fields.vfdb_id")}:</strong> {item.vfdb_id || "N/A"}</RecordField>

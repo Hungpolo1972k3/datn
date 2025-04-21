@@ -10,7 +10,8 @@ import Login from "./pages/Login";
 import ExperimentPage from "./pages/Experiment";
 import Statistic from "./pages/Statistic";
 import ProtectedRoute from "./utils/ProtectedRoute";
-import ExperimentManagement from "./pages/ExperimentManagement"
+import ExperimentManagement from "./pages/ExperimentManagement";
+import Dataset from "./pages/Dataset";
 
 const Container = styled.div`
   display: flex;
@@ -31,6 +32,7 @@ function App() {
           <Wrapper>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/dataset" element={<Dataset />}/>
               <Route path="/login" element={<Login />} />
               <Route
                 path="/submit"
