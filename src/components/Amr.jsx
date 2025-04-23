@@ -59,15 +59,7 @@ const EyeIcon = styled.span`
 const AmrTable = ({ data = []}) => {
   const { t } = useTranslation();
   const [visibleRows, setVisibleRows] = useState({});
-
-  const hiddenFields = ["sample_id", "protein_identifier", "_id", "__v", "createdAt", "updatedAt"];
-
-  const headers = [
-    "Index",
-    ...(Array.isArray(data) && data.length > 0
-      ? Object.keys(data[0]).filter((key) => !hiddenFields.includes(key))
-      : []),
-  ];
+  const headers = ["Index", "contig_id", "start", "stop", "strand", "gene_symbol", "element_name"];
 
   const toggleNucleic = (index) => {
     setVisibleRows((prev) => ({
@@ -84,7 +76,7 @@ const AmrTable = ({ data = []}) => {
           <thead>
             <tr>
               {headers.map((header, index) => (
-                <Th key={index}>{header}</Th>
+                <Th key={index}>{t(`amrComponent.columns.${header}`)}</Th>
               ))}
             </tr>
           </thead>

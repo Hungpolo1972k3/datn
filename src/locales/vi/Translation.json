@@ -14,7 +14,9 @@
         "language": "Ngôn ngữ",
         "logoutSuccess": "Đăng xuất thành công",
         "experiment-management": "Thí nghiệm",
-        "abdataset": "AB Dataset"
+        "abdataset": "AB Dataset",
+        "tokenExpired": "Phiên đăng nhập đã hết hạn.",
+        "tool": "Công cụ"
     },
     "homePage": {
         "title1": "Acinetobacter baumannii",
@@ -168,6 +170,15 @@
           "resistance": "Kháng",
           "model": "Mô hình",
           "database": "Cơ sở dữ liệu"
+        },
+        "columns": {
+          "Index": "STT",
+          "contig_id": "Mã Contig",
+          "start": "Vị trí bắt đầu",
+          "stop": "Vị trí kết thúc",
+          "strand": "Chiều",
+          "gene_symbol": "Ký hiệu gen",
+          "element_name": "Tên phần tử"
         }
       },
     "noticeComponent": {
@@ -322,6 +333,33 @@
     "delete": "Xác nhận",
     "success": "Xóa thí nghiệm thành công",
     "fail": "Lỗi khi xóa thí nghiệm"
-  }                    
+  },
+  "datasetAB": {
+    "title": "Danh sách bộ gen",
+    "filterPlaceholder": "Tìm theo tên hoặc từ khóa...",
+    "default": "Mặc định",
+    "all": "Tất cả",
+    "column": {
+      "name": "Tên bộ gen"
+    },
+    "download": "Tải xuống",
+    "index": "STT",
+    "pagination": {
+      "previous": "Trước",
+      "next": "Sau"
+    },
+    "downloadAll": "Tải xuống toàn bộ dataset"
+  },
+  "toolPage":{
+    "title": "Công cụ",
+    "chooseFile": "Chọn tệp FASTA",
+    "submitBtn": "Xác nhận",
+    "resetBtn": "Làm lại",
+    "successConfirm": "Phân tích thành công",
+    "failConfirm": "Phân tích thất bại",
+    "uploadFile": "Vui lòng nhập vào file",
+    "header": "Header",
+    "length": "Chiều dài mẫu"
+  }                      
 }
   

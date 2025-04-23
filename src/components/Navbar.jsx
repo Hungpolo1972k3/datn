@@ -228,7 +228,6 @@ const Navbar = () => {
     showNotice(1, t('navbarComponent.logoutSuccess')) 
   };
 
-  // Cancel logout
   const cancelLogout = () => {
     setShowModal(false);
   };
@@ -254,6 +253,29 @@ const Navbar = () => {
     });
   };
   
+  const { issuedAt } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const checkTokenExpiration = () => {
+      if (issuedAt) {
+        const now = Date.now();
+        const ONE_DAY = 1 * 24 * 60 * 60 * 1000;
+
+        if (now - issuedAt > ONE_DAY) {
+          dispatch(logout());
+          navigate("/");
+          showNotice(0, t('navbarComponent.tokenExpired'));
+        }
+      }
+    };
+
+    checkTokenExpiration();
+
+    const intervalId = setInterval(checkTokenExpiration, 5 * 60 * 1000); 
+
+    return () => clearInterval(intervalId);
+  }, [issuedAt, dispatch, navigate, showNotice, t, showDropdown]);
+
   
   return (
     <Container>
@@ -261,9 +283,16 @@ const Navbar = () => {
         <NavLink to="/">
           {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.home')}</Button>}
         </NavLink>
-        <NavLink to="/dataset">
-          {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.abdataset')}</Button>}
-        </NavLink>
+        {!isLogin && (
+          <NavLink to="/dataset">
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.abdataset')}</Button>}
+          </NavLink>
+        )}
+        {!isLogin && (
+          <NavLink to="/tool">
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.tool')}</Button>}
+          </NavLink>
+        )}
         {isLogin && !isLoginAdmin && (
           <NavLink to="/experiment">
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.experiment')}</Button>}

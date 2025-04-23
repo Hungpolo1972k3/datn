@@ -14,7 +14,9 @@
         "language": "Language",
         "logoutSuccess": "Logout successfully",
         "experiment-management": "Experiments",
-        "abdataset": "AB Dataset"
+        "abdataset": "AB Dataset",
+        "tokenExpired": "Session has expired.",
+        "tool": "Tool"
     },
     "homePage": {
         "title1": "Acinetobacter baumannii",
@@ -168,6 +170,15 @@
           "resistance": "Resistance",
           "model": "Model",
           "database": "Database"
+        },
+        "columns": {
+          "Index": "Index",
+          "contig_id": "Contig ID",
+          "start": "Start",
+          "stop": "Stop",
+          "strand": "Strand",
+          "gene_symbol": "Gene Symbol",
+          "element_name": "Element Name"
         }
       },
     "noticeComponent": {
@@ -322,6 +333,33 @@
     "delete": "Confirm",
     "success": "Experiment deleted successfully",
     "fail": "Error deleting experiment"
-  }                
+  },
+  "datasetAB": {
+    "title": "Genome List",
+    "filterPlaceholder": "Search by name or keyword...",
+    "default": "Default",
+    "all": "All",
+    "column": {
+      "name": "Genome Name"
+    },
+    "download": "Download",
+    "index": "No.",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "downloadAll": "Download All Dataset"
+  },
+  "toolPage":{
+    "title": "Tool",
+    "chooseFile": "Choose FASTA File",
+    "submitBtn": "Submit",
+    "resetBtn": "Reset",
+    "successConfirm": "Run tool success",
+    "failConfirm": "Fail to run tool",
+    "uploadFile": "Please upload fasta file",
+    "header": "Header",
+    "length": "Length"
+  }               
 }
   

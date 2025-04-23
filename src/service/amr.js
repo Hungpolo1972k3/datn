@@ -24,3 +24,20 @@ export const apiGetAmrsBySampleId = async (sample_id) => {
         throw error.response?.data || error.message;
     }
 };
+
+export const apiRunAmrTool = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append('fasta', file);
+
+        const response = await axiosConfig.post(`/api/amr/runamrtool`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Accept': 'application/json',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+};
