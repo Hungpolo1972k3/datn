@@ -1,7 +1,8 @@
 const express = require("express");
 const virulenceRoutes = require("./routes/virulence");
-const amrRoutes = require('./routes/amr')
-const plasmidRoutes = require('./routes/plasmid')
+const amrRoutes = require('./routes/amr');
+const plasmidRoutes = require('./routes/plasmid');
+const blastnRoutes = require('./routes/blastn');
 require('dotenv').config();
 
 const app = express();
@@ -10,6 +11,7 @@ app.use(express.json());
 app.use("/api/virulence", virulenceRoutes);
 app.use("/api/amrfinder", amrRoutes);
 app.use("/api/plasmid", plasmidRoutes);
+app.use("/api/blastn", blastnRoutes);
 app.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
