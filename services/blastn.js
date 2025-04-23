@@ -30,41 +30,48 @@ const runBlastn = async (filePath, res) => {
 
     try {
         const dataFiles = await getDataFiles();
-        const results = [];
+        const results = {};
 
         for (const file of dataFiles) {
             const subjectPath = path.join(dataDir, file);
-            const outputFilePath = `${fastaFilePath}.${file}.blastout`;
-            const command = `blastn -query "${fastaFilePath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
-            const result = await new Promise((resolve, reject) => {
-                exec(command, (error, stdout, stderr) => {
-                    if (error) {
-                        return reject({ file, error: `Error: ${stderr || error.message}` });
-                    }
+            const outputFileName = `${path.basename(fastaFilePath)}.${file}.blastout`;
+            const outputFilePath = path.join(os.tmpdir(), outputFileName); // tmp file
 
-                    fs.readFile(outputFilePath, 'utf8', (err, data) => {
-                        if (err) {
-                            return reject({ file, error: 'Lỗi khi đọc file kết quả' });
+            const command = `blastn -query "${fastaFilePath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
+
+            try {
+                const result = await new Promise((resolve, reject) => {
+                    exec(command, (error, stdout, stderr) => {
+                        if (error) {
+                            return reject(`Error: ${stderr || error.message}`);
                         }
 
-                        resolve({ file, result: data });
+                        fs.readFile(outputFilePath, 'utf8', (err, data) => {
+                            if (err) return reject('Lỗi khi đọc file kết quả');
+                            resolve(data);
+                        });
                     });
                 });
-            }).finally(() => {
-                removeFiles([outputFilePath]);
-            });
 
-            results.push(result);
+                results[file] = {
+                    result,
+                    downloadUrl: `download/${outputFileName}`
+                };
+            } catch (err) {
+                results[file] = { error: err };
+            } finally {
+            }
         }
 
         removeFiles([fastaFilePath]);
-        res.json({ results });
+        res.json(results);
     } catch (err) {
         removeFiles([fastaFilePath]);
         console.error(err);
-        res.status(500).json({ error: err.error || err.message });
+        res.status(500).json({ error: err.message || 'Lỗi không xác định' });
     }
 };
+
 
 module.exports = {
     runBlastn
