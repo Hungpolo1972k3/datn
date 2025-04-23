@@ -5,6 +5,6 @@ const blastnController = require("../controllers/blastn");
 const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
-router.post("/blastn", upload.single("fasta"), blastnController.runBlastn);
+router.post('/blastn', upload.array('fasta', 850), blastnController.runBlastn);
 
 module.exports = router;
