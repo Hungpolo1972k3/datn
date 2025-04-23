@@ -282,10 +282,13 @@ const PaginatedTable = () => {
     };
   }, [selectedGenome]);
   const handleShowDatasetPopup = async(title,url) => {
-    let data = await apiGetFolderInfo(url);
-    console.log(data)
-    setSelectedGenome(data);
-    setDatasetTitle(title);
+    try {
+      let data = await apiGetFolderInfo(url);
+      setSelectedGenome(data);
+      setDatasetTitle(title);
+    } catch (error) {
+      console.log(error)
+    }
   }
   return (
     <TableWrapper>
