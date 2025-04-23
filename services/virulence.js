@@ -177,7 +177,7 @@ const getVirulenceInfo = async (file, sample_id) => {
         }));
 
         await Virulence.insertMany(virulenceDocs);
-
+        await fs.promises.unlink(file.path);
         return virulenceDocs;
     } catch (error) {
         console.error(error);
@@ -219,9 +219,58 @@ const getVirulencesBySampleId = async(sample_id) => {
         throw new Error('Lỗi: ' + error.message);
     }
 }
+
+const runVirulenceTool = async (file) => {
+    if (!file || !file.path || !fs.existsSync(file.path)) {
+        throw new Error('File not found or invalid path');
+    }
+    const form = new FormData();
+    form.append('fasta', fs.createReadStream(file.path));
+    try {
+        const fastaContent = await fs.promises.readFile(file.path, 'utf8');
+        const response = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
+            headers: {
+                ...form.getHeaders(),
+            },
+        });
+        const virulenceList = await changleVirulenceInfo(response.data.result);
+        const fastaData = parseFasta(fastaContent);
+        const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
+            const seq = fastaData[v.sequence];
+            const rawSeq = seq ? seq.substring(v.start - 1, v.stop) : null;
+            const nucleic = rawSeq ? (v.strand === '-' ? reverseComplement(rawSeq) : rawSeq) : null;
+            const productInfo = parseProductInfo(v.product);
+            return {
+                sequence: v.sequence,
+                start: v.start,
+                stop: v.stop,
+                strand: v.strand,
+                gene: v.gene,
+                coverage: v.coverage,
+                identity: v.identity,
+                accession: v.accession,
+                database: v.database,
+                nucleic,
+                resistance: v.resistance,
+                description: productInfo.description,
+                group: productInfo.group,
+                vfdb_id: productInfo.vfdb_id,
+                function_group: productInfo.function_group,
+                function_group_id: productInfo.function_group_id,
+            };
+        }));
+        await fs.promises.unlink(file.path);
+        return virulenceDocs;
+    } catch (error) {
+        console.error(error);
+        throw new Error('Failed to process and save virulence data:' + error.message);
+    }
+};
+
 module.exports = { 
     getVirulenceInfo,
     findVirlencesByKey,
     getAllVirulenceGroup,
-    getVirulencesBySampleId
+    getVirulencesBySampleId,
+    runVirulenceTool
  };

@@ -126,6 +126,7 @@ const getAmrInfo = async (file, sample_id) => {
         });
 
         await Amr.insertMany(amrDocs);
+        await fs.promises.unlink(file.path);
         return amrDocs;
 
     } catch (error) {
@@ -144,7 +145,63 @@ const getAmrsBySampleId = async(sample_id) => {
     }
 }
 
+const runAmrTool = async (file) => {
+    if (!file || !file.path || !fs.existsSync(file.path)) {
+        throw new Error('File not found or invalid path');
+    }
+
+    const form = new FormData();
+    form.append('fasta', fs.createReadStream(file.path));
+    try {
+        const fastaContent = await fs.promises.readFile(file.path, 'utf8');
+        const response = await axios.post(`${process.env.BIOTOOL_URL}/api/amrfinder/amrfinder`, form, {
+            headers: {
+                ...form.getHeaders(),
+            },
+        });
+        
+        const fastaData = parseFasta(fastaContent);
+        const amrList = changeAmrInfo(response.data.result);
+
+        const amrDocs = amrList.map((v) => {
+            const seq = fastaData[v.contig_id];
+            const rawSeq = seq ? seq.substring(v.start - 1, v.stop) : null;
+            const nucleic = rawSeq ? (v.strand === '-' ? reverseComplement(rawSeq) : rawSeq) : null;
+
+            return {
+                protein_identifier: v.protein_identifier,
+                contig_id: v.contig_id,
+                start: v.start,
+                stop: v.stop,
+                strand: v.strand,
+                gene_symbol: v.gene_symbol,
+                element_name: v.element_name,
+                closest_reference_name: v.closest_reference_name,
+                scope: v.scope,
+                element_type: v.element_type,
+                class: v.class,
+                subclass: v.subclass,
+                method: v.method,
+                length: v.length,
+                reference_length: v.reference_length,
+                alignment_length: v.alignment_length,
+                coverage: v.coverage,
+                identity: v.identity,
+                accession: v.accession,
+                nucleic
+            };
+        });
+        await fs.promises.unlink(file.path);
+        return amrDocs;
+
+    } catch (error) {
+        console.error(error);
+        throw new Error('Failed to process AMR data: ' + error.message);
+    }
+};
+
 module.exports = { 
     getAmrInfo, 
-    getAmrsBySampleId
+    getAmrsBySampleId,
+    runAmrTool
  };

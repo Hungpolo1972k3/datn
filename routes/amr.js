@@ -24,4 +24,7 @@ const upload = multer({ storage: storage });
 router.post('/getamrinfo', requireLogin, upload.single('fasta'), amrController.getAmrInfo);
 
 router.get('/getamrsbysampleid', requireLogin, amrController.getAmrsBySampleId);
+
+router.post('/runamrtool', upload.single('fasta'), amrController.runAmrTool);
+
 module.exports = router;

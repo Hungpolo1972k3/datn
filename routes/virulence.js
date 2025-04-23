@@ -28,4 +28,6 @@ router.get('/getvirulencesbysampleid', requireLogin, virulenceController.getViru
 
 router.get("/getallvirulencesgroup", requireLogin, virulenceController.getAllVirulenceGroup);
 
+router.post('/runvirulencetool', upload.single('fasta'), virulenceController.runVirulenceTool);
+
 module.exports = router;
