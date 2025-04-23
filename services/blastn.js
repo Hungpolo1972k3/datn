@@ -35,9 +35,7 @@ const runBlastn = async (filePath, res) => {
         for (const file of dataFiles) {
             const subjectPath = path.join(dataDir, file);
             const outputFilePath = `${fastaFilePath}.${file}.blastout`;
-
-            const command = `blastn -query ${fastaFilePath} -subject ${subjectPath} -out ${outputFilePath} -outfmt 6`;
-
+            const command = `blastn -query "${fastaFilePath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
             const result = await new Promise((resolve, reject) => {
                 exec(command, (error, stdout, stderr) => {
                     if (error) {
