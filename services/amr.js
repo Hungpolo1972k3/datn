@@ -130,6 +130,7 @@ const getAmrInfo = async (file, sample_id) => {
         return amrDocs;
 
     } catch (error) {
+        await fs.promises.unlink(file.path);
         console.error(error);
         throw new Error('Failed to process AMR data: ' + error.message);
     }
@@ -195,6 +196,7 @@ const runAmrTool = async (file) => {
         return amrDocs;
 
     } catch (error) {
+        await fs.promises.unlink(file.path);
         console.error(error);
         throw new Error('Failed to process AMR data: ' + error.message);
     }

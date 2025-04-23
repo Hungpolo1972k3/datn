@@ -180,6 +180,7 @@ const getVirulenceInfo = async (file, sample_id) => {
         await fs.promises.unlink(file.path);
         return virulenceDocs;
     } catch (error) {
+        await fs.promises.unlink(file.path);
         console.error(error);
         throw new Error('Failed to process and save virulence data:' + error.message);
     }
@@ -262,6 +263,7 @@ const runVirulenceTool = async (file) => {
         await fs.promises.unlink(file.path);
         return virulenceDocs;
     } catch (error) {
+        await fs.promises.unlink(file.path);
         console.error(error);
         throw new Error('Failed to process and save virulence data:' + error.message);
     }
