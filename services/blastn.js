@@ -35,15 +35,13 @@ const runBlastnTool = async (inputFilePath) => {
 
 const getFullFolderPath = (relativePath) => {
   const fullPath = path.join(dataDir, relativePath);
-  console.log(fullPath);
   if (!fs.existsSync(fullPath)) {
-    throw new Error('Folder not found');
+    throw new Error('Folder not found'+ fullPath);
   }
 
   if (!fs.statSync(fullPath).isDirectory()) {
     throw new Error('Path is not a folder');
   }
-  console.log(fullPath)
   return fullPath;
 };
 
