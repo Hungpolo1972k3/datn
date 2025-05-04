@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 const path = require('path');
 const cheerio = require('cheerio');
 
-const dataDir = path.join(__dirname, '/data');
+const dataDir = path.join(__dirname, '../../FastA');
 const runBlastnTool = async (inputFilePath) => {
   const form = new FormData();
   form.append('fasta', fs.createReadStream(inputFilePath)); 
@@ -36,7 +36,7 @@ const runBlastnTool = async (inputFilePath) => {
 const getFullFolderPath = (relativePath) => {
   const fullPath = path.join(dataDir, relativePath);
   if (!fs.existsSync(fullPath)) {
-    throw new Error('Folder not found'+ fullPath);
+    throw new Error('Folder not found'+ fullPath + __dirname);
   }
 
   if (!fs.statSync(fullPath).isDirectory()) {
