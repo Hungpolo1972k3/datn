@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 const path = require('path');
 const cheerio = require('cheerio');
 
-const dataDir = path.join(__dirname, '../../FastA');
+const dataDir = path.join(__dirname, '/data');
 const runBlastnTool = async (inputFilePath) => {
   const form = new FormData();
   form.append('fasta', fs.createReadStream(inputFilePath)); 
