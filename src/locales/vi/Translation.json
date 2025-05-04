@@ -16,7 +16,9 @@
         "experiment-management": "Thí nghiệm",
         "abdataset": "AB Dataset",
         "tokenExpired": "Phiên đăng nhập đã hết hạn.",
-        "tool": "Công cụ"
+        "tool": "Công cụ",
+        "dataset": "Bộ dữ liệu",
+        "statistics": "Thống kê"
     },
     "homePage": {
         "title1": "Acinetobacter baumannii",
@@ -340,7 +342,9 @@
     "default": "Mặc định",
     "all": "Tất cả",
     "column": {
-      "name": "Tên bộ gen"
+      "name": "Tên bộ gen",
+      "id": "Mã giải trình tự",
+      "description": "Chức năng"
     },
     "download": "Tải xuống",
     "index": "STT",
@@ -348,7 +352,9 @@
       "previous": "Trước",
       "next": "Sau"
     },
-    "downloadAll": "Tải xuống toàn bộ dataset"
+    "downloadAll": "Tải xuống toàn bộ dataset",
+    "downloadFail": "Tải xuống thất bại",
+    "downloadSuccess": "Tải xuống thành công"
   },
   "toolPage":{
     "title": "Công cụ",
@@ -360,6 +366,9 @@
     "uploadFile": "Vui lòng nhập vào file",
     "header": "Header",
     "length": "Chiều dài mẫu"
-  }                      
+  },
+  "datasetStatistic": {
+    "title": "Thống kê bộ dữ liệu"
+  }                    
 }
   

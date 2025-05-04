@@ -49,3 +49,14 @@ export const apiDownloadFile = async (filePath) => {
       console.error('Error downloading file:', error);
     }
   };
+
+export const apiGetFileInfo = async (relativePath) => {
+  try {
+    const response = await axiosConfig.get('/api/blastn/getfileinfo', {
+      params: { path: relativePath }, 
+    });
+    return response.data; 
+  } catch (error) {
+    throw error;  
+  }
+};

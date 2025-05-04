@@ -5,6 +5,8 @@ import { Search, Download} from "lucide-react";
 import DatasetPopup from "../components/DatasetPopup";
 import { apiDownloadFolder, apiGetFolderInfo } from "../service/blastn";
 import datasetFolder from '../utils/datasetFolder.json';
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useNotice } from "../context/NoticeContext";
 
 const TableWrapper = styled.div`
   padding: 20px;
@@ -165,7 +167,9 @@ const PaginatedTable = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [itemPerPage, setItemPerPage] = useState(50);
   const [selectedGenome, setSelectedGenome] = useState(null);
-  const [datasetTitle, setDatasetTitle] = useState();
+  const [dataset, setDataset] = useState();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { showNotice } = useNotice();
 
   const handleSort = (key) => {
     if (sortKey === key) {
@@ -281,13 +285,28 @@ const PaginatedTable = () => {
       document.body.style.overflow = "auto";
     };
   }, [selectedGenome]);
-  const handleShowDatasetPopup = async(title,url) => {
+  const handleShowDatasetPopup = async(item) => {
     try {
-      let data = await apiGetFolderInfo(url);
+      let data = await apiGetFolderInfo(item.downloadUrl);
       setSelectedGenome(data);
-      setDatasetTitle(title);
+      setDataset(item);
     } catch (error) {
       console.log(error)
+    }
+  }
+
+  const handleDownloadFolder = async (e,url) => {
+    e.preventDefault();
+    try {
+      setIsDownloading(true);
+      await apiDownloadFolder(url);
+      showNotice(1, t('datasetAB.downloadSuccess'));
+    } catch (error) {
+      console.error("Download failed:", error);
+      showNotice(0, t('datasetAB.downloadFail'))
+    }
+    finally {
+      setIsDownloading(false);
     }
   }
   return (
@@ -314,13 +333,7 @@ const PaginatedTable = () => {
           <option value="all">{t("datasetAB.all")}</option>
         </ItemPerPageSelector>
         <ToolRight
-          onClick={async () => {
-            try {
-              await apiDownloadFolder('/');
-            } catch (err) {
-              console.error("Failed to download full dataset:", err);
-            }
-          }}
+          onClick={(e) => handleDownloadFolder(e, '/')}
           title={t("datasetAB.downloadAll")}
         >
           <Download size={20} />
@@ -332,25 +345,26 @@ const PaginatedTable = () => {
         <TableRow>
           <TableHeaderCell>{t("datasetAB.index")}</TableHeaderCell>
           <TableHeaderCell onClick={() => handleSort("name")}>
-            {t("datasetAB.column.name")}
+            {t("datasetAB.column.id")}
           </TableHeaderCell>
+          <TableHeaderCell>{t("datasetAB.column.name")}</TableHeaderCell>
+          <TableHeaderCell>{t("datasetAB.column.description")}</TableHeaderCell>
           <TableHeaderCell>{t("datasetAB.download")}</TableHeaderCell>
         </TableRow>
       </TableHead>
       <tbody>
         {paginatedData.map((item, index) => (
-          <TableRow key={item.name} onClick={() => handleShowDatasetPopup(item.name,item.downloadUrl)}>
+          <TableRow key={item.name} onClick={() => handleShowDatasetPopup(item)}>
             <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-            <TableCell>{item.name}</TableCell>
+            <TableCell>
+              <a href={item.ncbiUrl} target="_blank" rel="noopener noreferrer">
+                {item.name}
+              </a>
+            </TableCell>
+            <TableCell>{item.bacteria}</TableCell>
+            <TableCell>{item.description}</TableCell>
             <TableCell
-              onClick={async (e) => {
-                e.stopPropagation();
-                try {
-                  await apiDownloadFolder(item.downloadUrl);
-                } catch (error) {
-                  console.error("Download failed:", error);
-                }
-              }}
+              onClick={(e) => handleDownloadFolder(e,item.downloadUrl)}
               style={{ textAlign: "center", cursor: "pointer" }}
             >
               <Download size={18} />
@@ -363,11 +377,12 @@ const PaginatedTable = () => {
       <Pagination>{renderPageNumbers()}</Pagination>
       {selectedGenome && (
         <DatasetPopup
-          title={datasetTitle}
+          dataset={dataset}
           genome={selectedGenome}
           onClose={() => setSelectedGenome(null)}
         />
       )}
+      {isDownloading && <LoadingSpinner />}
     </TableWrapper>
   );
 };

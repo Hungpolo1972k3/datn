@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import { useNotice } from "../context/NoticeContext";
 import { Download, X } from "lucide-react";
-import { apiDownloadFile } from "../service/blastn";
+import { apiDownloadFile, apiGetFileInfo } from "../service/blastn";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import ShowFileContent from "./ShowFileContent";
+import LoadingSpinner from "./LoadingSpinner";
+import { useTranslation } from "react-i18next";
 
 const DimBackground = styled.div`
   position: fixed;
@@ -66,7 +69,7 @@ const SectionRow = styled.div`
 const ActionButtons = styled.div`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 16px;
 `;
 
 const Label = styled.span`
@@ -75,9 +78,66 @@ const Label = styled.span`
   gap: 6px;
 `;
 
-const DatasetPopup = ({ title, genome, onClose }) => {
-  const handleDownload = async(filePath) => {
+const folderLabelMap = {
+  contigs_summary: "Genomad",
+  MLST_output: "MLST",
+  PlasmidTyping_output: "PlasmidTyping",
+  chromosome: "Platon - Chromosome",
+  plasmid: "Platon - Plasmid",
+  Quast_output: "Quast",
+  Spades_output: "Spades",
+};
+
+const groupByFolderName = (genome) => {
+  const groups = {};
+
+  genome.forEach((file) => {
+    const label = folderLabelMap[file.folderName];
+    if (!label) return; 
+
+    if (!groups[label]) {
+      groups[label] = [];
+    }
+
+    groups[label].push(file);
+  });
+
+  return groups;
+};
+
+const DatasetPopup = ({ dataset, genome, onClose }) => {
+  const { t } = useTranslation();
+  const handleDownload = async (filePath) => {
     await apiDownloadFile(filePath); 
+  };
+
+  const grouped = groupByFolderName(genome);
+  const [expandedSections, setExpandedSections] = useState({});
+  const toggleSection = (section) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const [fileContent, setFileContent] = useState(null);
+  const [viewedFile, setViewedFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+  const handleViewContent = async (filePath, fileName) => {
+    setLoading(true);
+    try {
+      const content = await apiGetFileInfo(filePath);
+      setFileContent(content.data);
+      setViewedFile(fileName); 
+      setTimeout(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } catch (error) {
+      setFileContent("Không thể tải nội dung file.");
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <>
@@ -88,28 +148,109 @@ const DatasetPopup = ({ title, genome, onClose }) => {
             <X />
           </CloseButton>
         </PopupHeader>
-        <h2
+        <div
           style={{
-            fontSize: "3rem",
-            fontWeight: "bold",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: "12px",
             marginBottom: "1rem",
-            textAlign: "center",
-            color: "#1e3a8a"
           }}
         >
-          {title}
-        </h2>
-
-        <div>
-          {genome.map((file) => (
-            <SectionRow key={file.name} onClick={() => handleDownload(file.path)}>
-              <Label>{file.name}</Label>
-                <ActionButtons>
-                    <Download/>
-                </ActionButtons>
-            </SectionRow>
-          ))}
+          <h2
+            style={{
+              fontSize: "3rem",
+              fontWeight: "bold",
+              textAlign: "center",
+              color: "#1e3a8a",
+              margin: 0,
+            }}
+          >
+            {dataset.name}
+          </h2>
+          <a
+            href={`https://www.ncbi.nlm.nih.gov/search/all/?term=${encodeURIComponent(dataset.name)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              fontSize: "2rem",
+              color: "#0369a1",
+              padding: "4px 10px",
+              borderRadius: "8px",
+              textDecoration: "none",
+              fontWeight: "500",
+            }}
+          >
+            🔗
+          </a>
         </div>
+        <div
+          style={{
+            textAlign: "left",
+            color: "#1e40af",
+            margin: 30,
+          }}
+        >
+          <div style={{ marginBottom: "10px", marginLeft:"10px", display: "flex", flexDirection: "column", gap: "16px" }}>
+            <h2>{dataset.title}</h2>
+            <h2>{dataset.description}</h2>
+            <h2>{dataset.sequencingSystem}</h2>
+          </div>
+        </div>
+        <div>
+          {Object.entries(grouped).map(([section, files]) => {
+            const isOpen = expandedSections[section] ?? true;
+
+            return (
+              <div key={section}>
+                <h2
+                  style={{
+                    margin: "16px 40px 8px",
+                    color: "#1e40af",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    cursor: "pointer"
+                  }}
+                  onClick={() => toggleSection(section)}
+                >
+                  {section}
+                  <span>{isOpen ? <ChevronDown size={20} /> : <ChevronRight size={20} />}</span>
+                </h2>
+
+                {isOpen &&
+                  files.map((file) => (
+                    <SectionRow key={file.path}>
+                      <Label>
+                        <span style={{ flex: 1 }}>{file.fileName}</span>
+                        <span style={{ minWidth: "80px", textAlign: "right", color: "#555" }}>{file.size}</span>
+                      </Label>
+                      <ActionButtons>
+                        <span
+                          onClick={() => handleViewContent(file.path, file.fileName)}
+                          style={{ cursor: "pointer", fontSize: "1.5rem" }}
+                        >
+                          {viewedFile === file.fileName ? "🧐" : "🔍"}
+                        </span>
+                        <Download onClick={() => handleDownload(file.path)} />
+                      </ActionButtons>
+                    </SectionRow>
+                  ))}
+              </div>
+            );
+          })}
+        </div>
+
+        {loading ? (
+          <LoadingSpinner />
+        ) : (
+          fileContent && (
+            <>
+              <ShowFileContent fileContent={fileContent} viewedFile={viewedFile} />
+              <div ref={bottomRef} />
+            </>
+          )
+        )}
       </PopupOverlay>
     </>
   );

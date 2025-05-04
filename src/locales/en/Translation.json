@@ -16,7 +16,9 @@
         "experiment-management": "Experiments",
         "abdataset": "AB Dataset",
         "tokenExpired": "Session has expired.",
-        "tool": "Tool"
+        "tool": "Tool",
+        "dataset": "Dataset",
+        "statistics": "Statistic"
     },
     "homePage": {
         "title1": "Acinetobacter baumannii",
@@ -340,7 +342,9 @@
     "default": "Default",
     "all": "All",
     "column": {
-      "name": "Genome Name"
+      "name": "Genome Name",
+      "id": "Sequence ID",
+      "description": "Description"
     },
     "download": "Download",
     "index": "No.",
@@ -348,7 +352,9 @@
       "previous": "Previous",
       "next": "Next"
     },
-    "downloadAll": "Download All Dataset"
+    "downloadAll": "Download All Dataset",
+    "downloadFail": "Download fail",
+    "downloadSuccess": "Download successfully"
   },
   "toolPage":{
     "title": "Tool",
@@ -360,6 +366,9 @@
     "uploadFile": "Please upload fasta file",
     "header": "Header",
     "length": "Length"
+  },
+  "datasetStatistic": {
+    "title": "Dataset Statistic"
   }               
 }
   

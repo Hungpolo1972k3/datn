@@ -13,6 +13,7 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import ExperimentManagement from "./pages/ExperimentManagement";
 import Dataset from "./pages/Dataset";
 import Tool from "./pages/Tool";
+import DatasetStatistic from "./pages/DatasetStatistic";
 
 const Container = styled.div`
   display: flex;
@@ -36,6 +37,7 @@ function App() {
               <Route path="/dataset" element={<Dataset />}/>
               <Route path="/login" element={<Login />} />
               <Route path="/tool" element={<Tool />} />
+              <Route path="/dataset_statistics" element={<DatasetStatistic/>} />
               <Route
                 path="/submit"
                 element={
