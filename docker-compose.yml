@@ -15,4 +15,4 @@ services:
       JWT_REFRESH_SECRET: 20210392
       BIOTOOL_URL: http://103.159.50.207:5000
     volumes:
-      - ../FastA:/data
+      - ../:/app
