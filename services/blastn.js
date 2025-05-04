@@ -43,7 +43,7 @@ const getFullFolderPath = (relativePath) => {
   if (!fs.statSync(fullPath).isDirectory()) {
     throw new Error('Path is not a folder');
   }
-
+  console.log(fullPath)
   return fullPath;
 };
 
