@@ -62,13 +62,26 @@ const downloadFile = async (req, res) => {
     res.setHeader('Content-Type', file.mimeType || 'application/octet-stream');
     res.send(file.content);
   } catch (error) {
-    console.error('Error downloading file:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+const getFileInfo = async(req, res) => {
+  const filePath = req.query.path;
+  try {
+    const file = await blastnService.getFileInfo(filePath);
+    return res.status(200).json({ 
+      message: 'Thành công', 
+      data: file 
+    });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+} 
 module.exports = {
     runBlastmTool,
     downloadFolder,
     getFolderInfo,
-    downloadFile
+    downloadFile,
+    getFileInfo
 };

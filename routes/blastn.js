@@ -27,6 +27,6 @@ router.post('/runblastntool', upload.single('fasta'), blastnController.runBlastm
 router.get('/downloadfolder', blastnController.downloadFolder);
 
 router.get('/getfolderinfo', blastnController.getFolderInfo);
-
+router.get('/getfileinfo', blastnController.getFileInfo);
 router.get('/downloadfile', blastnController.downloadFile);
 module.exports = router;
