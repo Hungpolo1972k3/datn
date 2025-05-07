@@ -19,7 +19,7 @@ const PopupOverlay = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
+  width: 95%;
   max-height: 90vh;
   background: white;
   z-index: 1000;

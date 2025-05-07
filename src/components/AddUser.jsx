@@ -16,9 +16,9 @@ const Popup = styled.div`
   background: white;
   padding: 30px;
   border-radius: 10px;
-  width: 500px;
+  width: 70%;
   position: relative;
-  max-height: 80vh;
+  height: 70%;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -35,7 +35,7 @@ const CloseButton = styled.button`
 `;
 
 const Title = styled.h2`
-  font-size: 36px;
+  font-size: 40px;
   font-weight: bold;
   margin-bottom: 30px;
   text-align: center;
@@ -43,7 +43,7 @@ const Title = styled.h2`
 
 const InputGroup = styled.div`
   margin-bottom: 15px;
-  width: 100%;
+  width: 80%;
 `;
 
 const Label = styled.label`
@@ -78,8 +78,9 @@ const Button = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  width: 100%;
+  width: 15%;
   margin-top: 20px;
+  font-size: 15px
 `;
 
 const ErrorMsg = styled.div`

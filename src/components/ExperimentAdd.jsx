@@ -5,7 +5,6 @@ import { createExperiment } from '../service/experiment';
 import { useNotice } from "../context/NoticeContext";
 import { useTranslation } from "react-i18next";
 
-// Styled components for the page layout and form
 const ModalBackground = styled.div`
   position: fixed;
   top: 0;
@@ -19,8 +18,7 @@ const ModalBackground = styled.div`
 `;
 
 const ModalContainer = styled.div`
-  width: 80%;
-  max-width: 600px;
+  width: 90%;
   background-color: #ffffff;
   padding: 40px;
   border-radius: 12px;
@@ -30,7 +28,7 @@ const ModalContainer = styled.div`
 
 const Title = styled.h1`
   text-align: center;
-  font-size: 36px;
+  font-size: 45px;
   color: #333;
   margin-bottom: 40px;
 `;
@@ -99,9 +97,10 @@ const CloseButton = styled.button`
   top: 10px;
   right: 10px;
   padding: 10px;
+  margin-right: 20px;
   background-color: transparent;
   border: none;
-  font-size: 18px;
+  font-size: 40px;
   color: #333;
   cursor: pointer;
 

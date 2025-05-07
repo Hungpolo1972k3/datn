@@ -9,7 +9,7 @@ const PopupContainer = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50%;
+  width: 60%;
   padding: 20px;
   background-color: white;
   border-radius: 8px;
@@ -23,7 +23,7 @@ const Title = styled.h2`
   text-align: center;
   margin-bottom: 20px;
   position: relative;
-  font-size: 30px;
+  font-size: 40px;
   font-weight: bold;
 `;
 
@@ -46,6 +46,7 @@ const InfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
+  padding-left: 10%
 `;
 
 const InfoRow = styled.div`
@@ -66,29 +67,31 @@ const InputField = styled.input`
   margin: 5px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 60%;
+  width: 50%;
+  margin-left: 10%;
 `;
 
 const ValueText = styled.span`
   width: 60%;
   text-align: left;
+  margin-left: 10%;
   padding: 10px;
 `;
 
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin: 30px 80px 10px 80px
 `;
 
 const Button = styled.button`
-  padding: 10px 15px;
+  padding: 10px 25px;
   background-color: #007bff;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-
+  font-size: 15px;
   &:disabled {
     background-color: #ccc;
     cursor: not-allowed;
@@ -222,10 +225,10 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
                         onChange={handleChange}
                         style={{
                           padding: "10px",
-                          margin: "5px 0",
+                          margin: "5px 45px",
                           border: "1px solid #ccc",
                           borderRadius: "4px",
-                          width: "80px",
+                          width: "55%",
                         }}
                       >
                         <option value="">{t("userInfoComponent.gender_placeholder")}</option>
