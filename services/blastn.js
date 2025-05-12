@@ -13,7 +13,7 @@ const removeFiles = (files) => {
     });
 };
 
-const dataDir = path.join(__dirname, '../data');
+const dataDir = path.join("D:/NguyenThoHung", '../FastA');
 const getFastaLength = (fastaPath) => {
     return new Promise((resolve, reject) => {
         let totalLength = 0;
