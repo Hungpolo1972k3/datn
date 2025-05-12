@@ -22,7 +22,7 @@ const runBlastn = async (queryFastaPath, res) => {
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
             limit(() => new Promise((resolve) => {
-                const subjectPath = path.join("D:/NguyenThoHung/FastA", fastaUrl);
+                const subjectPath = path.join("/mnt/d/NguyenThoHung/FastA", fastaUrl);
                 const outputFileName = `${path.basename(queryPath)}.${name}.blastout`;
                 const outputFilePath = path.join(os.tmpdir(), outputFileName);
 
