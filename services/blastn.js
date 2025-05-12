@@ -13,7 +13,7 @@ const removeFiles = (files) => {
     });
 };
 
-const dataDir = path.join('/app', 'FastA');
+const dataDir = path.join('/app2', 'FastA');
 const parseBlastResults = (blastText) => {
     const lines = blastText.trim().split('\n');
     return lines.map(line => {
