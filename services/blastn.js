@@ -69,10 +69,15 @@ const runBlastn = async (queryFastaPath, res) => {
                         }
 
                         const parsed = parseBlastResults(data);
+                        const averageCoverage = parsed.length
+                            ? +(parsed.reduce((sum, hit) => sum + hit.coverage, 0) / parsed.length).toFixed(2)
+                            : 0;
+
                         resolve({
                             name,
-                            hits: parsed,
-                            success: true,
+                            // hits: parsed,
+                            averageCoverage,
+                            // success: true,
                         });
                     });
                 });
