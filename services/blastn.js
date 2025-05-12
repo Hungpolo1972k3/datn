@@ -88,7 +88,9 @@ const runBlastn = async (queryFastaPath, res) => {
         removeFiles([queryPath]);
 
         res.json({
-            results,
+            results: results
+                .filter(item => item.success)
+                .sort((a, b) => b.averageCoverage - a.averageCoverage),
         });
     } catch (err) {
         removeFiles([queryPath]);
