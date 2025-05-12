@@ -33,14 +33,12 @@ const runBlastn = async (queryFastaPath, res) => {
                         return resolve({
                             name,
                             result: `Error: ${stderr || error.message}`,
-                            success: false,
                         });
                     }
                     fs.readFile(outputFilePath, 'utf8', (err, data) => {
                         resolve({
                             name,
                             result: data.trim(),
-                            success: true,
                         });
                     });
                 });
@@ -49,10 +47,7 @@ const runBlastn = async (queryFastaPath, res) => {
 
         const results = await Promise.all(tasks);
         removeFiles([queryPath]);
-        res.json({
-            status: 'success',
-            results: results.filter(item => item.success), 
-        });
+        res.json(results.filter(item => item.success));
     } catch (err) {
         removeFiles([queryPath]);
         console.error(err);
