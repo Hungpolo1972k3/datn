@@ -46,7 +46,7 @@ const getFastaLength = (fastaPath) => {
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
-    const limit = pLimit(10); 
+    const limit = pLimit(10);
 
     try {
         const queryLength = await getFastaLength(queryPath);
@@ -63,8 +63,7 @@ const runBlastn = async (queryFastaPath, res) => {
                     if (error) {
                         return resolve({
                             name,
-                            coverage: 'Error: ' + (stderr || error.message),
-                            _coverageValue: -1
+                            result: 'Error: ' + (stderr || error.message),
                         });
                     }
 
@@ -72,28 +71,12 @@ const runBlastn = async (queryFastaPath, res) => {
                         if (err) {
                             return resolve({
                                 name,
-                                coverage: 'Error: Lỗi khi đọc file kết quả',
-                                _coverageValue: -1
+                                result: 'Error: Lỗi khi đọc file kết quả',
                             });
                         }
-
-                        let totalMatchLength = 0;
-                        const lines = data.trim().split('\n').filter(Boolean);
-
-                        for (const line of lines) {
-                            const cols = line.split('\t');
-                            const alignLen = Math.abs(parseInt(cols[7]) - parseInt(cols[6])) + 1;
-                            totalMatchLength += alignLen;
-                        }
-
-                        const coverageRaw = queryLength > 0
-                            ? (totalMatchLength / queryLength) * 100
-                            : 0;
-
                         resolve({
                             name,
-                            coverage: `${coverageRaw.toFixed(2)}%`,
-                            _coverageValue: coverageRaw
+                            result: data.trim(), 
                         });
                     });
                 });
@@ -101,12 +84,8 @@ const runBlastn = async (queryFastaPath, res) => {
         );
 
         const results = await Promise.all(tasks);
-
-        results.sort((a, b) => b._coverageValue - a._coverageValue);
-        const finalResults = results.map(({ _coverageValue, ...rest }) => rest);
-
         removeFiles([queryPath]);
-        res.json(finalResults);
+        res.json(results);
     } catch (err) {
         removeFiles([queryPath]);
         console.error(err);
