@@ -2,6 +2,8 @@ const { exec } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const os = require("os");
+const dataset = require('../utils/datasetFasta.json');
+const pLimit = require('p-limit');
 
 const removeFiles = (files) => {
     files.forEach(file => {
@@ -12,66 +14,104 @@ const removeFiles = (files) => {
 };
 
 const dataDir = path.join(__dirname, '../data');
+const getFastaLength = (fastaPath) => {
+    return new Promise((resolve, reject) => {
+        let totalLength = 0;
+        let currentSeq = '';
+        const rl = readline.createInterface({
+            input: fs.createReadStream(fastaPath),
+            crlfDelay: Infinity
+        });
 
-const getDataFiles = () => {
-  return new Promise((resolve, reject) => {
-    fs.readdir(dataDir, (err, files) => {
-      if (err) {
-        return reject(`Error reading files from data directory: ${err}`);
-      }
-      const dataFiles = files.filter(file => fs.lstatSync(path.join(dataDir, file)).isFile());
-      resolve(dataFiles);
+        rl.on('line', (line) => {
+            if (line.startsWith('>')) {
+                if (currentSeq) {
+                    totalLength += currentSeq.length;
+                    currentSeq = '';
+                }
+            } else {
+                currentSeq += line.trim();
+            }
+        });
+
+        rl.on('close', () => {
+            if (currentSeq) totalLength += currentSeq.length;
+            resolve(totalLength);
+        });
+
+        rl.on('error', reject);
     });
-  });
 };
 
-const runBlastn = async (filePath, res) => {
-    const fastaFilePath = path.resolve(filePath);
+const runBlastn = async (queryFastaPath, res) => {
+    const queryPath = path.resolve(queryFastaPath);
+    const limit = pLimit(10); 
 
     try {
-        const dataFiles = await getDataFiles();
-        const results = {};
+        const queryLength = await getFastaLength(queryPath);
 
-        for (const file of dataFiles) {
-            const subjectPath = path.join(dataDir, file);
-            const outputFileName = `${path.basename(fastaFilePath)}.${file}.blastout`;
-            const outputFilePath = path.join(os.tmpdir(), outputFileName); // tmp file
+        const tasks = dataset.map(({ name, fastaUrl }) =>
+            limit(() => new Promise((resolve) => {
+                const subjectPath = path.join(dataDir, fastaUrl);
+                const outputFileName = `${path.basename(queryPath)}.${name}.blastout`;
+                const outputFilePath = path.join(os.tmpdir(), outputFileName);
 
-            const command = `blastn -query "${fastaFilePath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
+                const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
 
-            try {
-                const result = await new Promise((resolve, reject) => {
-                    exec(command, (error, stdout, stderr) => {
-                        if (error) {
-                            return reject(`Error: ${stderr || error.message}`);
+                exec(command, (error, stdout, stderr) => {
+                    if (error) {
+                        return resolve({
+                            name,
+                            coverage: 'Error: ' + (stderr || error.message),
+                            _coverageValue: -1
+                        });
+                    }
+
+                    fs.readFile(outputFilePath, 'utf8', (err, data) => {
+                        if (err) {
+                            return resolve({
+                                name,
+                                coverage: 'Error: Lỗi khi đọc file kết quả',
+                                _coverageValue: -1
+                            });
                         }
 
-                        fs.readFile(outputFilePath, 'utf8', (err, data) => {
-                            if (err) return reject('Lỗi khi đọc file kết quả');
-                            resolve(data);
+                        let totalMatchLength = 0;
+                        const lines = data.trim().split('\n').filter(Boolean);
+
+                        for (const line of lines) {
+                            const cols = line.split('\t');
+                            const alignLen = Math.abs(parseInt(cols[7]) - parseInt(cols[6])) + 1;
+                            totalMatchLength += alignLen;
+                        }
+
+                        const coverageRaw = queryLength > 0
+                            ? (totalMatchLength / queryLength) * 100
+                            : 0;
+
+                        resolve({
+                            name,
+                            coverage: `${coverageRaw.toFixed(2)}%`,
+                            _coverageValue: coverageRaw
                         });
                     });
                 });
+            }))
+        );
 
-                results[file] = {
-                    result,
-                    downloadUrl: `download/${outputFileName}`
-                };
-            } catch (err) {
-                results[file] = { error: err };
-            } finally {
-            }
-        }
+        const results = await Promise.all(tasks);
 
-        removeFiles([fastaFilePath]);
-        res.json(results);
+        results.sort((a, b) => b._coverageValue - a._coverageValue);
+        const finalResults = results.map(({ _coverageValue, ...rest }) => rest);
+
+        removeFiles([queryPath]);
+        res.json(finalResults);
     } catch (err) {
-        removeFiles([fastaFilePath]);
+        removeFiles([queryPath]);
         console.error(err);
         res.status(500).json({ error: err.message || 'Lỗi không xác định' });
     }
 };
-
 
 module.exports = {
     runBlastn
