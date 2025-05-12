@@ -14,6 +14,28 @@ const removeFiles = (files) => {
 };
 
 const dataDir = path.join("D:/NguyenThoHung", '../FastA');
+const parseBlastResults = (blastText) => {
+    const lines = blastText.trim().split('\n');
+    return lines.map(line => {
+        const fields = line.split('\t');
+        return {
+            queryId: fields[0],
+            subjectId: fields[1],
+            identity: parseFloat(fields[2]),
+            alignmentLength: parseInt(fields[3], 10),
+            mismatches: parseInt(fields[4], 10),
+            gapOpens: parseInt(fields[5], 10),
+            qStart: parseInt(fields[6], 10),
+            qEnd: parseInt(fields[7], 10),
+            sStart: parseInt(fields[8], 10),
+            sEnd: parseInt(fields[9], 10),
+            evalue: parseFloat(fields[10]),
+            bitScore: parseFloat(fields[11]),
+            coverage: parseFloat(fields[2])
+        };
+    });
+};
+
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
