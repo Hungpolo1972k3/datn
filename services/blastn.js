@@ -32,20 +32,15 @@ const runBlastn = async (queryFastaPath, res) => {
                     if (error) {
                         return resolve({
                             name,
-                            result: 'Error: ' + (stderr || error.message),
+                            result: `Error: ${stderr || error.message}`,
+                            success: false,
                         });
                     }
-
                     fs.readFile(outputFilePath, 'utf8', (err, data) => {
-                        if (err) {
-                            return resolve({
-                                name,
-                                result: 'Error: Lỗi khi đọc file kết quả',
-                            });
-                        }
                         resolve({
                             name,
-                            result: data.trim(), 
+                            result: data.trim(),
+                            success: true,
                         });
                     });
                 });
@@ -54,11 +49,17 @@ const runBlastn = async (queryFastaPath, res) => {
 
         const results = await Promise.all(tasks);
         removeFiles([queryPath]);
-        res.json(results);
+        res.json({
+            status: 'success',
+            results: results.filter(item => item.success), 
+        });
     } catch (err) {
         removeFiles([queryPath]);
         console.error(err);
-        res.status(500).json({ error: err.message || 'Lỗi không xác định' });
+        res.status(500).json({
+            status: 'error',
+            error: err.message || 'Lỗi không xác định'
+        });
     }
 };
 
