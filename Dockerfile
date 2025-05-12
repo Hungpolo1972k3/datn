@@ -25,12 +25,13 @@ RUN mamba create -n abricate_env -c bioconda -c conda-forge abricate && \
 
 ENV PATH /opt/conda/envs/abricate_env/bin:$PATH
 
-WORKDIR /usr/src/app
+RUN wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.16.0+-x64-linux.tar.gz  
+RUN tar xvfz ncbi-blast-2.16.0+-x64-linux.tar.gz 
+WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
 
 EXPOSE 5000
 
-# Run the server
 CMD [ "npm", "start" ]

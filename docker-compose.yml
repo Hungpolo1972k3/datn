@@ -8,5 +8,5 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/usr/src/app
+      - ../FastA:/app/FastA
     restart: unless-stopped

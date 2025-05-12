@@ -13,7 +13,7 @@ const removeFiles = (files) => {
     });
 };
 
-const dataDir = path.join("D:/NguyenThoHung", '../FastA');
+const dataDir = path.join('/app', 'FastA');
 const parseBlastResults = (blastText) => {
     const lines = blastText.trim().split('\n');
     return lines.map(line => {
@@ -44,13 +44,12 @@ const runBlastn = async (queryFastaPath, res) => {
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
             limit(() => new Promise((resolve) => {
-                const subjectPath = path.join("/mnt/d/NguyenThoHung/FastA", fastaUrl);
+                const subjectPath = path.join(dataDir, fastaUrl);
                 const outputFileName = `${path.basename(queryPath)}.${name}.blastout`;
                 const outputFilePath = path.join(os.tmpdir(), outputFileName);
 
                 const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
-
-                exec(command, (error, stdout, stderr) => {
+                exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
                     if (error) {
                         return resolve({
                             name,
@@ -59,28 +58,17 @@ const runBlastn = async (queryFastaPath, res) => {
                         });
                     }
 
-                    fs.readFile(outputFilePath, 'utf8', (err, data) => {
-                        if (err) {
-                            return resolve({
-                                name,
-                                error: err.message,
-                                success: false,
-                            });
-                        }
+                    const parsed = parseBlastResults(stdout);
+                    const averageCoverage = parsed.length
+                        ? +(parsed.reduce((sum, hit) => sum + hit.coverage, 0) / parsed.length).toFixed(2)
+                        : 0;
 
-                        const parsed = parseBlastResults(data);
-                        const averageCoverage = parsed.length
-                            ? +(parsed.reduce((sum, hit) => sum + hit.coverage, 0) / parsed.length).toFixed(2)
-                            : 0;
-
-                        resolve({
-                            name,
-                            // hits: parsed,
-                            averageCoverage,
-                            // success: true,
-                        });
+                    resolve({
+                        name,
+                        averageCoverage,
+                        success: true,
                     });
-                });
+                });       
             }))
         );
 
