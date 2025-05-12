@@ -14,46 +14,15 @@ const removeFiles = (files) => {
 };
 
 const dataDir = path.join("D:/NguyenThoHung", '../FastA');
-const getFastaLength = (fastaPath) => {
-    return new Promise((resolve, reject) => {
-        let totalLength = 0;
-        let currentSeq = '';
-        const rl = readline.createInterface({
-            input: fs.createReadStream(fastaPath),
-            crlfDelay: Infinity
-        });
-
-        rl.on('line', (line) => {
-            if (line.startsWith('>')) {
-                if (currentSeq) {
-                    totalLength += currentSeq.length;
-                    currentSeq = '';
-                }
-            } else {
-                currentSeq += line.trim();
-            }
-        });
-
-        rl.on('close', () => {
-            if (currentSeq) totalLength += currentSeq.length;
-            resolve(totalLength);
-        });
-
-        rl.on('error', reject);
-    });
-};
-
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
     const limit = pLimit(10);
 
     try {
-        const queryLength = await getFastaLength(queryPath);
-
         const tasks = dataset.map(({ name, fastaUrl }) =>
             limit(() => new Promise((resolve) => {
-                const subjectPath = path.join(dataDir, fastaUrl);
+                const subjectPath = path.join("D:/NguyenThoHung/FastA", fastaUrl);
                 const outputFileName = `${path.basename(queryPath)}.${name}.blastout`;
                 const outputFilePath = path.join(os.tmpdir(), outputFileName);
 
