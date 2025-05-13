@@ -13,7 +13,7 @@ const removeFiles = (files) => {
     });
 };
 
-const dataDir = path.join('/app2', 'FastA');
+const dataDir = path.join('/app', 'FastA');
 const parseBlastResults = (blastText) => {
     const lines = blastText.trim().split('\n');
     return lines.map(line => {
@@ -67,6 +67,7 @@ const runBlastn = async (queryFastaPath, res) => {
                         name,
                         averageCoverage,
                         success: true,
+                        subjectPath
                     });
                 });       
             }))

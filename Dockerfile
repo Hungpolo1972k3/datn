@@ -27,7 +27,7 @@ ENV PATH /opt/conda/envs/abricate_env/bin:$PATH
 
 RUN wget https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-2.16.0+-x64-linux.tar.gz  
 RUN tar xvfz ncbi-blast-2.16.0+-x64-linux.tar.gz 
-WORKDIR /app2
+WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
