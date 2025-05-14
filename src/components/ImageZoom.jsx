@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { data } from "react-router-dom";
+import { FiChevronDown, FiChevronRight } from "react-icons/fi";
 import styled from "styled-components";
 const Button = styled.button`
   position: absolute;
@@ -23,7 +23,7 @@ const ButtonReset = styled.button`
   right: -80px;
   top: -3px;
   padding: 8px 10px;
-  background-color: #6c757d; /* Gray */
+  background-color: #6c757d;
   color: white;
   border: none;
   border-radius: 5px;
@@ -35,55 +35,111 @@ const ButtonReset = styled.button`
     background-color: #5a6268;
   }
 `;
+const Wrapper = styled.div`
+  padding: 1rem;
+`;
+const DropdownButton = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  background-color: #212529;
+  color: #f8f9fa;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid #343a40;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    background-color: #343a40;
+    transform: translateY(-1px);
+  }
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+`;
 
 const FinalExport = ({ file_dist }) => {
+  const [datasetsByLabel, setDatasetsByLabel] = useState({});
+  const [openDropdowns, setOpenDropdowns] = useState({});
+
   const fetchData = async () => {
     try {
       const response = await fetch(file_dist);
       const data = await response.json();
 
-      const datasetsGrouped = data.project.map((datasetArray) => {
-        const genes = datasetArray.find((d) => d.genes)?.genes || [];
+      const groupedData = {};
+
+      data.project.forEach((datasetArray) => {
+        const labeledDatasets = datasetArray.filter((d) => d.label);
+
         const antibiotics =
-          datasetArray.find((d) => d.antibiotics)?.antibiotics || "";
+          datasetArray.find((d) => d.antibiotics)?.antibiotics || "Unknown";
+        const genes = datasetArray.find((d) => d.genes)?.genes || [];
 
-        const group = datasetArray.filter((d) => d.label);
+        if (!groupedData[antibiotics]) groupedData[antibiotics] = [];
 
-        return {
+        groupedData[antibiotics].push({
           genes,
           antibiotics,
-          group,
-        };
+          group: labeledDatasets,
+        });
       });
-      return datasetsGrouped;
-    } catch (error) {
-      console.error("Error loading data:", error);
-      return [];
+
+      return groupedData;
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      return {};
     }
   };
-
-  const [datasets, setDatasets] = useState([]);
 
   useEffect(() => {
     const loadData = async () => {
       const data = await fetchData();
-      if (data) {
-        setDatasets(data);
-      }
+      setDatasetsByLabel(data);
     };
     loadData();
-  }, []);
+  }, [file_dist]);
 
-  return datasets.map((group, index) => {
-    return (
-      <DatasetSVG
-        key={index}
-        datasets={group.group}
-        genes={group.genes}
-        antibiotics={group.antibiotics}
-      />
-    );
-  });
+  const toggleDropdown = (label) => {
+    setOpenDropdowns((prevState) => ({
+      ...prevState,
+      [label]: !prevState[label],
+    }));
+  };
+
+  return (
+    <Wrapper>
+      {Object.entries(datasetsByLabel).map(([antibiotics, datasets]) => (
+        <div key={antibiotics}>
+          <DropdownButton onClick={() => toggleDropdown(antibiotics)}>
+            {antibiotics.toUpperCase()}
+            {openDropdowns[antibiotics] ? (
+              <FiChevronDown size={20} />
+            ) : (
+              <FiChevronRight size={20} />
+            )}
+          </DropdownButton>
+
+          {openDropdowns[antibiotics] &&
+            datasets.map((dataset, index) => (
+              <DatasetSVG
+                datasets={dataset.group}
+                genes={dataset.genes}
+                antibiotics={dataset.antibiotics}
+                key={index}
+              />
+            ))}
+        </div>
+      ))}
+    </Wrapper>
+  );
 };
 
 const DatasetSVG = ({ datasets, genes, antibiotics }) => {
@@ -207,6 +263,19 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
           `,
     });
   };
+  const svgRef = useRef(null);
+  const handleExportSVG = () => {
+    if (!svgRef.current) return;
+    const svgData = new XMLSerializer().serializeToString(svgRef.current);
+    const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${antibiotics || "chart"}.svg`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleMouseOut = () => {
     setHoverIndex(null);
@@ -226,11 +295,15 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
       <Button onClick={handleButtonClick}>
         {opacity === 0 ? "Show Point" : "Hide Point"}
       </Button>
+      <Button style={{ right: 150 }} onClick={handleExportSVG}>
+        Export SVG
+      </Button>
 
       <svg
         width={width + 100}
-        height={height + 120}
+        height={height + 140}
         viewBox={`0 0 ${width + 100} ${height}`}
+        ref={svgRef}
       >
         <text x={width / 2} y={-30} stroke="black" fontSize={20}>
           {antibiotics}
@@ -247,7 +320,7 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
         {values.reverse().map((value, index) =>
           index !== values.length - 1 ? (
             <g key={value}>
-              <text x={0} y={index * (height / 5) + 5} stroke="black">
+              <text x={0} y={index * (height / 5) + 5}>
                 {value}
               </text>
               <line
@@ -256,12 +329,12 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
                 x2={25}
                 y2={index * (height / 5)}
                 stroke="black"
-                strokeWidth="2"
+                strokeWidth="1"
               />
             </g>
           ) : (
             <g key={value}>
-              <text x={0} y={index * (height / 5)} stroke="black">
+              <text x={0} y={index * (height / 5)}>
                 {value}
               </text>
             </g>
@@ -275,7 +348,7 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
               <polyline
                 fill="none"
                 stroke={ds.color}
-                strokeWidth="2"
+                strokeWidth="1"
                 points={points.map((p) => `${p.x},${p.y}`).join(" ")}
               />
               {points.map((point, i) => (
@@ -283,7 +356,7 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
                   <circle
                     cx={point.x}
                     cy={point.y}
-                    r={4}
+                    r={3}
                     fill={ds.color}
                     opacity={opacity}
                     onMouseOver={(e) =>
@@ -291,35 +364,30 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
                     }
                     onMouseOut={handleMouseOut}
                   />
+                  <line
+                    x1={point.x}
+                    y1={height}
+                    x2={point.x}
+                    y2={height + 5}
+                    stroke="#000"
+                    strokeWidth="1"
+                  />
+                  <text
+                    x={point.x + 5}
+                    y={height + 10}
+                    fontSize={10}
+                    fontWeight="bold"
+                    fill="#333"
+                    textAnchor="end"
+                    transform={`rotate(-90 ${point.x + 5} ${height + 10})`}
+                  >
+                    {genes[i + range.start]}
+                  </text>
                 </g>
               ))}
             </g>
           );
         })}
-        {genes.map((item, i) => (
-          <g key={i}>
-            <line
-              x1={(i / dataLength) * width + 50}
-              y1={height}
-              x2={(i / dataLength) * width + 50}
-              y2={height + 5}
-              stroke="#000"
-              strokeWidth="1"
-            />
-            <text
-              x={(i / dataLength) * width + 60}
-              y={height + 20}
-              fontSize="10"
-              fill="#333"
-              textAnchor="end"
-              transform={`rotate(-90 ${(i / dataLength) * width + 50} ${
-                height + 20
-              })`}
-            >
-              {item}
-            </text>
-          </g>
-        ))}
 
         <line
           x1={30}
@@ -370,8 +438,8 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
       <div
         style={{
           width: width,
-          height: 30,
-          marginLeft: 50,
+          height: "30px",
+          marginLeft: "50px",
           position: "relative",
           background: "#eee",
           userSelect: "none",

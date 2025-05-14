@@ -1,9 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import SVgs from "../components/ImageZoom";
-
-// Styled components
+import StatisticsView from "../components/StatisticsView";
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -70,8 +68,8 @@ const Home = () => {
         <MultilineText text={t("homePage.content5")} />
         <Title>{t("homePage.title5")}</Title>
         <MultilineText text={t("homePage.content6")} />
-        <SVgs file_dist="amr.json" />
-        <SVgs file_dist="vplot.json" />
+
+        <StatisticsView />
       </Wrapper>
     </Container>
   );
