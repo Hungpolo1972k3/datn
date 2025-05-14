@@ -113,9 +113,15 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
   const [selectedTab, setSelectedTab] = useState("Fasta");
   const [label, setLabel] = useState("");
   const { t } = useTranslation();
-
+  const [showImage, setShowImage] = useState(false);
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
+    if (tab !== "Virulence") {
+      setLabel(""); 
+      setShowImage(false);
+    } else {
+      setShowImage(true);
+    }
   };
   if (!showModal) return null;
 
@@ -142,7 +148,7 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
             {selectedTab === "Virulence" && <VirulenceTable data={virulenceInfo} />}
             {selectedTab === "AMR" && <AmrTable data={amrInfo} />}
 
-            {selectedTab === "Virulence" && !label && (
+            {selectedTab === "Virulence" && showImage && (
             <ImageWrapper>
               <Image src="/Bacteria-Cell.jpg" alt="Bacteria" />
               <ClickArea style={{ top: "17%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.nucleoid"))} />
