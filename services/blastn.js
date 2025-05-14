@@ -66,12 +66,17 @@ const runBlastn = async (queryFastaPath, res) => {
                         ? +(parsed.reduce((sum, hit) => sum + hit.coverage, 0) / parsed.length).toFixed(2)
                         : 0;
 
-                    // Đọc nội dung file subjectPath
                     let subjectFileContent = '';
                     try {
                         subjectFileContent = await fs.readFile(subjectPath, 'utf8');
                     } catch (err) {
                         console.error(`Error reading subject file: ${err.message}`);
+                    }
+                    let queryFileContent = '';
+                    try {
+                        queryFileContent = await fs.readFile(queryPath, 'utf8');
+                    } catch (err) {
+                        console.error(`Error reading query file: ${err.message}`);
                     }
 
                     resolve({
@@ -82,7 +87,8 @@ const runBlastn = async (queryFastaPath, res) => {
                         averageCoverage,
                         success: true,
                         subjectPath,
-                        subjectFileContent, // Thêm nội dung file vào kết quả trả về
+                        subjectFileContent,
+                        queryFileContent,
                     });
                 });
             }))
