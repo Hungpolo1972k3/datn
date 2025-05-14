@@ -140,7 +140,12 @@ const VirulenceTable = ({ data }) => {
                 <Td>{index + 1}</Td>
                 <Td>{item.sequence}</Td>
                 <Td>
-                  <a href={`/dataset?search=${encodeURIComponent(item.gene)}`} style={{ color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}>
+                  <a
+                    href={`/dataset?search=${encodeURIComponent(item.gene)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
+                  >
                     {item.gene}
                   </a>
                 </Td>
