@@ -8,5 +8,5 @@ services:
     env_file:
       - .env
     volumes:
-      - ../FastA:/app/FastA
+      - /root/bacteriaAB/FastA:/app/FastA
     restart: unless-stopped
