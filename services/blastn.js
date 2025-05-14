@@ -38,18 +38,17 @@ const parseBlastResults = (blastText) => {
 
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
-    const { default: pLimit } = await import('p-limit');
-    const limit = pLimit(4);
 
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
-            limit(() => new Promise((resolve) => {
+            limit(() => new Promise(async (resolve) => {
                 const subjectPath = path.join(dataDir, fastaUrl);
                 const outputFileName = `${path.basename(queryPath)}.${name}.blastout`;
                 const outputFilePath = path.join(os.tmpdir(), outputFileName);
 
                 const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
-                exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
+
+                exec(command, { maxBuffer: 1024 * 1024 * 10 }, async (error, stdout, stderr) => {
                     if (error) {
                         console.error(`Error: ${stderr || error.message}`);
                         return resolve({
@@ -65,6 +64,14 @@ const runBlastn = async (queryFastaPath, res) => {
                         ? +(parsed.reduce((sum, hit) => sum + hit.coverage, 0) / parsed.length).toFixed(2)
                         : 0;
 
+                    // Đọc nội dung file subjectPath
+                    let subjectFileContent = '';
+                    try {
+                        subjectFileContent = await fs.readFile(subjectPath, 'utf8');
+                    } catch (err) {
+                        console.error(`Error reading subject file: ${err.message}`);
+                    }
+
                     resolve({
                         name,
                         hit: parsed,
@@ -72,9 +79,10 @@ const runBlastn = async (queryFastaPath, res) => {
                         stdout: stdout,
                         averageCoverage,
                         success: true,
-                        subjectPath
+                        subjectPath,
+                        subjectFileContent, // Thêm nội dung file vào kết quả trả về
                     });
-                });       
+                });
             }))
         );
 
