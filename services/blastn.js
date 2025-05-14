@@ -72,13 +72,6 @@ const runBlastn = async (queryFastaPath, res) => {
                     } catch (err) {
                         console.error(`Error reading subject file: ${err.message}`);
                     }
-                    let queryFileContent = '';
-                    try {
-                        queryFileContent = await fs.promises.readFile(queryPath, 'utf8');
-                    } catch (err) {
-                        console.error(`Error reading query file: ${err.message}`);
-                    }
-
                     resolve({
                         name,
                         hit: parsed,
@@ -88,7 +81,6 @@ const runBlastn = async (queryFastaPath, res) => {
                         success: true,
                         subjectPath,
                         subjectFileContent,
-                        queryFileContent,
                     });
                 });
             }))
