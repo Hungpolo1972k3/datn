@@ -62,14 +62,14 @@ const Home = () => {
         <MultilineText text={t("homePage.content2")} />
 
         <Title>{t("homePage.title2")}</Title>
-        <Image src="/nguyco.jpg" alt="Risk" />
+        <Image src="/nguyco.png" alt="Risk" />
         <MultilineText text={t("homePage.content3")} />
 
         <Title>{t("homePage.title3")}</Title>
         <MultilineText text={t("homePage.content4")} />
 
         <Title>{t("homePage.title4")}</Title>
-        <Image src="/dauhieunhiemtrung.jpg" alt="Symptoms" />
+        <Image src="/dauhieunhiemtrung.png" alt="Symptoms" />
         <MultilineText text={t("homePage.content5")} />
 
         <Title>{t("homePage.title5")}</Title>

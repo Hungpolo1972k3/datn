@@ -150,7 +150,7 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
 
             {selectedTab === "Virulence" && showImage && (
             <ImageWrapper>
-              <Image src="/Bacteria-Cell.jpg" alt="Bacteria" />
+              <Image src="/Bacteria-Cell.png" alt="Bacteria" />
               <ClickArea style={{ top: "17%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.nucleoid"))} />
               <ClickArea style={{ top: "15%", left: "0%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.ribosomes"))} />
               <ClickArea style={{ top: "10%", left: "27%", width: "20%", height: "8%" }} onClick={() => setLabel(t("resultPopupComponent.cytoplasm"))} />
