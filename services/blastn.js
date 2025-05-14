@@ -40,27 +40,39 @@ const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
     const limit = pLimit(4);
+
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
-            limit(() => new Promise(async (resolve) => {
+            limit(() => new Promise((resolve) => {
                 const subjectPath = path.join(dataDir, fastaUrl);
-                const outputFileName = `${path.basename(queryPath)}.${name}.blastout`;
-                const outputFilePath = path.join(os.tmpdir(), outputFileName);
-                const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
+                const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -outfmt 6`;
 
-                exec(command, { maxBuffer: 1024 * 1024 * 10 }, async (error, stdout, stderr) => {
+                exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
                     if (error) {
-                        console.error(`Error: ${stderr || error.message}`);
+                        console.error(`Error for ${name}:`, stderr || error.message);
                         return resolve({
                             name,
                             error: stderr || error.message,
                             success: false,
                         });
                     }
-                    const parsed = parseBlastResults(stdout);
+
+                    let parsed = [];
+                    try {
+                        parsed = parseBlastResults(stdout);
+                    } catch (parseError) {
+                        console.error(`Parse error for ${name}:`, parseError);
+                        return resolve({
+                            name,
+                            error: 'Failed to parse BLAST output',
+                            success: false,
+                        });
+                    }
+
                     const averageCoverage = parsed.length
                         ? +(parsed.reduce((sum, hit) => sum + hit.coverage, 0) / parsed.length).toFixed(2)
                         : 0;
+
                     resolve({
                         name,
                         hit: parsed,
