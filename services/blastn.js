@@ -40,7 +40,12 @@ const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
     const limit = pLimit(4);
-
+let queryFileContent = '';
+                    try {
+                        queryFileContent = await fs.promises.readFile(queryPath, 'utf8');
+                    } catch (err) {
+                        console.error(`Error reading query file: ${err.message}`);
+                    }
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
             limit(() => new Promise(async (resolve) => {
@@ -80,6 +85,7 @@ const runBlastn = async (queryFastaPath, res) => {
                         averageCoverage,
                         success: true,
                         subjectPath,
+                        queryFileContent,
                         subjectFileContent,
                     });
                 });
