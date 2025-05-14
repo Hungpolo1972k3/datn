@@ -122,9 +122,9 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
   };
 
   const [fileContent, setFileContent] = useState(null);
-  const [viewedFile, setViewedFile] = useState(null);
+  const [viewedFilePath, setViewedFilePath] = useState(null);
   const [loading, setLoading] = useState(false);
-  const bottomRef = useRef(null);
+  const fileContentRef = useRef(null);
   const [jsonFileContent, setJsonFileContent] = useState([])
   const handleViewContent = async (filePath, fileName) => {
     setLoading(true);
@@ -136,9 +136,9 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
         setJsonFileContent([]);
       }
       setFileContent(result.data.content);
-      setViewedFile(fileName); 
+      setViewedFilePath(filePath); 
       setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        fileContentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     } catch (error) {
       setFileContent("Không thể tải nội dung file.");
@@ -246,7 +246,7 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
                           onClick={() => handleViewContent(file.path, file.fileName)}
                           style={{ cursor: "pointer", fontSize: "1.5rem" }}
                         >
-                          {viewedFile === file.fileName ? "🧐" : "🔍"}
+                          {viewedFilePath === file.path ? "🧐" : "🔍"}
                         </span>
                         <Download onClick={() => handleDownload(file.path)} />
                       </ActionButtons>
@@ -262,11 +262,12 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
         ) : (
           fileContent && (
             <>
-              <ShowFileContent fileContent={fileContent} viewedFile={viewedFile} />
+              <div ref={fileContentRef}>
+                <ShowFileContent fileContent={fileContent} viewedFile={viewedFilePath} />
+              </div>
               {jsonFileContent && jsonFileContent.length > 0 && (
                 <JsonTable data={jsonFileContent} />
               )}
-              <div ref={bottomRef} />
             </>
           )
         )}
