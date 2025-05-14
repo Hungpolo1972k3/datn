@@ -7,6 +7,7 @@ const path = require('path');
 const cheerio = require('cheerio');
 
 const dataDir = path.join('/app', 'FastA');
+// const dataDir = path.join(__dirname,"../../FastA")
 const runBlastnTool = async (inputFilePath) => {
   const form = new FormData();
   form.append('fasta', fs.createReadStream(inputFilePath)); 
@@ -32,6 +33,149 @@ const runBlastnTool = async (inputFilePath) => {
   }
 };
 
+const changeVirulenceInfo = async (result) => {
+    try {
+        const records = result
+            .split("\n")
+            .slice(1) 
+            .filter(line => line.trim().length > 0) 
+            .map(line => {
+                const fields = line.split(",");
+                return fields[13];
+            });
+
+        return records; 
+    } catch (error) {
+        console.error("Error processing virulence info:", error);
+    }
+};
+
+const parseProductInfo = (productString) => {
+    const result = {
+        gene: null,
+        description: null,
+        group: null,
+        vfdb_id: null,
+        function_group: null,
+        function_group_id: null,
+        organism: null
+    };
+
+    const geneMatch = productString.match(/^\(([^)]+)\)\s+([^\[]+)/);
+    if (geneMatch) {
+        result.gene = geneMatch[1].trim();
+        result.description = geneMatch[2].trim();
+    }
+
+    const infoMatch = productString.match(/\[(.*?) \((VF\d+)\) - (.*?) \((VFC\d+)\)\]/);
+    if (infoMatch) {
+        result.group = infoMatch[1].trim();               
+        result.vfdb_id = infoMatch[2];
+        result.function_group = infoMatch[3].trim();    
+        result.function_group_id = infoMatch[4];
+    }
+
+    const organismMatch = productString.match(/\[([^\[\]]+?)\]$/);
+    if (organismMatch) {
+        result.organism = organismMatch[1].trim();
+    }
+
+    return result;
+};
+
+const changeAmrInfo = (result) => {
+    try {
+        if (!result || typeof result !== "string") {
+            throw new Error("Dữ liệu AMR không hợp lệ hoặc không phải chuỗi.");
+        }
+
+        const lines = result.trim().split("\n").slice(1); 
+
+        const records = lines.map(line => {
+            const fields = line.split("\t");
+            if (fields.length < 22) return null; 
+
+            return fields[5]
+        }).filter(record => record !== null); 
+
+        return records; 
+    } catch (error) {
+        console.error("Lỗi xử lý AMR:", error.message);
+        throw error;
+    }
+};
+
+const getSubFolders = async (dirPath) => {
+  const result = [];
+
+  const folders = fs.readdirSync(dirPath, { withFileTypes: true })
+    .filter(item => item.isDirectory());
+
+  for (const item of folders) {
+    const name = item.name;
+    const subPath = path.join(dirPath, name);
+    const fastaPath = path.join(subPath, 'Spades_output', 'contigs.fasta');
+
+    let combinedData = [];
+
+    if (fs.existsSync(fastaPath)) {
+      const chromoFile = path.join(subPath, 'Platon_output', 'chromosome', 'abricate_virulence.csv');
+      const plasmidFile = path.join(subPath, 'Platon_output', 'plasmid', 'abricate_virulence.csv');
+
+      if (fs.existsSync(chromoFile)) {
+        const chromoContent = fs.readFileSync(chromoFile, 'utf-8');
+        const chromoData = await changeVirulenceInfo(chromoContent);
+        combinedData = combinedData.concat(chromoData.map(parseProductInfo));
+      }
+
+      if (fs.existsSync(plasmidFile)) {
+        const plasmidContent = fs.readFileSync(plasmidFile, 'utf-8');
+        const plasmidData = await changeVirulenceInfo(plasmidContent);
+        combinedData = combinedData.concat(plasmidData.map(parseProductInfo));
+      }
+    }
+    result.push(combinedData);
+  }
+  return result;
+};
+
+const getSubFolderAmrs = async (dirPath) => {
+  const result = [];
+
+  const folders = fs.readdirSync(dirPath, { withFileTypes: true })
+    .filter(item => item.isDirectory());
+
+  for (const item of folders) {
+    const name = item.name;
+    const subPath = path.join(dirPath, name);
+    const fastaPath = path.join(subPath, 'Spades_output', 'contigs.fasta');
+
+    let combinedData = [];
+
+    if (fs.existsSync(fastaPath)) {
+      const chromoFile = path.join(subPath, 'Platon_output', 'chromosome', 'amrfinder.txt');
+      const plasmidFile = path.join(subPath, 'Platon_output', 'plasmid', 'amrfinder.txt');
+
+      if (fs.existsSync(chromoFile)) {
+        const chromoContent = fs.readFileSync(chromoFile, 'utf-8');
+        const chromoData = await changeAmrInfo(chromoContent);
+        combinedData = combinedData.concat(chromoData);
+      }
+
+      if (fs.existsSync(plasmidFile)) {
+        const plasmidContent = fs.readFileSync(plasmidFile, 'utf-8');
+        const plasmidData = await changeAmrInfo(plasmidContent);
+        combinedData = combinedData.concat(plasmidData);
+      }
+    }
+    result.push({
+      name,
+      gene: combinedData
+    });
+  }
+  return result;
+};
+
 
 const getFullFolderPath = (relativePath) => {
   const fullPath = path.join(dataDir, relativePath);
@@ -55,39 +199,8 @@ const zipFolderAndSend = (folderPath, res) => {
   archive.finalize(); 
 };
 
-const getFilesRecursively = (dirPath, baseUrlPath = '') => {
-  const result = [];
-  const items = fs.readdirSync(dirPath, { withFileTypes: true });
-
-  for (const item of items) {
-
-    const itemPath = path.join(dirPath, item.name);
-    const relativeItemPath = path.join(baseUrlPath, item.name).replace(/\\/g, '/');
-
-    if (item.isDirectory()) {
-      const childFiles = getFilesRecursively(itemPath, relativeItemPath);
-      result.push(...childFiles);
-    } else {
-      const stats = fs.statSync(itemPath);
-      const folderName = path.basename(path.dirname(itemPath));
-      const downloadFolderUrl = path.posix.dirname(relativeItemPath);
-
-      result.push({
-        fileName: item.name,
-        folderName: folderName,
-        path: relativeItemPath,
-        downloadFolderUrl,
-        size: (stats.size / 1024).toFixed(2) + ' KB'
-      });
-    }
-  }
-
-  return result;
-};
-
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Hàm xử lý từng folder
 const fetchFolderInfo = async (folder) => {
   const ncbiUrl = `https://www.ncbi.nlm.nih.gov/search/all/?term=${folder}`;
   let bacteria = '';
@@ -158,6 +271,36 @@ const getFolderInfoss = async () => {
     }
 };
 
+const getFilesRecursively = (dirPath, baseUrlPath = '') => {
+  const result = [];
+  const items = fs.readdirSync(dirPath, { withFileTypes: true });
+
+  for (const item of items) {
+
+    const itemPath = path.join(dirPath, item.name);
+    const relativeItemPath = path.join(baseUrlPath, item.name).replace(/\\/g, '/');
+
+    if (item.isDirectory()) {
+      const childFiles = getFilesRecursively(itemPath, relativeItemPath);
+      result.push(...childFiles);
+    } else {
+      const stats = fs.statSync(itemPath);
+      const folderName = path.basename(path.dirname(itemPath));
+      const downloadFolderUrl = path.posix.dirname(relativeItemPath);
+
+      result.push({
+        fileName: item.name,
+        folderName: folderName,
+        path: relativeItemPath,
+        downloadFolderUrl,
+        size: (stats.size / 1024).toFixed(2) + ' KB'
+      });
+    }
+  }
+
+  return result;
+};
+
 const getFolderInfoService = async(relativePath = "") => {
   const targetPath = path.join(dataDir, relativePath);
   if (!fs.existsSync(targetPath)) {
@@ -189,17 +332,59 @@ const getFileForDownload = async (relativePath) => {
   }
 };
 
+const csvToJson = (csvText, delimiter = "\t") => {
+  const lines = csvText.trim().split("\n");
+  const headers = lines[0].split(delimiter);
+
+  return lines.slice(1).map((line) => {
+    const values = line.split(delimiter);
+    const entry = {};
+    headers.forEach((header, index) => {
+      entry[header.trim()] = values[index]?.trim() || "";
+    });
+    return entry;
+  });
+}
+
+const parseTxtFileToJson = (fileContent) => {
+  const lines = fileContent.trim().split('\n');
+  const headers = lines[0].split('\t');
+
+  const jsonArray = lines.slice(1).map(line => {
+    const values = line.split('\t');
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header.trim()] = values[index]?.trim() || '';
+    });
+    return row;
+  });
+
+  return jsonArray;
+}
+
 const getFileInfo = async (relativePath) => {
   try {
     const safePath = path.normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, '').replace(/^[/\\]/, '');
     const fullPath = path.join(dataDir, safePath);
 
     const content = await fs.promises.readFile(fullPath, 'utf8');
-    return content;
+    const ext = path.extname(fullPath).toLowerCase();
+
+    if (ext === '.tsv' || ext === '.csv') {
+      const delimiter = ext === '.csv' ? ',' : '\t';
+      const parsed = csvToJson(content, delimiter);
+      return { content, parsed };
+    } else if (ext === '.txt') {
+      const parsed = parseTxtFileToJson(content);
+      return { content, parsed };
+    } else {
+      return { content, parsed: null };
+    }
   } catch (error) {
     throw new Error(`Không thể đọc file: ${error.message}`);
   }
 };
+
 
 module.exports = {
   runBlastnTool,
