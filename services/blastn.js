@@ -51,6 +51,7 @@ const runBlastn = async (queryFastaPath, res) => {
                 const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
                 exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
                     if (error) {
+                        console.error(`Error: ${stderr || error.message}`);
                         return resolve({
                             name,
                             error: stderr || error.message,
@@ -58,6 +59,7 @@ const runBlastn = async (queryFastaPath, res) => {
                         });
                     }
 
+                    console.log(`BLAST Output: ${stdout}`);
                     const parsed = parseBlastResults(stdout);
                     const averageCoverage = parsed.length
                         ? +(parsed.reduce((sum, hit) => sum + hit.coverage, 0) / parsed.length).toFixed(2)
