@@ -68,13 +68,13 @@ const runBlastn = async (queryFastaPath, res) => {
 
                     let subjectFileContent = '';
                     try {
-                        subjectFileContent = await fs.readFile(subjectPath, 'utf8');
+                        subjectFileContent = fs.readFile(subjectPath, 'utf8');
                     } catch (err) {
                         console.error(`Error reading subject file: ${err.message}`);
                     }
                     let queryFileContent = '';
                     try {
-                        queryFileContent = await fs.readFile(queryPath, 'utf8');
+                        queryFileContent = fs.readFile(queryPath, 'utf8');
                     } catch (err) {
                         console.error(`Error reading query file: ${err.message}`);
                     }
