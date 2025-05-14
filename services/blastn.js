@@ -57,8 +57,6 @@ const runBlastn = async (queryFastaPath, res) => {
                             success: false,
                         });
                     }
-
-                    console.log(`BLAST Output: ${stdout}`);
                     const parsed = parseBlastResults(stdout);
                     const averageCoverage = parsed.length
                         ? +(parsed.reduce((sum, hit) => sum + hit.coverage, 0) / parsed.length).toFixed(2)

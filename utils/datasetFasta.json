@@ -7,5 +7,9 @@
     {
         "name": "SRR1997868",
         "fastaUrl": "/SRR1997868/Spades_output/contigs.fasta"
+    },
+    {
+        "name": "SRR2075860",
+        "fastaUrl": "/SRR2075860/Spades_output/contigs.fasta"
     }
 ]
