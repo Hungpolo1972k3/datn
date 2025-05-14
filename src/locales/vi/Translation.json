@@ -180,7 +180,8 @@
           "stop": "Vị trí kết thúc",
           "strand": "Chiều",
           "gene_symbol": "Ký hiệu gen",
-          "element_name": "Tên phần tử"
+          "element_name": "Tên phần tử",
+          "nucleic": "Trình tự nucleic"
         }
       },
     "noticeComponent": {
@@ -189,9 +190,9 @@
       },
     "resultComponent":{
         "analysisResult": "Kết quả phân tích mẫu",
-        "fasta": "Fasta",
-        "virulence": "Virulence",
-        "amr": "AMR",
+        "fasta": "Phân tích",
+        "virulence": "Gene độc lực",
+        "amr": "Gene kháng kháng sinh",
         "nucleoid": "Vùng nhân - DNA",
         "ribosomes": "Ribosome",
         "cytoplasm": "Tế bào chất",
@@ -205,9 +206,9 @@
       },
     "resultPopupComponent": {
         "analysisResult": "Kết quả phân tích mẫu",
-        "fasta": "Fasta",
-        "virulence": "Virulence",
-        "amr": "AMR",
+        "fasta": "Phân tích",
+        "virulence": "Gene độc lực",
+        "amr": "Gene kháng kháng sinh",
         "nucleoid": "Vùng nhân - DNA",
         "ribosomes": "Ribosome",
         "cytoplasm": "Tế bào chất",
@@ -369,6 +370,12 @@
   },
   "datasetStatistic": {
     "title": "Thống kê bộ dữ liệu"
-  }                    
+  },
+  "statistics_viewer":{
+    "title": "Thống kê bộ dữ liệu",
+    "histogram": "Biểu đồ MIC",
+    "amr_plot": "Biểu đồ AMR",
+    "vfactors_plot": "Biểu đồ yếu tố độc lực"
+  }                       
 }
   

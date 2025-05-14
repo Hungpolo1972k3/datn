@@ -7,6 +7,9 @@ import { apiDownloadFolder, apiGetFolderInfo } from "../service/blastn";
 import datasetFolder from '../utils/datasetFolder.json';
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useNotice } from "../context/NoticeContext";
+import datasetGeneVirulence from "../utils/datasetGeneVirulence.json"
+import datasetGeneAmr from "../utils/datasetGeneAmr.json"
+import { useLocation } from "react-router-dom";
 
 const TableWrapper = styled.div`
   padding: 20px;
@@ -170,7 +173,14 @@ const PaginatedTable = () => {
   const [dataset, setDataset] = useState();
   const [isDownloading, setIsDownloading] = useState(false);
   const { showNotice } = useNotice();
-
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchParam = params.get("search");
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+  }, [location.search]);
   const handleSort = (key) => {
     if (sortKey === key) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -180,11 +190,27 @@ const PaginatedTable = () => {
     }
   };
 
-  const filteredData = datasetFolder.filter((item) =>
-    Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  const term = searchTerm.toLowerCase();
+
+  const matchedNames = [
+    ...datasetGeneVirulence,
+    ...datasetGeneAmr
+  ]
+    .filter((g) =>
+      g.gene.some((geneName) => geneName.toLowerCase().includes(term))
     )
-  );
+    .map((g) => g.name);
+
+  const filteredData = datasetFolder.filter((item) => {
+    const matchesBasicInfo =
+      item.name.toLowerCase().includes(term) ||
+      item.bacteria.toLowerCase().includes(term) ||
+      item.description.toLowerCase().includes(term);
+
+    const matchesGene = matchedNames.includes(item.name);
+
+    return matchesBasicInfo || matchesGene;
+  });
 
   const sortedData = [...filteredData].sort((a, b) => {
     if (!sortKey) return 0;

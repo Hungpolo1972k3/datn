@@ -180,7 +180,8 @@
           "stop": "Stop",
           "strand": "Strand",
           "gene_symbol": "Gene Symbol",
-          "element_name": "Element Name"
+          "element_name": "Element Name",
+          "nucleic": "Nucleic Sequence"
         }
       },
     "noticeComponent": {
@@ -189,7 +190,7 @@
       },
     "resultComponent": {
         "analysisResult": "Sample Analysis Result",
-        "fasta": "Fasta",
+        "fasta": "Sequence",
         "virulence": "Virulence",
         "amr": "AMR",
         "nucleoid": "Nucleoid (DNA)",
@@ -205,7 +206,7 @@
       },
     "resultPopupComponent": {
         "analysisResult": "Sample Analysis Result",
-        "fasta": "Fasta",
+        "fasta": "Sequence",
         "virulence": "Virulence",
         "amr": "AMR",
         "nucleoid": "Nucleoid (DNA)",
@@ -369,6 +370,12 @@
   },
   "datasetStatistic": {
     "title": "Dataset Statistic"
+  },
+  "statistics_viewer":{
+    "title": "Statistics Viewer",
+    "histogram": "MIC Plot",
+    "amr_plot": "AMR Plot",
+    "vfactors_plot": "VFactors Plot"
   }               
 }
   

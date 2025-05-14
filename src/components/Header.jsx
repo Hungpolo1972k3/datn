@@ -1,8 +1,7 @@
 import React from "react";
 import styled, { keyframes } from "styled-components";
-import { useTranslation } from "react-i18next"; // ⬅ import hook
+import { useTranslation } from "react-i18next"; 
 
-// Tạo hiệu ứng chuyển động cho background của Header
 const gradientAnimation = keyframes`
   0% {
     background: linear-gradient(135deg, #a7c7e7 0%, #3b7b9e 100%);

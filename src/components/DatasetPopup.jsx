@@ -6,6 +6,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import ShowFileContent from "./ShowFileContent";
 import LoadingSpinner from "./LoadingSpinner";
 import { useTranslation } from "react-i18next";
+import JsonTable from "./JsonTable"
 
 const DimBackground = styled.div`
   position: fixed;
@@ -124,11 +125,17 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
   const [viewedFile, setViewedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef(null);
+  const [jsonFileContent, setJsonFileContent] = useState([])
   const handleViewContent = async (filePath, fileName) => {
     setLoading(true);
     try {
-      const content = await apiGetFileInfo(filePath);
-      setFileContent(content.data);
+      const result = await apiGetFileInfo(filePath);
+      if (result.data.parsed && Array.isArray(result.data.parsed)) {
+      setJsonFileContent(result.data.parsed);
+      } else {
+        setJsonFileContent([]);
+      }
+      setFileContent(result.data.content);
       setViewedFile(fileName); 
       setTimeout(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -192,9 +199,18 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
           }}
         >
           <div style={{ marginBottom: "10px", marginLeft:"10px", display: "flex", flexDirection: "column", gap: "16px" }}>
-            <h2>{dataset.title}</h2>
-            <h2>{dataset.description}</h2>
-            <h2>{dataset.sequencingSystem}</h2>
+            <h2>
+              <a
+                href="https://www.ncbi.nlm.nih.gov/sra/SRR1945422"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#1e40af", textDecoration: "underline" }}
+              >
+                {dataset.title}
+              </a>
+            </h2>
+            <h3>{dataset.description}</h3>
+            <h3>{dataset.sequencingSystem}</h3>
           </div>
         </div>
         <div>
@@ -247,6 +263,9 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
           fileContent && (
             <>
               <ShowFileContent fileContent={fileContent} viewedFile={viewedFile} />
+              {jsonFileContent && jsonFileContent.length > 0 && (
+                <JsonTable data={jsonFileContent} />
+              )}
               <div ref={bottomRef} />
             </>
           )

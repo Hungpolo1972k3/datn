@@ -13,7 +13,7 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import ExperimentManagement from "./pages/ExperimentManagement";
 import Dataset from "./pages/Dataset";
 import Tool from "./pages/Tool";
-import DatasetStatistic from "./pages/DatasetStatistic";
+import DatasetStatistic from "./pages/StatisticsView";
 
 const Container = styled.div`
   display: flex;

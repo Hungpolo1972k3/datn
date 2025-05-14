@@ -142,6 +142,7 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
             {selectedTab === "Virulence" && <VirulenceTable data={virulenceInfo} />}
             {selectedTab === "AMR" && <AmrTable data={amrInfo} />}
 
+            {selectedTab === "Virulence" && !label && (
             <ImageWrapper>
               <Image src="/Bacteria-Cell.jpg" alt="Bacteria" />
               <ClickArea style={{ top: "17%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.nucleoid"))} />
@@ -155,8 +156,11 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
               <ClickArea style={{ top: "76%", left: "8%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.cellWall"))} />
               <ClickArea style={{ top: "66%", left: "3%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.capsule"))} />
             </ImageWrapper>
+            )}
 
-            {label && <VirulenceListResult label={label} data={virulenceInfo} />}
+            {selectedTab === "Virulence" && label && (
+              <VirulenceListResult label={label} data={virulenceInfo} />
+            )}
           </Wrapper>
         </Container>
       </PopUpForm>

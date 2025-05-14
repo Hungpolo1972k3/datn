@@ -6,8 +6,8 @@ const Overlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(rgba(100, 100, 100, 0.6), rgba(50, 50, 50, 0.6));
   display: flex;
   flex-direction: column;

@@ -301,6 +301,7 @@ const Navbar = () => {
       setShowLanguageDropdown(false);
       window.location.reload(); 
     });
+    setShowLanguageDropdown(!showLanguageDropdown);
   };
   
   const { issuedAt } = useSelector((state) => state.user);
@@ -334,7 +335,6 @@ const Navbar = () => {
         <NavLink to="/">
           {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.home')}</Button>}
         </NavLink>
-        {!isLogin && (
           <WrapperItem>
             <Button
               isActive={false}
@@ -344,13 +344,18 @@ const Navbar = () => {
             </Button>
             {showAbDatasetSubMenu && (
               <SubMenu>
-                <SubMenuItem to="/dataset">{t('navbarComponent.dataset')}</SubMenuItem>
-                <SubMenuItem to="/dataset_statistics">{t('navbarComponent.statistics')}</SubMenuItem>
-                <SubMenuItem to="/tool">{t('navbarComponent.tool')}</SubMenuItem>
+                <SubMenuItem to="/dataset" onClick={() => setShowAbDatasetSubMenu(false)}>
+                  {t('navbarComponent.dataset')}
+                </SubMenuItem>
+                <SubMenuItem to="/dataset_statistics" onClick={() => setShowAbDatasetSubMenu(false)}>
+                  {t('navbarComponent.statistics')}
+                </SubMenuItem>
+                <SubMenuItem to="/tool" onClick={() => setShowAbDatasetSubMenu(false)}>
+                  {t('navbarComponent.tool')}
+                </SubMenuItem>
               </SubMenu>
             )}
           </WrapperItem>
-        )}
         {isLogin && !isLoginAdmin && (
           <NavLink to="/experiment">
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.experiment')}</Button>}
