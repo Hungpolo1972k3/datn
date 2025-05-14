@@ -68,6 +68,7 @@ const runBlastn = async (queryFastaPath, res) => {
                     resolve({
                         name,
                         hit: parsed,
+                        stdout: stdout,
                         averageCoverage,
                         success: true,
                         subjectPath
