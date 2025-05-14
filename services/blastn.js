@@ -46,8 +46,9 @@ const runBlastn = async (queryFastaPath, res) => {
                 const subjectPath = path.join(dataDir, fastaUrl);
                 const outputFileName = `${path.basename(queryPath)}.${name}.blastout`;
                 const outputFilePath = path.join(os.tmpdir(), outputFileName);
+                const blastnPath = '/opt/conda/envs/abricate_env/bin/blastn';
 
-                const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
+                const command = `${blastnPath} -query "${queryPath}" -subject "${subjectPath}" -out "${outputFilePath}" -outfmt 6`;
 
                 exec(command, { maxBuffer: 1024 * 1024 * 10 }, async (error, stdout, stderr) => {
                     if (error) {
