@@ -38,6 +38,8 @@ const parseBlastResults = (blastText) => {
 
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
+    const { default: pLimit } = await import('p-limit');
+    const limit = pLimit(4);
 
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
