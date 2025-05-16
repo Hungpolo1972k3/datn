@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   biotool_nodeapp:
+    command: node --max-old-space-size=4096 server.js
     build: .
     ports:
       - "5000:5000"
