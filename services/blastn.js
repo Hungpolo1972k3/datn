@@ -58,7 +58,7 @@ const parseBlastResults = (blastText, querySeq, subjectSeq) => {
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
-    const limit = pLimit(10);
+    const limit = pLimit(4);
     const querySeq = await readFastaSequence(queryPath);
 
     try {
