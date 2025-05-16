@@ -58,15 +58,8 @@ const parseBlastResults = (blastText, querySeq, subjectSeq) => {
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
-    const limit = pLimit(4); 
+    const limit = pLimit(10);
     const querySeq = await readFastaSequence(queryPath);
-
-    const subjectSeqMap = new Map();
-    await Promise.all(dataset.map(async ({ fastaUrl }) => {
-        const fullPath = path.join(dataDir, fastaUrl);
-        const seq = await readFastaSequence(fullPath);
-        subjectSeqMap.set(fastaUrl, seq);
-    }));
 
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
@@ -74,7 +67,7 @@ const runBlastn = async (queryFastaPath, res) => {
                 const subjectPath = path.join(dataDir, fastaUrl);
                 const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -outfmt 6`;
 
-                exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
+                exec(command, { maxBuffer: 1024 * 1024 * 10 }, async (error, stdout, stderr) => {
                     if (error) {
                         console.error(`Error for ${name}:`, stderr || error.message);
                         return resolve({ name, error: stderr || error.message, success: false });
@@ -82,7 +75,7 @@ const runBlastn = async (queryFastaPath, res) => {
 
                     let parsed = [];
                     try {
-                        const subjectSeq = subjectSeqMap.get(fastaUrl);
+                        const subjectSeq = await readFastaSequence(subjectPath);
                         parsed = parseBlastResults(stdout, querySeq, subjectSeq);
                     } catch (parseError) {
                         console.error(`Parse error for ${name}:`, parseError);
@@ -100,14 +93,14 @@ const runBlastn = async (queryFastaPath, res) => {
                     resolve({
                         name,
                         subjectPath,
+                        queryPath,
                         result: parsed,
                         averageCoverage,
-                        success: true,
                     });
                 });
+
             }))
         );
-
         const results = await Promise.all(tasks);
         removeFiles([queryPath]);
 
@@ -121,7 +114,6 @@ const runBlastn = async (queryFastaPath, res) => {
         });
     }
 };
-
 
 module.exports = {
     runBlastn
