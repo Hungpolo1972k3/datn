@@ -14,10 +14,27 @@ const removeFiles = (files) => {
 };
 
 const dataDir = path.join('/app', 'FastA');
-const parseBlastResults = (blastText) => {
+const extractSubsequence = (sequence, start, end) => {
+    if (!sequence || start <= 0 || end > sequence.length || start > end) return '';
+    return sequence.substring(start - 1, end);
+};
+const readFastaSequence = async (fastaPath) => {
+    const content = await fs.promises.readFile(fastaPath, 'utf8');
+    return content
+        .split('\n')
+        .filter(line => !line.startsWith('>'))
+        .join('')
+        .replace(/\s/g, '');
+};
+const parseBlastResults = (blastText, querySeq, subjectSeq) => {
     const lines = blastText.trim().split('\n');
     return lines.map(line => {
         const fields = line.split('\t');
+        const qStart = parseInt(fields[6], 10);
+        const qEnd = parseInt(fields[7], 10);
+        const sStart = parseInt(fields[8], 10);
+        const sEnd = parseInt(fields[9], 10);
+
         return {
             queryId: fields[0],
             subjectId: fields[1],
@@ -25,13 +42,15 @@ const parseBlastResults = (blastText) => {
             alignmentLength: parseInt(fields[3], 10),
             mismatches: parseInt(fields[4], 10),
             gapOpens: parseInt(fields[5], 10),
-            qStart: parseInt(fields[6], 10),
-            qEnd: parseInt(fields[7], 10),
-            sStart: parseInt(fields[8], 10),
-            sEnd: parseInt(fields[9], 10),
+            qStart,
+            qEnd,
+            sStart,
+            sEnd,
             evalue: parseFloat(fields[10]),
             bitScore: parseFloat(fields[11]),
-            coverage: parseFloat(fields[2])
+            coverage: parseFloat(fields[2]),
+            qNucleic: extractSubsequence(querySeq, qStart, qEnd),
+            sNucleic: extractSubsequence(subjectSeq, sStart, sEnd)
         };
     });
 };
@@ -39,7 +58,15 @@ const parseBlastResults = (blastText) => {
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
-    const limit = pLimit(10);
+    const limit = pLimit(4); 
+    const querySeq = await readFastaSequence(queryPath);
+
+    const subjectSeqMap = new Map();
+    await Promise.all(dataset.map(async ({ fastaUrl }) => {
+        const fullPath = path.join(dataDir, fastaUrl);
+        const seq = await readFastaSequence(fullPath);
+        subjectSeqMap.set(fastaUrl, seq);
+    }));
 
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
@@ -50,16 +77,13 @@ const runBlastn = async (queryFastaPath, res) => {
                 exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
                     if (error) {
                         console.error(`Error for ${name}:`, stderr || error.message);
-                        return resolve({
-                            name,
-                            error: stderr || error.message,
-                            success: false,
-                        });
+                        return resolve({ name, error: stderr || error.message, success: false });
                     }
 
                     let parsed = [];
                     try {
-                        parsed = parseBlastResults(stdout);
+                        const subjectSeq = subjectSeqMap.get(fastaUrl);
+                        parsed = parseBlastResults(stdout, querySeq, subjectSeq);
                     } catch (parseError) {
                         console.error(`Parse error for ${name}:`, parseError);
                         return resolve({
@@ -75,7 +99,8 @@ const runBlastn = async (queryFastaPath, res) => {
 
                     resolve({
                         name,
-                        hit: parsed,
+                        subjectPath,
+                        result: parsed,
                         averageCoverage,
                         success: true,
                     });
@@ -96,6 +121,7 @@ const runBlastn = async (queryFastaPath, res) => {
         });
     }
 };
+
 
 module.exports = {
     runBlastn
