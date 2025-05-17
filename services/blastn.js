@@ -58,53 +58,60 @@ const parseBlastResults = (blastText, querySeq, subjectSeq) => {
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
-    const limit = pLimit(1);
+    const limit = pLimit(2);
     const querySeq = await readFastaSequence(queryPath);
 
+    const batchSize = 4;
+    const results = [];
+    const resultFilePath = path.join("/app", 'result.json');
+
     try {
-        const tasks = dataset.map(({ name, fastaUrl }) =>
-            limit(() => new Promise((resolve) => {
-                const subjectPath = path.join(dataDir, fastaUrl);
-                const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -outfmt 6`;
+        for (let i = 0; i < dataset.length; i += batchSize) {
+            const batch = dataset.slice(i, i + batchSize);
 
-                exec(command, { maxBuffer: 1024 * 1024 * 10 }, async (error, stdout, stderr) => {
-                    if (error) {
-                        console.error(`Error for ${name}:`, stderr || error.message);
-                        return resolve({ name, error: stderr || error.message, success: false });
-                    }
+            const tasks = batch.map(({ name, fastaUrl }) =>
+                limit(() => new Promise((resolve) => {
+                    const subjectPath = path.join(dataDir, fastaUrl);
+                    const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -outfmt 6`;
 
-                    let parsed = [];
-                    try {
-                        const subjectSeq = await readFastaSequence(subjectPath);
-                        parsed = parseBlastResults(stdout, querySeq, subjectSeq);
-                    } catch (parseError) {
-                        console.error(`Parse error for ${name}:`, parseError);
-                        return resolve({
+                    exec(command, { maxBuffer: 1024 * 1024 * 10 }, async (error, stdout, stderr) => {
+                        if (error) {
+                            console.error(`Error for ${name}:`, stderr || error.message);
+                            return resolve({ name, error: stderr || error.message, success: false });
+                        }
+
+                        let parsed = [];
+                        try {
+                            const subjectSeq = await readFastaSequence(subjectPath);
+                            parsed = parseBlastResults(stdout, querySeq, subjectSeq);
+                        } catch (parseError) {
+                            console.error(`Parse error for ${name}:`, parseError);
+                            return resolve({
+                                name,
+                                error: 'Failed to parse BLAST output',
+                                success: false,
+                            });
+                        }
+
+                        resolve({
                             name,
-                            error: 'Failed to parse BLAST output',
-                            success: false,
+                            subjectPath,
+                            queryPath,
+                            result: parsed,
+                            success: true
                         });
-                    }
-
-                    const averageCoverage = parsed.length
-                        ? +(parsed.reduce((sum, hit) => sum + hit.coverage, 0) / parsed.length).toFixed(2)
-                        : 0;
-
-                    resolve({
-                        name,
-                        subjectPath,
-                        queryPath,
-                        result: parsed,
-                        averageCoverage,
                     });
-                });
+                }))
+            );
 
-            }))
-        );
-        const results = await Promise.all(tasks);
+            const batchResults = await Promise.all(tasks);
+            results.push(...batchResults);
+            await fs.promises.writeFile(resultFilePath, JSON.stringify(results, null, 2), 'utf8');
+        }
+
         removeFiles([queryPath]);
 
-        res.json(results.sort((a, b) => b.averageCoverage - a.averageCoverage));
+        res.json(results);
     } catch (err) {
         removeFiles([queryPath]);
         console.error(err);
