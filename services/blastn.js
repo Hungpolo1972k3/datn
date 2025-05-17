@@ -48,9 +48,7 @@ const parseBlastResults = (blastText, querySeq, subjectSeq) => {
             sEnd,
             evalue: parseFloat(fields[10]),
             bitScore: parseFloat(fields[11]),
-            coverage: parseFloat(fields[2]),
-            qNucleic: extractSubsequence(querySeq, qStart, qEnd),
-            sNucleic: extractSubsequence(subjectSeq, sStart, sEnd)
+            coverage: parseFloat(fields[2])
         };
     });
 };
@@ -58,10 +56,10 @@ const parseBlastResults = (blastText, querySeq, subjectSeq) => {
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const { default: pLimit } = await import('p-limit');
-    const limit = pLimit(2);
+    const limit = pLimit(1);
     const querySeq = await readFastaSequence(queryPath);
 
-    const batchSize = 4;
+    const batchSize = 5;
     const results = [];
     const resultFilePath = path.join("/app", 'result.json');
 
