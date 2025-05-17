@@ -10,3 +10,4 @@ services:
       - .env
     volumes:
       - ../FastA:/app/FastA
+      - ../fastA:/app/fastA
