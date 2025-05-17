@@ -59,13 +59,13 @@ const runBlastn = async (queryFastaPath, res) => {
     const limit = pLimit(1);
     const querySeq = await readFastaSequence(queryPath);
 
-    const batchSize = 5;
+    const batchSize = 100;
     const results = [];
-    const resultFilePath = path.join("/app", 'result.json');
 
     try {
         for (let i = 0; i < dataset.length; i += batchSize) {
             const batch = dataset.slice(i, i + batchSize);
+            const batchIndex = i / batchSize + 1; 
 
             const tasks = batch.map(({ name, fastaUrl }) =>
                 limit(() => new Promise((resolve) => {
@@ -104,12 +104,20 @@ const runBlastn = async (queryFastaPath, res) => {
 
             const batchResults = await Promise.all(tasks);
             results.push(...batchResults);
-            await fs.promises.writeFile(resultFilePath, JSON.stringify(results, null, 2), 'utf8');
+
+            const batchFilePath = path.join("/app/fastA", `result_batch_${batchIndex}.json`);
+            await fs.promises.writeFile(batchFilePath, JSON.stringify(batchResults, null, 2), 'utf8');
+
+            console.log(`✔️ Batch ${batchIndex} saved to ${batchFilePath}`);
         }
 
         removeFiles([queryPath]);
 
-        res.json(results);
+        res.json({
+            status: 'done',
+            totalBatches: Math.ceil(dataset.length / batchSize),
+            message: 'All BLAST batches completed and saved.',
+        });
     } catch (err) {
         removeFiles([queryPath]);
         console.error(err);
@@ -119,6 +127,7 @@ const runBlastn = async (queryFastaPath, res) => {
         });
     }
 };
+
 
 module.exports = {
     runBlastn
