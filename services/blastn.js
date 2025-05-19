@@ -4,9 +4,9 @@ const path = require("path");
 const os = require("os");
 const dataset = require('../utils/datasetFasta.json');
 const readline = require("readline");
-import { createGzip } from 'zlib';
-import { fileURLToPath } from 'url';
-import { pipeline } from 'stream/promises';
+const { createGzip } = require('zlib');
+const { fileURLToPath } = require('url');
+const { pipeline } = require('stream/promises');
 
 const removeFiles = (files) => {
     files.forEach(file => {
