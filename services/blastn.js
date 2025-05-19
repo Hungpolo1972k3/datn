@@ -73,7 +73,7 @@ const runBlastn = async (queryFastaPath, res) => {
   const queryPath = path.resolve(queryFastaPath);
   const results = [];
   const pLimit = (await import('p-limit')).default;
-  const limit = pLimit(3); 
+  const limit = pLimit(2); 
 
   try {
     const tasks = dataset.map(({ name, fastaUrl }) =>
@@ -98,13 +98,10 @@ const runBlastn = async (queryFastaPath, res) => {
             subjectPath,
             queryPath,
             result: parsed,
-            success: true,
           };
         } catch (error) {
           return {
-            name,
             error: error.message,
-            success: false,
           };
         }
       })
