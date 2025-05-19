@@ -6,7 +6,9 @@ const dataset = require('../utils/datasetFasta.json');
 const readline = require("readline");
 const { createGzip } = require('zlib');
 const { fileURLToPath } = require('url');
-const { pipeline } = require('stream/promises');
+const { pipeline } = require('stream');
+const { promisify } = require('util');
+const pipelineAsync = promisify(pipeline);
 
 const removeFiles = (files) => {
     files.forEach(file => {
@@ -123,7 +125,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
     const source = fs.createReadStream(jsonPath);
     const destination = fs.createWriteStream(gzipPath);
 
-    await pipeline(source, gzip, destination);
+    await pipelineAsync(source, gzip, destination);
 
     await fs.unlink(jsonPath);
 
