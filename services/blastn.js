@@ -26,108 +26,100 @@ const readFastaSequence = async (fastaPath) => {
         .join('')
         .replace(/\s/g, '');
 };
-const parseBlastResults = (blastText, querySeq, subjectSeq) => {
+const parseBlastResults = (blastText) => {
     const lines = blastText.trim().split('\n');
-    return lines.map(line => {
-        const fields = line.split('\t');
-        const qStart = parseInt(fields[6], 10);
-        const qEnd = parseInt(fields[7], 10);
-        const sStart = parseInt(fields[8], 10);
-        const sEnd = parseInt(fields[9], 10);
+    const groupedResults = {};
 
-        return {
-            queryId: fields[0],
-            subjectId: fields[1],
-            identity: parseFloat(fields[2]),
-            alignmentLength: parseInt(fields[3], 10),
-            mismatches: parseInt(fields[4], 10),
-            gapOpens: parseInt(fields[5], 10),
-            qStart,
-            qEnd,
-            sStart,
-            sEnd,
-            evalue: parseFloat(fields[10]),
-            bitScore: parseFloat(fields[11]),
-            coverage: parseFloat(fields[2])
-        };
+    lines.forEach(line => {
+        const fields = line.split('\t');
+        const queryId = fields[0];
+
+        if (!groupedResults[queryId]) {
+            groupedResults[queryId] = {
+                queryId,
+                subjectId: [],
+                identity: [],
+                alignmentLength: [],
+                mismatches: [],
+                gapOpens: [],
+                qStart: [],
+                qEnd: [],
+                sStart: [],
+                sEnd: [],
+                evalue: [],
+                bitScore: [],
+                coverage: []
+            };
+        }
+        groupedResults[queryId].subjectId.push(fields[1]);
+        groupedResults[queryId].identity.push(parseFloat(fields[2]));
+        groupedResults[queryId].alignmentLength.push(parseInt(fields[3], 10));
+        groupedResults[queryId].mismatches.push(parseInt(fields[4], 10));
+        groupedResults[queryId].gapOpens.push(parseInt(fields[5], 10));
+        groupedResults[queryId].qStart.push(parseInt(fields[6], 10));
+        groupedResults[queryId].qEnd.push(parseInt(fields[7], 10));
+        groupedResults[queryId].sStart.push(parseInt(fields[8], 10));
+        groupedResults[queryId].sEnd.push(parseInt(fields[9], 10));
+        groupedResults[queryId].evalue.push(parseFloat(fields[10]));
+        groupedResults[queryId].bitScore.push(parseFloat(fields[11]));
+        groupedResults[queryId].coverage.push(parseFloat(fields[2]));
     });
+    return Object.values(groupedResults); 
 };
 
 const runBlastn = async (queryFastaPath, res) => {
     const queryPath = path.resolve(queryFastaPath);
-    const { default: pLimit } = await import('p-limit');
-    const limit = pLimit(1);
-    const querySeq = await readFastaSequence(queryPath);
-
-    const batchSize = 100;
     const results = [];
 
     try {
-        for (let i = 0; i < dataset.length; i += batchSize) {
-            const batch = dataset.slice(i, i + batchSize);
-            const batchIndex = i / batchSize + 1; 
+        for (let i = 0; i < dataset.length; i++) {
+            const { name, fastaUrl } = dataset[i];
+            const subjectPath = path.join(dataDir, fastaUrl);
+            const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -outfmt 6`;
 
-            const tasks = batch.map(({ name, fastaUrl }) =>
-                limit(() => new Promise((resolve) => {
-                    const subjectPath = path.join(dataDir, fastaUrl);
-                    const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -outfmt 6`;
+            const stdout = await new Promise((resolve, reject) => {
+                exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
+                    if (error) {
+                        return resolve(null); 
+                    }
+                    resolve(stdout);
+                });
+            });
 
-                    exec(command, { maxBuffer: 1024 * 1024 * 10 }, async (error, stdout, stderr) => {
-                        if (error) {
-                            console.error(`Error for ${name}:`, stderr || error.message);
-                            return resolve({ name, error: stderr || error.message, success: false });
-                        }
+            if (!stdout) {
+                results.push({
+                    name,
+                    error: 'BLAST execution failed',
+                    success: false
+                });
+                continue;
+            }
 
-                        let parsed = [];
-                        try {
-                            const subjectSeq = await readFastaSequence(subjectPath);
-                            parsed = parseBlastResults(stdout, querySeq, subjectSeq);
-                        } catch (parseError) {
-                            console.error(`Parse error for ${name}:`, parseError);
-                            return resolve({
-                                name,
-                                error: 'Failed to parse BLAST output',
-                                success: false,
-                            });
-                        }
+            try {
+                const parsed = parseBlastResults(stdout);
 
-                        resolve({
-                            name,
-                            subjectPath,
-                            queryPath,
-                            result: parsed,
-                            success: true
-                        });
-                    });
-                }))
-            );
-
-            const batchResults = await Promise.all(tasks);
-            results.push(...batchResults);
-
-            const batchFilePath = path.join("/app/fastA", `result_batch_${batchIndex}.json`);
-            await fs.promises.writeFile(batchFilePath, JSON.stringify(batchResults, null, 2), 'utf8');
-
-            console.log(`✔️ Batch ${batchIndex} saved to ${batchFilePath}`);
+                results.push({
+                    name,
+                    subjectPath,
+                    queryPath,
+                    result: parsed,
+                    success: true
+                });
+            } catch (parseError) {
+            }
         }
 
         removeFiles([queryPath]);
 
-        res.json({
-            status: 'done',
-            totalBatches: Math.ceil(dataset.length / batchSize),
-            message: 'All BLAST batches completed and saved.',
-        });
+        res.send(results);
     } catch (err) {
         removeFiles([queryPath]);
-        console.error(err);
         res.status(500).json({
             status: 'error',
-            error: err.message || 'Lỗi không xác định',
+            error: err.message,
         });
     }
 };
-
 
 module.exports = {
     runBlastn
