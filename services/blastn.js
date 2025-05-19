@@ -1,33 +1,22 @@
 const { exec } = require("child_process");
-const fs = require("fs");
+const fs = require("fs/promises");
+const fsStream = require("fs");
 const path = require("path");
-const os = require("os");
 const dataset = require('../utils/datasetFasta.json');
-const readline = require("readline");
 const { createGzip } = require('zlib');
+const pLimitImport = import('p-limit');
 
 const removeFiles = (files) => {
     files.forEach(file => {
-        if (fs.existsSync(file)) {
-            fs.unlinkSync(file);
+        if (fsStream.existsSync(file)) {
+            fsStream.unlinkSync(file);
         }
     });
 };
 
 const dataDir = path.join('/app', 'FastA');
-const extractSubsequence = (sequence, start, end) => {
-    if (!sequence || start <= 0 || end > sequence.length || start > end) return '';
-    return sequence.substring(start - 1, end);
-};
-const readFastaSequence = async (fastaPath) => {
-    const content = await fs.promises.readFile(fastaPath, 'utf8');
-    return content
-        .split('\n')
-        .filter(line => !line.startsWith('>'))
-        .join('')
-        .replace(/\s/g, '');
-};
-const parseBlastResults = (blastText, querySeq, subjectSeq) => {
+
+const parseBlastResults = (blastText) => {
     const lines = blastText.trim().split('\n');
     const groupedResults = {};
 
@@ -67,84 +56,77 @@ const parseBlastResults = (blastText, querySeq, subjectSeq) => {
         groupedResults[queryId].coverage.push(parseFloat(fields[2]));
     });
 
-    return Object.values(groupedResults); 
+    return Object.values(groupedResults);
 };
 
 const runBlastn = async (queryFastaPath, id, res) => {
-  const queryPath = path.resolve(queryFastaPath);
-  const results = [];
-  const pLimit = (await import('p-limit')).default;
-  const limit = pLimit(4);
+    const queryPath = path.resolve(queryFastaPath);
+    const results = [];
+    const pLimit = (await pLimitImport).default;
+    const limit = pLimit(4);
 
-  try {
-    const tasks = dataset.map(({ name, fastaUrl }) =>
-      limit(async () => {
-        const subjectPath = path.join(dataDir, fastaUrl);
-        const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -outfmt 6`;
+    try {
+        const tasks = dataset.map(({ name, fastaUrl }) =>
+            limit(async () => {
+                const subjectPath = path.join(dataDir, fastaUrl);
+                const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -outfmt 6`;
 
-        const stdout = await new Promise((resolve) => {
-          exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
-            if (error) {
-              resolve(null);
-            } else {
-              resolve(stdout);
-            }
-          });
+                const stdout = await new Promise((resolve) => {
+                    exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
+                        if (error) {
+                            resolve(null);
+                        } else {
+                            resolve(stdout);
+                        }
+                    });
+                });
+
+                try {
+                    const parsed = parseBlastResults(stdout);
+                    return {
+                        name,
+                        subjectPath,
+                        queryPath,
+                        result: parsed,
+                    };
+                } catch (error) {
+                    return { error: error.message };
+                }
+            })
+        );
+
+        const batchResults = await Promise.all(tasks);
+        results.push(...batchResults);
+
+        removeFiles([queryPath]);
+
+        const jsonPath = path.resolve(`app/fastA/${id}.json`);
+        await fs.writeFile(jsonPath, JSON.stringify(results, null, 2));
+
+        const gzipPath = jsonPath + '.gz';
+
+        await new Promise((resolve, reject) => {
+            const gzip = createGzip();
+            const source = fsStream.createReadStream(jsonPath);
+            const destination = fsStream.createWriteStream(gzipPath);
+
+            source.pipe(gzip).pipe(destination)
+                .on('finish', resolve)
+                .on('error', reject);
         });
 
-        try {
-          const parsed = parseBlastResults(stdout);
-          return {
-            name,
-            subjectPath,
-            queryPath,
-            result: parsed,
-          };
-        } catch (error) {
-          return {
-            error: error.message,
-          };
-        }
-      })
-    );
+        await fs.unlink(jsonPath);
 
-    const batchResults = await Promise.all(tasks);
-    results.push(...batchResults);
+        res.json({ file: gzipPath });
 
-    removeFiles([queryPath]);
-
-    const jsonPath = path.resolve(`app/fastA/${id}.json`);
-    await fs.writeFile(jsonPath, JSON.stringify(results, null, 2));
-
-    const gzipPath = jsonPath + '.gz';
-
-    await new Promise((resolve, reject) => {
-      const gzip = createGzip();
-      const source = fs.createReadStream(jsonPath);
-      const destination = fs.createWriteStream(gzipPath);
-
-      source
-        .pipe(gzip)
-        .pipe(destination)
-        .on('finish', resolve)
-        .on('error', reject);
-    });
-
-    await fs.unlink(jsonPath);
-
-    res.json({
-      file: gzipPath,
-    });
-
-  } catch (err) {
-    removeFiles([queryPath]);
-    res.status(500).json({
-      status: 'error',
-      error: err.message,
-    });
-  }
+    } catch (err) {
+        removeFiles([queryPath]);
+        res.status(500).json({
+            status: 'error',
+            error: err.message,
+        });
+    }
 };
-
 
 module.exports = {
     runBlastn
