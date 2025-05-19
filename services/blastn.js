@@ -100,7 +100,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
 
         removeFiles([queryPath]);
 
-        const jsonPath = path.resolve(`app/fastA/${id}.json`);
+        const jsonPath = path.join('/app', 'fastA', `${id}.json`);
         await fs.writeFile(jsonPath, JSON.stringify(results, null, 2));
 
         const gzipPath = jsonPath + '.gz';
