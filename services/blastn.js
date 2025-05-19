@@ -4,6 +4,9 @@ const path = require("path");
 const os = require("os");
 const dataset = require('../utils/datasetFasta.json');
 const readline = require("readline");
+import { createGzip } from 'zlib';
+import { fileURLToPath } from 'url';
+import { pipeline } from 'stream/promises';
 
 const removeFiles = (files) => {
     files.forEach(file => {
@@ -69,7 +72,7 @@ const parseBlastResults = (blastText, querySeq, subjectSeq) => {
     return Object.values(groupedResults); 
 };
 
-const runBlastn = async (queryFastaPath, res) => {
+const runBlastn = async (queryFastaPath, id, res) => {
   const queryPath = path.resolve(queryFastaPath);
   const results = [];
   const pLimit = (await import('p-limit')).default;
@@ -111,7 +114,27 @@ const runBlastn = async (queryFastaPath, res) => {
     results.push(...batchResults);
 
     removeFiles([queryPath]);
-    res.send(results);
+
+    const jsonPath = path.resolve(`app/fastA/${id}.json`);
+    await fs.writeFile(jsonPath, JSON.stringify(results, null, 2));
+
+    const gzipPath = jsonPath + '.gz';
+    const gzip = createGzip();
+    const source = await fs.open(jsonPath);
+    const destination = await fs.open(gzipPath, 'w');
+
+    await pipeline(
+      source.createReadStream(),
+      gzip,
+      destination.createWriteStream()
+    );
+
+    await fs.unlink(jsonPath);
+
+    res.json({
+      file: gzipPath,
+    });
+
   } catch (err) {
     removeFiles([queryPath]);
     res.status(500).json({
