@@ -9,7 +9,7 @@ const runBlastn = async(req, res) => {
 };
 
 const getZipFile = async (req, res) => {
-    const {url} = req.body;
+    const {url} = req.query;
     let result = await blastnService.getGzipFile(url);
     return res.status(200).json({
         data: result
