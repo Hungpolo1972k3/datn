@@ -4,6 +4,7 @@ const path = require("path");
 const os = require("os");
 const dataset = require('../utils/datasetFasta.json');
 const readline = require("readline");
+const pLimit = require('p-limit');
 
 const removeFiles = (files) => {
     files.forEach(file => {
