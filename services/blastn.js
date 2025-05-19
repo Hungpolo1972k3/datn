@@ -5,10 +5,6 @@ const os = require("os");
 const dataset = require('../utils/datasetFasta.json');
 const readline = require("readline");
 const { createGzip } = require('zlib');
-const { fileURLToPath } = require('url');
-const { pipeline } = require('stream');
-const { promisify } = require('util');
-const pipelineAsync = promisify(pipeline);
 
 const removeFiles = (files) => {
     files.forEach(file => {
@@ -78,7 +74,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
   const queryPath = path.resolve(queryFastaPath);
   const results = [];
   const pLimit = (await import('p-limit')).default;
-  const limit = pLimit(4); 
+  const limit = pLimit(4);
 
   try {
     const tasks = dataset.map(({ name, fastaUrl }) =>
@@ -121,11 +117,18 @@ const runBlastn = async (queryFastaPath, id, res) => {
     await fs.writeFile(jsonPath, JSON.stringify(results, null, 2));
 
     const gzipPath = jsonPath + '.gz';
-    const gzip = createGzip();
-    const source = fs.createReadStream(jsonPath);
-    const destination = fs.createWriteStream(gzipPath);
 
-    await pipelineAsync(source, gzip, destination);
+    await new Promise((resolve, reject) => {
+      const gzip = createGzip();
+      const source = fs.createReadStream(jsonPath);
+      const destination = fs.createWriteStream(gzipPath);
+
+      source
+        .pipe(gzip)
+        .pipe(destination)
+        .on('finish', resolve)
+        .on('error', reject);
+    });
 
     await fs.unlink(jsonPath);
 
@@ -141,6 +144,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
     });
   }
 };
+
 
 module.exports = {
     runBlastn
