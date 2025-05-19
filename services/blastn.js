@@ -26,6 +26,49 @@ const readFastaSequence = async (fastaPath) => {
         .join('')
         .replace(/\s/g, '');
 };
+const parseBlastResults = (blastText, querySeq, subjectSeq) => {
+    const lines = blastText.trim().split('\n');
+    const groupedResults = {};
+
+    lines.forEach(line => {
+        const fields = line.split('\t');
+        const queryId = fields[0];
+
+        if (!groupedResults[queryId]) {
+            groupedResults[queryId] = {
+                queryId,
+                subjectId: [],
+                identity: [],
+                alignmentLength: [],
+                mismatches: [],
+                gapOpens: [],
+                qStart: [],
+                qEnd: [],
+                sStart: [],
+                sEnd: [],
+                evalue: [],
+                bitScore: [],
+                coverage: []
+            };
+        }
+
+        groupedResults[queryId].subjectId.push(fields[1]);
+        groupedResults[queryId].identity.push(parseFloat(fields[2]));
+        groupedResults[queryId].alignmentLength.push(parseInt(fields[3], 10));
+        groupedResults[queryId].mismatches.push(parseInt(fields[4], 10));
+        groupedResults[queryId].gapOpens.push(parseInt(fields[5], 10));
+        groupedResults[queryId].qStart.push(parseInt(fields[6], 10));
+        groupedResults[queryId].qEnd.push(parseInt(fields[7], 10));
+        groupedResults[queryId].sStart.push(parseInt(fields[8], 10));
+        groupedResults[queryId].sEnd.push(parseInt(fields[9], 10));
+        groupedResults[queryId].evalue.push(parseFloat(fields[10]));
+        groupedResults[queryId].bitScore.push(parseFloat(fields[11]));
+        groupedResults[queryId].coverage.push(parseFloat(fields[2]));
+    });
+
+    return Object.values(groupedResults); 
+};
+
 const runBlastn = async (queryFastaPath, res) => {
   const queryPath = path.resolve(queryFastaPath);
   const results = [];
@@ -47,7 +90,7 @@ const runBlastn = async (queryFastaPath, res) => {
             }
           });
         });
-        
+
         try {
           const parsed = parseBlastResults(stdout);
           return {
