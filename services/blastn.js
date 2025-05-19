@@ -47,15 +47,7 @@ const runBlastn = async (queryFastaPath, res) => {
             }
           });
         });
-
-        if (!stdout) {
-          return {
-            name,
-            error: 'BLAST execution failed',
-            success: false,
-          };
-        }
-
+        
         try {
           const parsed = parseBlastResults(stdout);
           return {
@@ -65,10 +57,10 @@ const runBlastn = async (queryFastaPath, res) => {
             result: parsed,
             success: true,
           };
-        } catch {
+        } catch (error) {
           return {
             name,
-            error: 'Failed to parse BLAST results',
+            error: error.message,
             success: false,
           };
         }
