@@ -5,6 +5,7 @@ const path = require("path");
 const dataset = require('../utils/datasetFasta.json');
 const { createGzip } = require('zlib');
 const pLimitImport = import('p-limit');
+const zlib = require("zlib");
 
 const removeFiles = (files) => {
     files.forEach(file => {
@@ -57,6 +58,28 @@ const parseBlastResults = (blastText) => {
     });
 
     return Object.values(groupedResults);
+};
+const getGzipFile = async (gzipFilePath) => {
+    const chunks = [];
+    const gunzip = zlib.createGunzip();
+
+    return new Promise((resolve, reject) => {
+        const source = fsStream.createReadStream(gzipFilePath);
+
+        source.pipe(gunzip)
+            .on('data', (chunk) => chunks.push(chunk))
+            .on('end', () => {
+                try {
+                    const buffer = Buffer.concat(chunks);
+                    const content = buffer.toString('utf8');
+                    const json = JSON.parse(content);
+                    resolve(json);
+                } catch (error) {
+                    reject(error);
+                }
+            })
+            .on('error', reject);
+    });
 };
 
 const runBlastn = async (queryFastaPath, id, res) => {
@@ -116,7 +139,6 @@ const runBlastn = async (queryFastaPath, id, res) => {
         });
 
         await fs.unlink(jsonPath);
-
         res.json({ file: gzipPath });
 
     } catch (err) {
@@ -128,6 +150,8 @@ const runBlastn = async (queryFastaPath, id, res) => {
     }
 };
 
+
 module.exports = {
-    runBlastn
+    runBlastn,
+    getGzipFile
 };

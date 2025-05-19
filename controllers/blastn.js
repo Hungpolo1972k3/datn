@@ -8,6 +8,14 @@ const runBlastn = async(req, res) => {
     await blastnService.runBlastn(req.file.path, id, res);
 };
 
+const getZipFile = async (req, res) => {
+    const {url} = req.body;
+    let result = await blastnService.getGzipFile(url);
+    return res.status(200).json({
+        data: result
+    })
+}
 module.exports = {
-    runBlastn
+    runBlastn,
+    getZipFile
 };

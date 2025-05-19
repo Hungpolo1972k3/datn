@@ -6,5 +6,5 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 router.post('/blastn/:id', upload.single('fasta'), blastnController.runBlastn);
-
+router.get('/getzipfile',blastnController.getZipFile )
 module.exports = router;
