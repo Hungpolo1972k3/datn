@@ -76,7 +76,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
   const queryPath = path.resolve(queryFastaPath);
   const results = [];
   const pLimit = (await import('p-limit')).default;
-  const limit = pLimit(2); 
+  const limit = pLimit(4); 
 
   try {
     const tasks = dataset.map(({ name, fastaUrl }) =>
@@ -120,14 +120,10 @@ const runBlastn = async (queryFastaPath, id, res) => {
 
     const gzipPath = jsonPath + '.gz';
     const gzip = createGzip();
-    const source = await fs.open(jsonPath);
-    const destination = await fs.open(gzipPath, 'w');
+    const source = fs.createReadStream(jsonPath);
+    const destination = fs.createWriteStream(gzipPath);
 
-    await pipeline(
-      source.createReadStream(),
-      gzip,
-      destination.createWriteStream()
-    );
+    await pipeline(source, gzip, destination);
 
     await fs.unlink(jsonPath);
 
