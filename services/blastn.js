@@ -4,7 +4,6 @@ const path = require("path");
 const os = require("os");
 const dataset = require('../utils/datasetFasta.json');
 const readline = require("readline");
-const pLimit = require('p-limit');
 
 const removeFiles = (files) => {
     files.forEach(file => {
@@ -30,6 +29,7 @@ const readFastaSequence = async (fastaPath) => {
 const runBlastn = async (queryFastaPath, res) => {
   const queryPath = path.resolve(queryFastaPath);
   const results = [];
+  const pLimit = (await import('p-limit')).default;
   const limit = pLimit(3); 
 
   try {
