@@ -1,3 +1,4 @@
+const fs = require('fs');
 const blastnService = require("../services/blastn");
 
 const runBlastn = async(req, res) => {
