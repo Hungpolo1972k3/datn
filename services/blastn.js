@@ -84,7 +84,10 @@ const runBlastn = async (queryFastaPath, id, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const results = [];
     const pLimit = (await pLimitImport).default;
-    const limit = pLimit(2);
+    const limit = pLimit(4);
+
+    const jsonPath = path.join('/app', 'fastA', `${id}.json`);
+    const gzipPath = jsonPath + '.gz';
 
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
@@ -115,10 +118,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
         const batchResults = await Promise.all(tasks);
         results.push(...batchResults);
 
-        const jsonPath = path.join('/app', 'fastA', `${id}.json`);
         await fs.writeFile(jsonPath, JSON.stringify(results, null, 2));
-
-        const gzipPath = jsonPath + '.gz';
 
         await new Promise((resolve, reject) => {
             const gzip = createGzip();
@@ -136,13 +136,19 @@ const runBlastn = async (queryFastaPath, id, res) => {
         res.json({ file: gzipPath });
 
     } catch (err) {
+        try {
+            await fs.unlink(jsonPath);
+        } catch (_) {} /
+
         removeFiles([queryPath]);
+
         res.status(500).json({
             status: 'error',
             error: err.message,
         });
     }
 };
+
 
 
 
