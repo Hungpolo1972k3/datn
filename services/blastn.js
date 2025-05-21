@@ -19,32 +19,24 @@ const dataDir = path.join('/app', 'FastA');
 
 const parseBlastResults = (blastText) => {
     const lines = blastText.trim().split('\n');
-    const grouped = {};
+
+    const identity = [];
+    const alignmentLength = [];
+    const mismatches = [];
+    const gapOpens = [];
+    const evalue = [];
+    const bitScore = [];
+    const coverage = [];
 
     lines.forEach(line => {
         const fields = line.split('\t');
-        const queryId = fields[0];
-
-        if (!grouped[queryId]) {
-            grouped[queryId] = {
-                queryId,
-                identity: [],
-                alignmentLength: [],
-                mismatches: [],
-                gapOpens: [],
-                evalue: [],
-                bitScore: [],
-                coverage: []
-            };
-        }
-
-        grouped[queryId].identity.push(parseFloat(fields[2]));
-        grouped[queryId].alignmentLength.push(parseInt(fields[3], 10));
-        grouped[queryId].mismatches.push(parseInt(fields[4], 10));
-        grouped[queryId].gapOpens.push(parseInt(fields[5], 10));
-        grouped[queryId].evalue.push(parseFloat(fields[10]));
-        grouped[queryId].bitScore.push(parseFloat(fields[11]));
-        grouped[queryId].coverage.push(parseFloat(fields[2]));
+        identity.push(parseFloat(fields[2]));
+        alignmentLength.push(parseInt(fields[3], 10));
+        mismatches.push(parseInt(fields[4], 10));
+        gapOpens.push(parseInt(fields[5], 10));
+        evalue.push(parseFloat(fields[10]));
+        bitScore.push(parseFloat(fields[11]));
+        coverage.push(parseFloat(fields[2])); 
     });
 
     const calculateAverage = (arr) => {
@@ -53,17 +45,17 @@ const parseBlastResults = (blastText) => {
         return Number((sum / arr.length).toFixed(2));
     };
 
-    return Object.values(grouped).map(query => ({
-        queryId: query.queryId,
-        avgIdentity: calculateAverage(query.identity),
-        avgBitScore: calculateAverage(query.bitScore),
-        avgAlignmentLength: calculateAverage(query.alignmentLength),
-        avgMismatch: calculateAverage(query.mismatches),
-        avgGapOpens: calculateAverage(query.gapOpens),
-        avgEValue: calculateAverage(query.evalue),
-        avgCoverage: calculateAverage(query.coverage),
-    }));
+    return {
+        avgIdentity: calculateAverage(identity),
+        avgBitScore: calculateAverage(bitScore),
+        avgAlignmentLength: calculateAverage(alignmentLength),
+        avgMismatch: calculateAverage(mismatches),
+        avgGapOpens: calculateAverage(gapOpens),
+        avgEValue: calculateAverage(evalue),
+        avgCoverage: calculateAverage(coverage),
+    };
 };
+
 
 const getGzipFile = async (gzipFilePath) => {
     const chunks = [];
@@ -92,7 +84,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const results = [];
     const pLimit = (await pLimitImport).default;
-    const limit = pLimit(4);
+    const limit = pLimit(2);
 
     try {
         const tasks = dataset.map(({ name, fastaUrl }) =>
