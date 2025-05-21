@@ -138,7 +138,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
     } catch (err) {
         try {
             await fs.unlink(jsonPath);
-        } catch (_) {} /
+        } catch (_) {}
 
         removeFiles([queryPath]);
 
