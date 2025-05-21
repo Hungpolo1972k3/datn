@@ -10,9 +10,19 @@ const runBlastn = async(req, res) => {
 
 const getZipFile = async (req, res) => {
     const {url} = req.query;
+    const filePath = url;
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({
+            message: "Không tồn tại file",
+            data: filePath,
+            status: 0
+        });
+    }
     let result = await blastnService.getGzipFile(url);
     return res.status(200).json({
-        data: result
+        message: "Lấy thông tin file thành công",
+        data: result,
+        status: 1
     })
 }
 module.exports = {
