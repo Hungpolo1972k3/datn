@@ -149,7 +149,7 @@ const ResultPage = () => {
   const [results, setResults] = useState([]);
   const [uploadedIdList, setUploadedIdList] = useState([]);
   useEffect(() => {
-    const storedUploadedIds = JSON.parse(sessionStorage.getItem("uploadedIdList") || "[]");
+    const storedUploadedIds = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
     setUploadedIdList(storedUploadedIds);
   }, []);
   const handleSearch = async () => {
@@ -197,11 +197,11 @@ const ResultPage = () => {
   };
 
   const addBlastIdToUploadedList = (id, time, fileName) => {
-  let list = JSON.parse(sessionStorage.getItem("uploadedIdList") || "[]");
+  let list = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
   const exists = list.find((item) => item.id === id);
     if (!exists) {
       const updatedList = [{ id, time, fileName }, ...list];
-      sessionStorage.setItem("uploadedIdList", JSON.stringify(updatedList));
+      localStorage.setItem("uploadedIdList", JSON.stringify(updatedList));
       setUploadedIdList(updatedList);
     }
   };
