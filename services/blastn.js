@@ -19,46 +19,52 @@ const dataDir = path.join('/app', 'FastA');
 
 const parseBlastResults = (blastText) => {
     const lines = blastText.trim().split('\n');
-    const groupedResults = {};
+    const grouped = {};
 
     lines.forEach(line => {
         const fields = line.split('\t');
         const queryId = fields[0];
 
-        if (!groupedResults[queryId]) {
-            groupedResults[queryId] = {
+        if (!grouped[queryId]) {
+            grouped[queryId] = {
                 queryId,
-                subjectId: [],
                 identity: [],
                 alignmentLength: [],
                 mismatches: [],
                 gapOpens: [],
-                qStart: [],
-                qEnd: [],
-                sStart: [],
-                sEnd: [],
                 evalue: [],
                 bitScore: [],
                 coverage: []
             };
         }
 
-        groupedResults[queryId].subjectId.push(fields[1]);
-        groupedResults[queryId].identity.push(parseFloat(fields[2]));
-        groupedResults[queryId].alignmentLength.push(parseInt(fields[3], 10));
-        groupedResults[queryId].mismatches.push(parseInt(fields[4], 10));
-        groupedResults[queryId].gapOpens.push(parseInt(fields[5], 10));
-        groupedResults[queryId].qStart.push(parseInt(fields[6], 10));
-        groupedResults[queryId].qEnd.push(parseInt(fields[7], 10));
-        groupedResults[queryId].sStart.push(parseInt(fields[8], 10));
-        groupedResults[queryId].sEnd.push(parseInt(fields[9], 10));
-        groupedResults[queryId].evalue.push(parseFloat(fields[10]));
-        groupedResults[queryId].bitScore.push(parseFloat(fields[11]));
-        groupedResults[queryId].coverage.push(parseFloat(fields[2]));
+        grouped[queryId].identity.push(parseFloat(fields[2]));
+        grouped[queryId].alignmentLength.push(parseInt(fields[3], 10));
+        grouped[queryId].mismatches.push(parseInt(fields[4], 10));
+        grouped[queryId].gapOpens.push(parseInt(fields[5], 10));
+        grouped[queryId].evalue.push(parseFloat(fields[10]));
+        grouped[queryId].bitScore.push(parseFloat(fields[11]));
+        grouped[queryId].coverage.push(parseFloat(fields[2]));
     });
 
-    return Object.values(groupedResults);
+    const calculateAverage = (arr) => {
+        if (!arr.length) return null;
+        const sum = arr.reduce((a, b) => a + b, 0);
+        return Number((sum / arr.length).toFixed(2));
+    };
+
+    return Object.values(grouped).map(query => ({
+        queryId: query.queryId,
+        avgIdentity: calculateAverage(query.identity),
+        avgBitScore: calculateAverage(query.bitScore),
+        avgAlignmentLength: calculateAverage(query.alignmentLength),
+        avgMismatch: calculateAverage(query.mismatches),
+        avgGapOpens: calculateAverage(query.gapOpens),
+        avgEValue: calculateAverage(query.evalue),
+        avgCoverage: calculateAverage(query.coverage),
+    }));
 };
+
 const getGzipFile = async (gzipFilePath) => {
     const chunks = [];
     const gunzip = zlib.createGunzip();
@@ -95,33 +101,27 @@ const runBlastn = async (queryFastaPath, id, res) => {
                 const command = `blastn -query "${queryPath}" -subject "${subjectPath}" -outfmt 6`;
 
                 const stdout = await new Promise((resolve) => {
-                    exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
-                        if (error) {
-                            resolve(null);
-                        } else {
-                            resolve(stdout);
-                        }
+                    exec(command, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout) => {
+                        resolve(error ? null : stdout);
                     });
                 });
+
+                if (!stdout) return { name, result: [] };
 
                 try {
                     const parsed = parseBlastResults(stdout);
                     return {
                         name,
-                        subjectPath,
-                        queryPath,
-                        result: parsed,
+                        result: parsed
                     };
                 } catch (error) {
-                    return { error: error.message };
+                    return { name, error: error.message };
                 }
             })
         );
 
         const batchResults = await Promise.all(tasks);
         results.push(...batchResults);
-
-        removeFiles([queryPath]);
 
         const jsonPath = path.join('/app', 'fastA', `${id}.json`);
         await fs.writeFile(jsonPath, JSON.stringify(results, null, 2));
@@ -139,6 +139,8 @@ const runBlastn = async (queryFastaPath, id, res) => {
         });
 
         await fs.unlink(jsonPath);
+        removeFiles([queryPath]);
+
         res.json({ file: gzipPath });
 
     } catch (err) {
@@ -149,6 +151,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
         });
     }
 };
+
 
 
 module.exports = {
