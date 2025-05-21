@@ -140,7 +140,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
         });
 
         await fs.unlink(jsonPath);
-        removeFiles([queryPath]);
+        // removeFiles([queryPath]);
 
         res.json({ file: gzipPath });
 
