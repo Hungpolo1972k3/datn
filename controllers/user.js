@@ -147,4 +147,16 @@ const refreshToken = async (req, res) => {
     }
   };
 
-module.exports = { loginUser, getUserById, updateUserInfo, getAllUsers, addUser, deleteUser, refreshToken };
+const editPassword = async (req, res) => {
+    try {
+        let {user_id} = req.query;
+        let {newpassword} = req.body;
+        await userService.editPassword(user_id, newpassword);
+        return res.status(200).json({
+            message:"Đổi mật khẩu thành công"
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Server error", error: error.message });
+    }
+}
+module.exports = { loginUser, getUserById, updateUserInfo, getAllUsers, addUser, deleteUser, refreshToken, editPassword };

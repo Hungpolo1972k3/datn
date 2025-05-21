@@ -10,13 +10,14 @@ const runBlastmTool = async (req, res) => {
       const result = await blastnService.runBlastnTool(file.path);
       return res.status(200).json({ 
         message: 'Thành công', 
-        data: result });
+        data: result 
+      });
     } catch (error) {
       return res.status(500).json({ 
         message: 'Lỗi', 
         error: error.message });
     }
-  };
+};
 
 const downloadFolder = async (req, res) => {
     const relativePath = req.query.path; 
@@ -78,10 +79,25 @@ const getFileInfo = async(req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 } 
+
+const getZipFile = async(req, res) => {
+  try {
+    const {id} = req.query;
+    const result = await blastnService.getZipFile(id);
+    return res.status(200).json({
+      data: result
+    })
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+}
 module.exports = {
     runBlastmTool,
     downloadFolder,
     getFolderInfo,
     downloadFile,
-    getFileInfo
+    getFileInfo,
+    getZipFile
 };

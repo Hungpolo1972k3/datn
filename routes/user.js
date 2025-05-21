@@ -13,5 +13,6 @@ router.post('/refreshtoken', userController.refreshToken);
 //ADMIN
 router.post('/adduser', requireLogin, userController.addUser);
 
-router.delete('/deleteuser', requireLogin, userController.deleteUser)
+router.delete('/deleteuser', requireLogin, userController.deleteUser);
+router.put('/editpassword', requireLogin, userController.editPassword)
 module.exports = router;

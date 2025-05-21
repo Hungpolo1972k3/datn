@@ -101,4 +101,28 @@ const getAllExperiments = async () => {
     }
   };
   
-module.exports = { createExperiment, getExperimentsByUserId , editExperiment, experimentStatistic, getAllExperiments, deleteExperiment };
+const getExperimentStatisticAdmin = async () => {
+  try {
+    const users = await User.find().select("username");
+
+    const result = await Promise.all(
+      users.map(async (user) => {
+        const experiments = await Experiment.find(
+          { user_id: user._id },
+          { _id: 1, createdAt: 1 }
+        ).sort({ createdAt: -1 });
+        return {
+          user,
+          experiments,
+          total: experiments.length
+        };
+      })
+    );
+
+    return result;
+  } catch (error) {
+    throw new Error("Error: " + error.message);
+  }
+};
+
+module.exports = { createExperiment, getExperimentsByUserId , editExperiment, experimentStatistic, getAllExperiments, deleteExperiment, getExperimentStatisticAdmin };

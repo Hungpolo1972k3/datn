@@ -5,16 +5,25 @@ const archiver = require('archiver');
 const { exec } = require('child_process');
 const path = require('path');
 const cheerio = require('cheerio');
+const crypto = require("crypto");
 
-const dataDir = path.join('/app', 'FastA');
-// const dataDir = path.join(__dirname,"../../FastA")
+// const dataDir = path.join('/app', 'FastA');
+const dataDir = path.join(__dirname,"../../FastA")
+
+const generateRandomId = (length = 10) => {
+  return crypto.randomBytes(length)
+    .toString("base64")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(0, length);
+};
+
 const runBlastnTool = async (inputFilePath) => {
   const form = new FormData();
   form.append('fasta', fs.createReadStream(inputFilePath)); 
-
+  const id = generateRandomId();
   try {
     const response = await axios.post(
-      `${process.env.BIOTOOL_URL}/api/blastn/blastn`,
+      `${process.env.BIOTOOL_URL}/api/blastn/blastn/${id}`,
       form,
       {
         headers: {
@@ -22,8 +31,10 @@ const runBlastnTool = async (inputFilePath) => {
         },
       }
     );
-
-    return response.data; 
+    return {
+      file: response.file,
+      id: id
+    }; 
   } catch (error) {
     throw new Error(`Error executing blastn: ${error.message}`);
   } finally {
@@ -385,6 +396,15 @@ const getFileInfo = async (relativePath) => {
   }
 };
 
+const getZipFile = async(id) =>{
+  try {
+    const encodedUrl = encodeURIComponent(`/app/fastA/${id}.json.gz`);
+    const response = await axios.get(`${process.env.BIOTOOL_URL}/api/blastn/getzipfile?url=${encodedUrl}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Lỗi: ${error.message}`);
+  }
+}
 
 module.exports = {
   runBlastnTool,
@@ -392,5 +412,6 @@ module.exports = {
   zipFolderAndSend,
   getFolderInfoService,
   getFileForDownload,
-  getFileInfo
+  getFileInfo,
+  getZipFile
 };

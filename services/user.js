@@ -147,4 +147,17 @@ const deleteUser = async (id) => {
     }
 };
 
-module.exports = { loginUser, getUserById, updateUserInfo, getAllUsers, checkUser, addUser, deleteUser };
+const editPassword = async (user_id, newpassword) => {
+  try {
+    const hashedPassword = await bcrypt.hash(newpassword,parseInt(process.env.PASSWORD_HASH_NUMBER));
+    const updatedUser = await User.findByIdAndUpdate(
+      user_id,
+      { password: hashedPassword },
+      { new: true }
+    );
+    return;
+  } catch (error) {
+    throw new Error("Lỗi: " + error.message);
+  }
+};
+module.exports = { loginUser, getUserById, updateUserInfo, getAllUsers, checkUser, addUser, deleteUser, editPassword };
