@@ -18,20 +18,21 @@
         "tokenExpired": "Phiên đăng nhập đã hết hạn.",
         "tool": "Công cụ",
         "dataset": "Bộ dữ liệu",
-        "statistics": "Thống kê"
+        "statistics": "Thống kê",
+        "blastn": "Công cụ so khớp"
     },
     "homePage": {
         "title1": "Acinetobacter baumannii",
-        "content1": "Acinetobacter baumannii là một loại vi khuẩn Gram âm, hiếu khí, thuộc họ Neisseriaceae...",
-        "content2": "Tuy nhiên khi gặp điều kiện thuận lợi như sức đề kháng của cơ thể suy giảm...",
+        "content1": " \n Acinetobacter baumannii là một loại vi khuẩn Gram âm, hiếu khí, thuộc họ Neisseriaceae. Loại vi khuẩn này có thể sống trên cơ thể của một người khỏe mạnh, nó có thể trú ngụ ở họng, da hay dịch tiết cơ thể mà không gây bệnh.",
+        "content2": "\n Tuy nhiên khi gặp điều kiện thuận lợi như sức đề kháng của cơ thể người bị suy giảm miễn dịch thì Acinetobacter baumannii sẽ trở thành một tác nhân gây bệnh.\n \nVi khuẩn Acinetobacter baumannii có khả năng tồn tại được rất lâu ở môi trường bên ngoài, ngoài ra nó còn có khả năng chống lại với một số các loại thuốc dùng để diệt khuẩn, nên việc sử dụng nước tẩy trong bệnh viện thường không có tác dụng với các loại vi khuẩn này. Chính vì vậy mà nó đã trở thành một trong những mầm bệnh khó điều trị hiệu quả nhất.\n \n Đặc biệt, đây là một loại vi khuẩn có khả năng đề kháng với tất cả các loại thuốc kháng khuẩn được sử dụng để điều trị nhiễm trùng Acinetobacter thông thường hầu như không có hiệu quả, do đó mà việc điều trị Acinetobacter baumannii gặp phải rất nhiều khó khăn và tỷ lệ tử vong do nhiễm khuẩn bệnh viện ngày càng tăng.",
         "title2": "Ai có nguy cơ bị nhiễm?",
-        "content3": "Bất kỳ ai cũng có thể bị nhiễm, đặc biệt là người:\n– Có hệ miễn dịch yếu\n– Vệ sinh kém\n– Nằm viện dài ngày...",
+        "content3": "\n Bất kỳ ai cũng có thể bị nhiễm Acinetobacter baumannii. Bạn là người có nhiều khả năng bị nhiễm trùng Acinetobacter baumannii nếu như bạn mắc phải các bệnh như tiểu đường hoặc bệnh COPD. Ngoài ra, bạn cũng có nguy cơ bị nhiễm Acinetobacter baumannii cao hơn nếu bạn: \n \n+ Có một hệ thống miễn dịch kém.\n \n + Có thói quen vệ sinh kém như rửa tay không kỹ, rửa tay không đúng cách.\n \n+ Bạn đã ở trong phòng chăm sóc đặc biệt hoặc đang sử dụng máy thở.\n \n + Bạn có vết thương hở do tai nạn hoặc chấn thương\n \n + Bạn tiếp xúc gần với một người bị nhiễm Acinetobacter baumannii.\n \n+ Bạn đã sử dụng thuốc kháng sinh và nằm viện trong thời gian dài.\n \n+ Điều trị yêu cầu sử dụng các thiết bị xâm lấn như ống thông tiểu",
         "title3": "Acinetobacter baumannii gây ra bệnh gì?",
-        "content4": "Vi khuẩn này có thể gây nhiều bệnh nghiêm trọng như:\n– Viêm phổi\n– Nhiễm trùng máu...",
+        "content4": "\n Acinetobacter baumannii có thể gây nhiễm trùng nghiêm trọng và đôi khi nó còn đe dọa tính mạng của bạn. Bạn có thể không biết rằng mình bị nhiễm vi khuẩn Acinetobacter cho đến khi bạn gặp phải một số vấn đề sau:\n \n + Viêm phổi\n \n + Nhiễm trùng máu\n \n \t+ Viêm màng não\n \n + Nhiễm trùng đường tiết niệu\n \n + Nhiễm trùng da hoặc vết thương",
         "title4": "Dấu hiệu và triệu chứng",
-        "content5": "Các triệu chứng phổ biến gồm:\n– Sốt\n– Đau hoặc sưng đỏ tại vết thương...",
+        "content5": "\n Nhiễm trùng Acinetobacter baumannii có thể đưa ra những dấu hiệu và các triệu chứng như sau: \n \n + Sốt\n \n+ Các vùng da hoặc vết thương đỏ, sưng, nóng hoặc đau\n \n+ Vùng da sần sùi màu cam, có mụn nước\n \n+ Ho, đau ngực hoặc khó thở\n \n+ Cảm giác nóng rát khi đi tiểu\n \n+ Buồn ngủ, đau đầu hoặc cứng cổ",
         "title5": "Phòng ngừa lây nhiễm",
-        "content6": "– Rửa tay thường xuyên bằng xà phòng hoặc dung dịch sát khuẩn...\n– Vết thương cần được vệ sinh và băng kín..."
+        "content6": "\n Rửa tay: Sử dụng xà phòng và nước để rửa tay sau khi đi vệ sinh, trước khi ăn và sau khi ho hoặc hắt hơi. Bạn có thể sử dụng nước rửa tay diệt vi khuẩn nếu không có nước. Hãy thường xuyên rửa sạch tay.\n \n Giữ cho vết thương được bao phủ: Giữ cho bất kỳ vết thương nào sạch sẽ và băng kín bằng băng cho đến khi chúng được chữa lành.\n \n Băng kín vết thương hở: Sát khuẩn vị trí các vết thương thật sạch sẽ và băng lại, thay băng sạch hàng ngày cho đến khi vết thương được chữa lành.\n \n Luôn làm theo hướng dẫn của các bác sĩ khi dùng thuốc kháng sinh: Uống thuốc đầy đủ và đúng liều lượng, ngay cả khi bạn cảm thấy sức khỏe được tốt hơn. Vi khuẩn có thể trở nên kháng thuốc (khó tiêu diệt hơn) nếu bạn không làm theo sự chỉ dẫn của các bác sĩ. Tuyệt đối không dùng thuốc kháng sinh nếu không được các bác sĩ chỉ định."
     },
     "headerComponent":{
         "organism_name": "Acinetobacter baumannii",
@@ -65,7 +66,9 @@
         "adduser": "Thêm người dùng",
         "selectGender": "Lựa chọn giới tính",
         "delete_user": "Xóa người dùng",
-        "total_users": "Tổng số người dùng"
+        "total_users": "Tổng số người dùng",
+        "searchPlaceholder": "Tìm theo tên người dùng hoặc số điện thoại...",
+        "change_password": "Đổi mật khẩu"
       },
     "experimentPage":{
         "experimentList": "Danh sách thí nghiệm",
@@ -78,7 +81,9 @@
         "detail": "Chi tiết",
         "edit": "Chỉnh sửa",
         "username": "Tác giả",
-        "delete": "Xóa"
+        "delete": "Xóa",
+        "searchPlaceholder": "Tìm theo tên, mã hoặc người thực hiện...",
+        "allPerformers": "Tất cả người thực hiện"
       },
     "authForm":{
         "title": "Đăng nhập",
@@ -94,7 +99,8 @@
         "all": "Tất cả",
         "account": "Tài khoản",
         "experiment": "Thí nghiệm",
-        "sample": "Mẫu thí nghiệm"
+        "sample": "Mẫu thí nghiệm",
+        "user_statistics": "Thống kê hệ thống"
       },
     "submitPage": {
         "title": "Thêm mẫu thí nghiệm",
@@ -376,6 +382,54 @@
     "histogram": "Biểu đồ MIC",
     "amr_plot": "Biểu đồ AMR",
     "vfactors_plot": "Biểu đồ yếu tố độc lực"
-  }                       
+  },
+    "editPassword": {
+      "title": "Thay đổi mật khẩu",
+      "email": "Email",
+      "name": "Tên",
+      "phone": "Số điện thoại",
+      "new_password": "Mật khẩu mới",
+      "confirm_password": "Xác nhận mật khẩu",
+      "enter_new_password": "Nhập mật khẩu mới",
+      "confirm_new_password": "Xác nhận lại mật khẩu",
+      "submit": "Cập nhật mật khẩu",
+      "submitting": "Đang cập nhật mật khẩu",
+      "password_hint": "Mật khẩu chứa ít nhất 6 ký tự",
+      "errors": {
+        "required_password": "Vui lòng nhập đầy đủ mật khẩu.",
+        "password_mismatch": "Mật khẩu xác nhận không khớp.",
+        "password_updated_fail": "Cập nhật mật khẩu thất bại",
+        "password_too_short": "Mật khẩu chứa ít nhất 6 ký tự"
+      },
+      "success": {
+        "password_updated": "Cập nhật mật khẩu thành công!"
+      } 
+    },
+    "resultPage": {
+       "title": "Kết quả BLASTn",
+      "enterRid": "Nhập mã giải trình tự",
+      "search": "Tìm kiếm",
+      "upload": "Tải lên",
+      "uploadError": "Không tồn tại kết quả này",
+      "error": {
+        "existfile": "File đã tồn tại trên server."
+      },
+      "reset":"Cài lại",
+      "uploadFile": "Chọn 1 file fasta",
+      "tableHeaders": {
+        "name": "Mã giải trình tự",
+        "bacteria": "Tên loài vi khuẩn",
+        "avgIdentity": "Độ đồng nhất TB",
+        "bitScore": "Bit Score",
+        "alignmentLength": "Chiều dài đối sánh",
+        "mismatches": "Số lỗi",
+        "gapOpens": "Số khoảng trống",
+        "coverage": "Phủ"
+      },
+      "time": "Thời gian tải lên",
+      "noData": "Không tồn tại dữ liệu",
+      "success": "Phân tích thành công !",
+      "previousIds": "Các BLASTN ID đã lưu"  
+    }                
 }
   

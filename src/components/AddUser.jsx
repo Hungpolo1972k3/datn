@@ -127,7 +127,6 @@ const AddUserPopup = ({ onClose }) => {
     if (Object.keys(validationErrors).length > 0) return;
   
     try {
-      console.log(formData);
       const a = await apiAddUser(formData);
       const translatedMessage = t("addUserComponent.addUserSuccess");
       showNotice(1, translatedMessage);
@@ -223,9 +222,9 @@ const AddUserPopup = ({ onClose }) => {
                 style={{ fontSize: "15px", padding: "5px", width: "35%" }} 
             >
                 <option value="">{t("addUserComponent.selectGender")}</option>
-                <option value="Male">{t("addUserComponent.male")}</option>
-                <option value="Female">{t("addUserComponent.female")}</option>
-            </select>
+                <option value={t("addUserComponent.male")}>{t("addUserComponent.male")}</option>
+                <option value={t("addUserComponent.female")}>{t("addUserComponent.female")}</option>
+              </select>
             {errors.gender && <ErrorMsg>{errors.gender}</ErrorMsg>}
             </InputGroup>
         <InputGroup>

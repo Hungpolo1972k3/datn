@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ExperimentInfo from '../components/ExperimentInfo';
 import { useDispatch, useSelector } from "react-redux";
-import { apiGetExperimentsByUserId } from "../service/experiment";
+import { apiGetExperimentsByUserId, apiGetAllExperiments } from "../service/experiment";
 import { apiGetSamplesByExperimentId } from '../service/sample';
 import { useTranslation } from "react-i18next";
-
 
 const Container = styled.div`
   display: flex;
@@ -20,20 +19,26 @@ const Wrapper = styled.div`
   flex-direction: column;
 `;
 
+const FilterContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+`;
 
-const Button = styled.button`
-  padding: 12px 20px;
-  font-size: 18px;
-  background-color: #00aaff;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.3s;
+const Input = styled.input`
+  padding: 8px;
+  font-size: 16px;
+  width: 60%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
 
-  &:hover {
-    background-color: #0088cc;
-  }
+const Select = styled.select`
+  padding: 8px;
+  font-size: 16px;
+  width: 35%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 `;
 
 const Title = styled.h1`
@@ -79,38 +84,24 @@ const ViewDetailsWrapper = styled.div`
   }
 `;
 
-const EditWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: #ffaa00;
-
-  &:hover {
-    color: #cc6600;
-  }
-`;
-
 const ExperimentPage = () => {
   const { t } = useTranslation();
   const { userId } = useSelector((state) => state.user);
   const [experiments, setExperiments] = useState([]);
+  const [filteredExperiments, setFilteredExperiments] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedEngineer, setSelectedEngineer] = useState('');
 
   const [showModalInfo, setShowModalInfo] = useState(false);
   const [sampleInfo, setSampleInfo] = useState([]);
 
-  const handleViewDetails = async (id) => {
-    setShowModalInfo(true);
-    let samples = await apiGetSamplesByExperimentId(id);
-    setSampleInfo(samples.data);
-  };
-
-  const closeModalInfo = () => setShowModalInfo(false);
   useEffect(() => {
     const fetchExperiments = async () => {
       try {
         if (userId) {
-          const experiment = await apiGetExperimentsByUserId(userId);
+          const experiment = await apiGetAllExperiments();
           setExperiments(experiment.data);
+          setFilteredExperiments(experiment.data);
         }
       } catch (error) {
         console.error(error);
@@ -119,10 +110,57 @@ const ExperimentPage = () => {
     fetchExperiments();
   }, [userId]);
 
+  useEffect(() => {
+    const filtered = experiments.filter((exp) => {
+      const keyword = searchTerm.toLowerCase();
+      const matchSearch =
+        exp.name?.toLowerCase().includes(keyword) ||
+        exp.code?.toLowerCase().includes(keyword) ||
+        exp.engineer?.toLowerCase().includes(keyword);
+
+      const matchEngineer = selectedEngineer
+        ? exp.engineer === selectedEngineer
+        : true;
+
+      return matchSearch && matchEngineer;
+    });
+    setFilteredExperiments(filtered);
+  }, [searchTerm, selectedEngineer, experiments]);
+
+  const handleViewDetails = async (id) => {
+    setShowModalInfo(true);
+    let samples = await apiGetSamplesByExperimentId(id);
+    setSampleInfo(samples.data);
+  };
+
+  const closeModalInfo = () => setShowModalInfo(false);
+
+  const uniqueEngineers = [...new Set(experiments.map((exp) => exp.engineer))];
+
   return (
     <Container>
       <Wrapper>
         <Title>{t('experimentPage.experimentList')}</Title>
+
+        <FilterContainer>
+          <Input
+            type="text"
+            placeholder={t('experimentPage.searchPlaceholder') || "Tìm kiếm..."}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+
+          <Select
+            value={selectedEngineer}
+            onChange={(e) => setSelectedEngineer(e.target.value)}
+          >
+            <option value="">{t('experimentPage.allPerformers') || "Tất cả người thực hiện"}</option>
+            {uniqueEngineers.map((eng, idx) => (
+              <option key={idx} value={eng}>{eng}</option>
+            ))}
+          </Select>
+        </FilterContainer>
+
         <Table>
           <thead>
             <tr>
@@ -135,8 +173,8 @@ const ExperimentPage = () => {
             </tr>
           </thead>
           <tbody>
-            {experiments.map((experiment, index) => (
-              <TableRow key={experiment.id}>
+            {filteredExperiments.map((experiment, index) => (
+              <TableRow key={experiment._id}>
                 <TableData>{index + 1}</TableData>
                 <TableData>{experiment.name}</TableData>
                 <TableData>{experiment.code}</TableData>

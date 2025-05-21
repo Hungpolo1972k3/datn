@@ -353,6 +353,9 @@ const Navbar = () => {
                 <SubMenuItem to="/tool" onClick={() => setShowAbDatasetSubMenu(false)}>
                   {t('navbarComponent.tool')}
                 </SubMenuItem>
+                <SubMenuItem to="/blastn-result" onClick={() => setShowAbDatasetSubMenu(false)}>
+                  {t('navbarComponent.blastn')}
+                </SubMenuItem>
               </SubMenu>
             )}
           </WrapperItem>
@@ -366,8 +369,13 @@ const Navbar = () => {
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.sample')}</Button>}
           </NavLink>
         )}
-        {isLogin && (
+        {isLogin && !isLoginAdmin &&(
           <NavLink to="/statistic">
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.statistic')}</Button>}
+          </NavLink>
+        )}
+        {isLogin && isLoginAdmin &&(
+          <NavLink to="/statistic-admin">
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.statistic')}</Button>}
           </NavLink>
         )}

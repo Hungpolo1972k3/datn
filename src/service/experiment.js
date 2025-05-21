@@ -67,4 +67,12 @@ export const apiDeleteExperiment = async (id) => {
   }
 };
 
+export const apiGetExperimentStatisticAdmin = async () => {
+  try {
+    const response = await axiosConfig.get('/api/experiment/experimentstatisticadmin');
+    return response.data;
+  } catch (error) {
+    throw error.message;
+  }
+};
 

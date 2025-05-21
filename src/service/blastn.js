@@ -66,7 +66,7 @@ export const apiRunBlastnTool = async (file) => {
         const formData = new FormData();
         formData.append('fasta', file);
 
-        const response = await axiosConfig.post(`/api/virulence/runvirulencetool`, formData, {
+        const response = await axiosConfig.post(`/api/blastn/runblastntool`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
                 'Accept': 'application/json',
@@ -77,3 +77,15 @@ export const apiRunBlastnTool = async (file) => {
         throw error.response?.data || error.message;
     }
 };
+
+export const apiGetZipFile = async (id) => {
+  try {
+    const response = await axiosConfig.get('/api/blastn/getzipfile', {
+      params: { id } 
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+}
+
