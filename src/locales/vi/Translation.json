@@ -414,6 +414,10 @@
       "error": {
         "existfile": "File đã tồn tại trên server."
       },
+      "rowsPerPage": "Số hàng mỗi trang",
+      "prev": "Trước",
+      "next": "Sau",
+      "all": "Tất cả",
       "reset":"Cài lại",
       "uploadFile": "Chọn 1 file fasta",
       "tableHeaders": {

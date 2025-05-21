@@ -413,6 +413,10 @@
     "error": {
       "existfile": "File does not exist on the server"
     },
+    "rowsPerPage": "Rows per page",
+    "prev": "Previous",
+    "next": "Next",
+    "all": "All",
     "reset":"Reset",
     "uploadFile": "Choose a fasta file",
     "tableHeaders": {
