@@ -112,7 +112,6 @@ const runBlastn = async (queryFastaPath, id, res) => {
                     const parsed = parseBlastResults(stdout);
                     return {
                         name,
-                        queryPath: queryPath,
                         result: parsed
                     };
                 } catch (error) {
@@ -140,7 +139,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
         });
 
         await fs.unlink(jsonPath);
-        // removeFiles([queryPath]);
+        removeFiles([queryPath]);
 
         res.json({ file: gzipPath });
 
