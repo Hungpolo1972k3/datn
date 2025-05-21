@@ -112,6 +112,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
                     const parsed = parseBlastResults(stdout);
                     return {
                         name,
+                        queryPath: queryPath,
                         result: parsed
                     };
                 } catch (error) {
