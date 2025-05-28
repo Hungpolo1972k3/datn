@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import datasetFolder from "../utils/datasetFolder.json";
+import { apiRunBlastnTwoFiles, apiGetFileInfo } from "../service/blastn";
+import LoadingSpinner from "./LoadingSpinner";
+import BlastnModal from "./Blastn";
 
 const Table = styled.table`
   width: 100%;
@@ -85,13 +88,21 @@ const Select = styled.select`
   color: #1e293b;
 `;
 
-const ResultTable = ({ results }) => {
+const formatDateVN = (isoDate) => {
+  const date = new Date(isoDate);
+  return date.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
+};
+
+const ResultTable = ({ results, blastnInfo }) => {
   const { t } = useTranslation();
   const findInfoByName = (name) => datasetFolder.find(item => item.name === name);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(20);
-
+  const [rowsPerPage, setRowsPerPage] = useState(30);
+  const [isLoading, setIsLoading] = useState(false);
+  const [blastnData, setBlastnData] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [bacteriaInfo, setBacteriaInfo] = useState();
   useEffect(() => {
     setCurrentPage(1);
   }, [rowsPerPage, results]);
@@ -115,11 +126,48 @@ const ResultTable = ({ results }) => {
     setCurrentPage(page);
   };
 
+  const [modalInfo, setModalInfo] = useState(null);
+
+  const handleViewDetails = async (url, name, info, bacteria) => {
+    let url2 = `/app/FastA/${name}/Spades_output/contigs.fasta`;
+    setIsLoading(true);
+    try {
+      const result = await apiRunBlastnTwoFiles(url, url2);
+      setIsLoading(false);
+      setBlastnData(result.data);
+      setModalInfo(info);  
+      setShowModal(true);
+      setBacteriaInfo(bacteria);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
   return (
     <>
+      {blastnInfo && Object.keys(blastnInfo).length > 0 && (
+        <div
+          style={{
+            marginBottom: "12px",
+            color: "#1e293b",
+            fontSize: "0.95rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <div><strong>{t("resultPage.filename")}:</strong> {blastnInfo.filename}</div>
+            <div><strong>{t("resultPage.createdAt")}:</strong> {formatDateVN(blastnInfo.createdAt)}</div>
+          </div>
+        </div>
+      )}
       <Table>
         <thead>
           <tr>
+            <Th>{t("resultPage.tableHeaders.index")}</Th>
             <Th>{t("resultPage.tableHeaders.name")}</Th>
             <Th>{t("resultPage.tableHeaders.bacteria")}</Th>
             <Th>{t("resultPage.tableHeaders.avgIdentity")}</Th>
@@ -128,6 +176,7 @@ const ResultTable = ({ results }) => {
             <Th>{t("resultPage.tableHeaders.mismatches")}</Th>
             <Th>{t("resultPage.tableHeaders.gapOpens")}</Th>
             <Th>{t("resultPage.tableHeaders.coverage")}</Th>
+            <Th>{t("resultPage.tableHeaders.detail")}</Th>
           </tr>
         </thead>
         <tbody>
@@ -145,6 +194,7 @@ const ResultTable = ({ results }) => {
 
               return (
                 <Tr key={idx}>
+                  <Td>{(currentPage - 1) * (rowsPerPage === "all" ? results.length : rowsPerPage) + idx + 1}</Td>
                   <Td>{r.name}</Td>
                   <Td>
                     {ncbiUrl ? (
@@ -165,26 +215,46 @@ const ResultTable = ({ results }) => {
                   <Td>{r.result.avgMismatch}</Td>
                   <Td>{r.result.avgGapOpens}</Td>
                   <Td>{r.result.avgCoverage}</Td>
+                  <Td>
+                    <span
+                      style={{ cursor: "pointer", fontSize: "1.8rem", userSelect: "none" }}
+                      onClick={() => handleViewDetails(blastnInfo.url, r.name, r, bacteria)}
+                      title={t("resultPage.viewDetails")}
+                    >
+                      👁️
+                    </span>
+                  </Td>
                 </Tr>
               );
             })
           )}
         </tbody>
       </Table>
-
+      {isLoading && (
+        <div style={{ marginTop: "200px" }}>
+          <LoadingSpinner />
+        </div>
+      )}
+      {showModal && (
+        <BlastnModal
+          blastn={blastnData}
+          onClose={() => setShowModal(false)}
+          info={modalInfo}
+          bacteria={bacteriaInfo}
+        />
+      )}
       {results.length > 0 && (
         <PaginationWrapper>
           <div>
             {t("resultPage.rowsPerPage")}:{" "}
             <Select value={rowsPerPage} onChange={handleRowsChange}>
-              <option value="20">20</option>
               <option value="30">30</option>
               <option value="50">50</option>
               <option value="100">100</option>
               <option value="all">{t("resultPage.all")}</option>
             </Select>
           </div>
-
+          
           {rowsPerPage !== "all" && (
             <PageControls>
               <PageButton onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>

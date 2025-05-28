@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import ResultTable from "../components/ResultTable";
 import { useTranslation } from "react-i18next";
-import { apiRunBlastnTool, apiGetZipFile } from "../service/blastn";
+import { apiRunBlastnTool, apiGetZipFile, apiGetBlastnInfo } from "../service/blastn";
 import { useNotice } from "../context/NoticeContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 
-// Styled components
 const Container = styled.div`
   margin: 40px auto;
   padding: 20px 30px;
@@ -140,6 +140,8 @@ const SearchIcon = () => (
   </svg>
 );
 
+const FIFTEEN_MINUTES = 15 * 60 * 1000; 
+
 const ResultPage = () => {
   const { showNotice } = useNotice();
   const { t } = useTranslation();
@@ -148,10 +150,69 @@ const ResultPage = () => {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [uploadedIdList, setUploadedIdList] = useState([]);
+  const [isLocked, setIsLocked] = useState(false);
+  const [countdown, setCountdown] = useState(FIFTEEN_MINUTES);
+  const [blastnInfo, setBlastnInfo] = useState({})
+
   useEffect(() => {
     const storedUploadedIds = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
     setUploadedIdList(storedUploadedIds);
+
+    if (storedUploadedIds.length > 0) {
+      const latestTime = storedUploadedIds.reduce((latest, item) => {
+        const itemTime = new Date(item.time).getTime();
+        return itemTime > latest ? itemTime : latest;
+      }, 0);
+
+      const now = Date.now();
+      if (now - latestTime < FIFTEEN_MINUTES) {
+        setIsLocked(true);
+      }
+    }
+
+    const lockStartTimeStr = localStorage.getItem("lockStartTime");
+    if (lockStartTimeStr) {
+      const lockStartTime = parseInt(lockStartTimeStr, 10);
+      const now = Date.now();
+      const elapsed = now - lockStartTime;
+      if (elapsed < FIFTEEN_MINUTES) {
+        setIsLocked(true);
+        setCountdown(FIFTEEN_MINUTES - elapsed);
+      } else {
+        localStorage.removeItem("lockStartTime");
+        setIsLocked(false);
+        setCountdown(FIFTEEN_MINUTES);
+      }
+    }
   }, []);
+
+  useEffect(() => {
+    if (!isLocked) return;
+
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1000) {
+          localStorage.removeItem("lockStartTime");
+          setIsLocked(false);
+          clearInterval(interval);
+          window.location.reload();
+          return 0;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isLocked]);
+
+  useEffect(() => {
+    if (isLocked) {
+      if (!localStorage.getItem("lockStartTime")) {
+        localStorage.setItem("lockStartTime", Date.now().toString());
+      }
+    }
+  }, [isLocked]);
+
   const handleSearch = async () => {
     if (!search) return;
     setIsLoading(true);
@@ -162,6 +223,8 @@ const ResultPage = () => {
       } else {
         setResults(result.data.data);
       }
+      const data = await apiGetBlastnInfo(search);
+      setBlastnInfo(data.data)
     } catch (error) {
       showNotice(0, t("resultPage.uploadError"));
     } finally {
@@ -169,36 +232,18 @@ const ResultPage = () => {
     }
   };
 
-  const handleFileUpload = async () => {
-    if (!file) return;
-    setIsLoading(true);
-    try {
-      const result = await apiRunBlastnTool(file);
-      const currentTime = new Date().toISOString();
-      addBlastIdToUploadedList(result.data.id, currentTime, file.name);
-
-      const response = await apiGetZipFile(result.data.id);
-      if (response.data.status === 0) {
-        showNotice(0, t("resultPage.error.existfile"));
-      } else {
-        setResults(response.data.data);
-        showNotice(1, t("resultPage.success"));
-      }
-    } catch (error) {
-      showNotice(0, t("resultPage.uploadError"));
-    } finally {
-      setIsLoading(false);
+  const generateRandomId = (length = 10) => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-  };
-
-  const handleResetFile = () => {
-    setFile(null);
-    setResults([]);
+    return result;
   };
 
   const addBlastIdToUploadedList = (id, time, fileName) => {
-  let list = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
-  const exists = list.find((item) => item.id === id);
+    let list = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
+    const exists = list.find((item) => item.id === id);
     if (!exists) {
       const updatedList = [{ id, time, fileName }, ...list];
       localStorage.setItem("uploadedIdList", JSON.stringify(updatedList));
@@ -206,6 +251,56 @@ const ResultPage = () => {
     }
   };
 
+  const handleFileUpload = async () => {
+    if (!file) return;
+
+    const id = generateRandomId();
+
+    addBlastIdToUploadedList(id, new Date().toISOString(), file.name);
+    try {
+      const result = await apiRunBlastnTool(file, id);
+
+      const response = await apiGetZipFile(result.data.id);
+      if (response.data.status === 0) {
+        showNotice(0, t("resultPage.error.existfile"));
+      } else {
+        setResults(response.data.data);
+        showNotice(1, t("resultPage.success"));
+        setIsLocked(true);
+        window.location.reload();
+      }
+    } catch (error) {
+      showNotice(0, t("resultPage.uploadError"));
+    } 
+  };
+
+  const handleResetFile = () => {
+    setFile(null);
+    setResults([]);
+    setSearch("");
+  };
+
+  const formatCountdown = (ms) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+    const seconds = (totalSeconds % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchId = params.get("search");
+    if (searchId) {
+      setSearch(searchId);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (search) {
+      handleSearch();
+    }
+  }, [search]);
 
   return (
     <Container>
@@ -216,12 +311,12 @@ const ResultPage = () => {
           placeholder={t("resultPage.enterRid")}
           onChange={(e) => setSearch(e.target.value)}
           value={search}
-          disabled={file !== null}
+          disabled={file !== null || isLocked}
           aria-label={t("resultPage.enterRid")}
         />
         <IconButton
           onClick={handleSearch}
-          disabled={file !== null || !search}
+          disabled={file !== null || !search || isLocked}
           aria-label={t("resultPage.search")}
           title={t("resultPage.search")}
         >
@@ -231,20 +326,21 @@ const ResultPage = () => {
 
       <FormGroup>
         <FileInputWrapper
-          disabled={search !== ""}
+          disabled={search !== "" || isLocked}
           title={file ? file.name : t("resultPage.uploadFile")}
         >
           {file ? file.name : t("resultPage.uploadFile")}
           <HiddenFileInput
             accept=".fasta,.fa"
             onChange={(e) => setFile(e.target.files[0])}
-            disabled={search !== ""}
+            disabled={search !== "" || isLocked}
             aria-label={t("resultPage.uploadFile")}
           />
         </FileInputWrapper>
+
         <Button
           onClick={handleFileUpload}
-          disabled={search !== "" || !file}
+          disabled={search !== "" || !file || isLocked}
           aria-label={t("resultPage.upload")}
           title={t("resultPage.upload")}
         >
@@ -255,6 +351,7 @@ const ResultPage = () => {
         {file && (
           <ResetButton
             onClick={handleResetFile}
+            disabled={isLocked}
             aria-label={t("resultPage.reset")}
             title={t("resultPage.reset")}
           >
@@ -262,22 +359,89 @@ const ResultPage = () => {
           </ResetButton>
         )}
       </FormGroup>
+      {isLocked && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "20px 0",
+            fontWeight: "700",
+            color: "#ef4444",
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 100 100"
+            width="200"
+            height="200"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle cx="50" cy="50" r="48" stroke="#ef4444" strokeWidth="4" fill="none" />
 
-      {uploadedIdList.length > 0 && (
+            <text
+              x="50"
+              y="58"
+              textAnchor="middle"
+              fontSize="28"
+              fill="#ef4444"
+              fontWeight="700"
+              fontFamily="Arial, sans-serif"
+            >
+              {formatCountdown(countdown)}
+            </text>
+          </svg>
+        </div>
+      )}
+
+      {uploadedIdList.length > 0 && !isLocked && (
         <div style={{ marginTop: "20px" }}>
-          <h3 style={{ color: "#1e3a8a", marginBottom: "8px" }}>{t("resultPage.previousIds")}</h3>
+          <h3 style={{ color: "#1e3a8a", marginBottom: "8px" }}>
+            {t("resultPage.previousIds")}
+          </h3>
           <ul style={{ listStyle: "none", paddingLeft: 0, color: "#2563eb" }}>
             {uploadedIdList.map((item, index) => (
-              <li key={index} style={{ marginBottom: "6px" }}>
-                {item.id} - {new Date(item.time).toLocaleString()} - {item.fileName}
+              <li
+                key={index}
+                style={{ marginBottom: "6px", display: "flex", alignItems: "center", gap: "4px" }}
+              >
+                <button
+                    onDoubleClick={() => {
+                      const filteredList = uploadedIdList.filter((_, i) => i !== index);
+                      localStorage.setItem("uploadedIdList", JSON.stringify(filteredList));
+                      setUploadedIdList(filteredList);
+                    }}
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "#ef4444",
+                      fontWeight: "900",
+                      cursor: "pointer",
+                      fontSize: "1.8rem",
+                      userSelect: "none",
+                      paddingRight: "20px",    
+                      lineHeight: "1",     
+                    }}
+                  >
+                    x
+                  </button>
+                <a
+                  href={`/blastn-result?search=${item.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#2563eb", textDecoration: "underline", flex: 1 }}
+                >
+                  {item.id} - {new Date(item.time).toLocaleString()} - {item.fileName}
+                </a>
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      <ResultTable results={results} />
-
+      <ResultTable results={results} blastnInfo={blastnInfo}/>
+      
       {isLoading && (
         <div style={{ marginTop: "200px" }}>
           <LoadingSpinner />

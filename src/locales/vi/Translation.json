@@ -428,12 +428,42 @@
         "alignmentLength": "Chiều dài đối sánh",
         "mismatches": "Số lỗi",
         "gapOpens": "Số khoảng trống",
-        "coverage": "Phủ"
+        "coverage": "Phủ",
+        "index": "STT",
+        "detail": "Chi tiết"
       },
       "time": "Thời gian tải lên",
       "noData": "Không tồn tại dữ liệu",
       "success": "Phân tích thành công !",
-      "previousIds": "Các BLASTN ID đã lưu"  
-    }                
+      "previousIds": "Các BLASTN ID đã lưu",
+      "filename":"Tên file phân tích",
+      "createdAt": "Thời gian tạo",
+      "download": "Tải xuống",
+      "viewDetails": "Xem chi tiết"
+    },
+    "blastn": {
+      "index": "STT",
+      "query": "Truy vấn",
+      "subject": "Chuỗi so khớp",
+      "identity": "Độ giống nhau (%)",
+      "bitScore": "Điểm Bit",
+      "evalue": "Giá trị E",
+      "alignmentLength": "Chiều dài căn chỉnh",
+      "mismatches": "Số lượng sai khác",
+      "gapOpens": "Số lần mở gap",
+      "qStart": "Bắt đầu truy vấn",
+      "qEnd": "Kết thúc truy vấn",
+      "sStart": "Bắt đầu chuỗi so khớp",
+      "sEnd": "Kết thúc chuỗi so khớp",
+      "avgIdentity": "Trung bình độ giống nhau (%)",
+      "avgBitScore": "Trung bình điểm Bit",
+      "avgAlignmentLength": "Trung bình chiều dài căn chỉnh",
+      "avgMismatch": "Trung bình số lượng sai khác",
+      "avgGapOpens": "Trung bình mở gap",
+      "avgEValue": "Trung bình giá trị E",
+      "avgCoverage": "Trung bình độ phủ",
+      "detail": "Chi tiết",
+      "noData": "Không có dữ liệu BLASTN"
+    }               
 }
   

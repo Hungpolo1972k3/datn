@@ -427,12 +427,42 @@
       "alignmentLength": "Alignment Length",
       "mismatches": "Mismatches",
       "gapOpens": "Gap Opens",
-      "coverage": "Coverage"
+      "coverage": "Coverage",
+      "index": "No.",
+      "detail": "Detail"
     },
     "noData": "No data",
     "time": "Upload time",
     "success": "Success to blastn file !",
-    "previousIds": "Saved BLASTN IDs"
+    "previousIds": "Saved BLASTN IDs",
+    "filename":"FASTA File",
+    "createdAt": "Created Time",
+    "download": "Download",
+    "viewDetails": "Detail"
+  },
+  "blastn": {
+    "index": "Index",
+    "query": "Query",
+    "subject": "Subject",
+    "identity": "Identity (%)",
+    "bitScore": "Bit Score",
+    "evalue": "E-value",
+    "alignmentLength": "Alignment Length",
+    "mismatches": "Mismatches",
+    "gapOpens": "Gap Opens",
+    "qStart": "Query Start",
+    "qEnd": "Query End",
+    "sStart": "Subject Start",
+    "sEnd": "Subject End",
+    "avgIdentity": "Average Identity (%)",
+    "avgBitScore": "Average Bit Score",
+    "avgAlignmentLength": "Average Alignment Length",
+    "avgMismatch": "Average Mismatches",
+    "avgGapOpens": "Average Gap Opens",
+    "avgEValue": "Average E-value",
+    "avgCoverage": "Average Coverage",
+    "detail": "Detail",
+    "noData": "No BLASTN data available"
   }              
 }
   
