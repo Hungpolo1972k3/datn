@@ -404,6 +404,26 @@ const getZipFile = async(id) =>{
     throw new Error(`Lỗi: ${error.message}`);
   }
 }
+const reverseComplement = (seq) => {
+  const complement = {
+    A: 'T',
+    T: 'A',
+    G: 'C',
+    C: 'G',
+    a: 't',
+    t: 'a',
+    g: 'c',
+    c: 'g',
+    N: 'N',
+    n: 'n'
+  };
+
+  return seq
+    .split('')
+    .reverse()
+    .map(nuc => complement[nuc] || nuc)
+    .join('');
+};
 
 const parseBlastnOutfmt7 = (output, querySequences, subjectSequences) => {
   const results = [];
