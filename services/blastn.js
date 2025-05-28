@@ -7,8 +7,8 @@ const path = require('path');
 const cheerio = require('cheerio');
 const crypto = require("crypto");
 
-// const dataDir = path.join('/app', 'FastA');
-const dataDir = path.join(__dirname,"../../FastA")
+const dataDir = path.join('/app', 'FastA');
+// const dataDir = path.join(__dirname,"../../FastA")
 
 const generateRandomId = (length = 10) => {
   return crypto.randomBytes(length)
