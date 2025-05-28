@@ -8,7 +8,7 @@ const runBlastmTool = async (req, res) => {
       if (!file) {
         return res.status(400).json({ message: 'Không có file được tải lên' });
       }
-      const result = await blastnService.runBlastnTool(file.path, id);
+      const result = await blastnService.runBlastnTool(file.path, file.originalname, id);
       return res.status(200).json({ 
         message: 'Thành công', 
         data: result 
@@ -94,11 +94,14 @@ const getZipFile = async(req, res) => {
     });
   }
 }
+
+
 module.exports = {
     runBlastmTool,
     downloadFolder,
     getFolderInfo,
     downloadFile,
     getFileInfo,
-    getZipFile
+    getZipFile,
+    addBlastn
 };

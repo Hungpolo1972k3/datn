@@ -6,6 +6,7 @@ const { exec } = require('child_process');
 const path = require('path');
 const cheerio = require('cheerio');
 const crypto = require("crypto");
+const Blastn = require('../models/blastn')
 
 const dataDir = path.join('/app', 'FastA');
 // const dataDir = path.join(__dirname,"../../FastA")
@@ -17,7 +18,7 @@ const generateRandomId = (length = 10) => {
     .slice(0, length);
 };
 
-const runBlastnTool = async (inputFilePath, id) => {
+const runBlastnTool = async (inputFilePath, filename, id) => {
   const form = new FormData();
   form.append('fasta', fs.createReadStream(inputFilePath)); 
   try {
@@ -30,6 +31,12 @@ const runBlastnTool = async (inputFilePath, id) => {
         },
       }
     );
+    let newblastn = new Blastn({
+      url: inputFilePath,
+      code: id,
+      filename: filename
+    })
+    await newblastn.save()
     return {
       file: response.file,
       url: inputFilePath,
