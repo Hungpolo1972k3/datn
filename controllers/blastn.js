@@ -109,6 +109,19 @@ const runBlastn = async (req, res) => {
   }
 }
 
+const getBlastnByCode = async (req, res) => {
+  try {
+    const {code} = req.query;
+    const result = await blastnService.getBlastnByCode(code);
+    return res.status(200).json({
+      data: result
+    })
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+}
 module.exports = {
     runBlastmTool,
     downloadFolder,
@@ -116,5 +129,6 @@ module.exports = {
     downloadFile,
     getFileInfo,
     getZipFile,
-    runBlastn
+    runBlastn,
+    getBlastnByCode
 };

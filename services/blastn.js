@@ -538,6 +538,15 @@ const runBlastn = async(path1, path2) => {{
     throw new Error(`Lỗi: ${error.message}`);
   }
 }}
+
+const getBlastnByCode = async (code) => {
+  try {
+    let data = await Blastn.findOne({code: code});
+    return data;
+  } catch (error) {
+    throw new Error(`Lỗi: ${error.message}`);
+  }
+}
 module.exports = {
   runBlastnTool,
   getFullFolderPath,
@@ -546,5 +555,6 @@ module.exports = {
   getFileForDownload,
   getFileInfo,
   getZipFile,
-  runBlastn
+  runBlastn,
+  getBlastnByCode
 };
