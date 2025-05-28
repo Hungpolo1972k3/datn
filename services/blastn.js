@@ -6,17 +6,10 @@ const { exec } = require('child_process');
 const path = require('path');
 const cheerio = require('cheerio');
 const crypto = require("crypto");
-const Blastn = require('../models/blastn')
+const Blastn = require('../models/blastn');
 
 const dataDir = path.join('/app', 'FastA');
 // const dataDir = path.join(__dirname,"../../FastA")
-
-const generateRandomId = (length = 10) => {
-  return crypto.randomBytes(length)
-    .toString("base64")
-    .replace(/[^a-zA-Z0-9]/g, "")
-    .slice(0, length);
-};
 
 const runBlastnTool = async (inputFilePath, filename, id) => {
   const form = new FormData();
@@ -412,6 +405,119 @@ const getZipFile = async(id) =>{
   }
 }
 
+const parseBlastnOutfmt7 = (output, querySequences, subjectSequences) => {
+  const results = [];
+  const lines = output.trim().split('\n');
+
+  let currentQuery = null;
+
+  for (const line of lines) {
+    if (line.startsWith('# Query:')) {
+      currentQuery = line.split('# Query:')[1].trim();
+    } else if (!line.startsWith('#') && line.trim()) {
+      const fields = line.split('\t');
+      if (fields.length === 12) {
+        const subject = fields[1];
+        const qStart = parseInt(fields[6], 10);
+        const qEnd = parseInt(fields[7], 10);
+        const sStart = parseInt(fields[8], 10);
+        const sEnd = parseInt(fields[9], 10);
+
+        const qSeq = querySequences[currentQuery];
+        const sSeq = subjectSequences[subject];
+
+        const queryFragment =
+          qSeq && qStart <= qEnd
+            ? qSeq.slice(qStart - 1, qEnd)
+            : qSeq && qEnd < qStart
+            ? reverseComplement(qSeq.slice(qEnd - 1, qStart))
+            : '';
+
+        const subjectFragment =
+          sSeq && sStart <= sEnd
+            ? sSeq.slice(sStart - 1, sEnd)
+            : sSeq && sEnd < sStart
+            ? reverseComplement(sSeq.slice(sEnd - 1, sStart))
+            : '';
+
+        results.push({
+          query: currentQuery,
+          subject,
+          identity: parseFloat(fields[2]),
+          alignmentLength: parseInt(fields[3], 10),
+          mismatches: parseInt(fields[4], 10),
+          gapOpens: parseInt(fields[5], 10),
+          qStart,
+          qEnd,
+          sStart,
+          sEnd,
+          evalue: fields[10],
+          bitScore: fields[11],
+          queryFragment,
+          subjectFragment
+        });
+      }
+    }
+  }
+
+  return results;
+};
+
+const parseFasta = (filePath) => {
+  const content = fs.readFileSync(filePath, 'utf8');
+  const sequences = {};
+  let currentId = null;
+  let currentSeq = [];
+
+  content.split('\n').forEach(line => {
+    if (line.startsWith('>')) {
+      if (currentId) {
+        sequences[currentId] = currentSeq.join('');
+      }
+      currentId = line.slice(1).split(/\s+/)[0];
+      currentSeq = [];
+    } else {
+      currentSeq.push(line.trim());
+    }
+  });
+
+  if (currentId) {
+    sequences[currentId] = currentSeq.join('');
+  }
+
+  return sequences;
+};
+
+const runBlastn = async(path1, path2) => {{
+  const filePath1 = path.resolve(path1);
+  const filePath2 = path.resolve(path2);
+
+  if (!fs.existsSync(filePath1)) throw new Error(`Không tìm thấy file: ${filePath1}`);
+  if (!fs.existsSync(filePath2)) throw new Error(`Không tìm thấy file: ${filePath2}`);
+
+  const form = new FormData();
+  form.append('file1', fs.createReadStream(filePath1), path.basename(filePath1));
+  form.append('file2', fs.createReadStream(filePath2), path.basename(filePath2)); 
+  try {
+    const response = await axios.post(
+      `${process.env.BIOTOOL_URL}/api/blastn/blastntwofile`,
+      form,
+      {
+        headers: form.getHeaders(),
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity,
+      }
+    )
+    const rawOutput = response.data;
+    const querySequences = parseFasta(filePath1);
+    const subjectSequences = parseFasta(filePath2);
+
+    const parsedResult = parseBlastnOutfmt7(rawOutput, querySequences, subjectSequences);
+    return parsedResult;
+  } catch (error) {
+    throw new Error(`Lỗi: ${error.message}`);
+  }
+}}
 module.exports = {
   runBlastnTool,
   getFullFolderPath,
@@ -419,5 +525,6 @@ module.exports = {
   getFolderInfoService,
   getFileForDownload,
   getFileInfo,
-  getZipFile
+  getZipFile,
+  runBlastn
 };

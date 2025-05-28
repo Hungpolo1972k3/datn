@@ -29,4 +29,5 @@ router.get('/getfileinfo', blastnController.getFileInfo);
 router.get('/downloadfile', blastnController.downloadFile);
 router.get('/getzipfile', blastnController.getZipFile );
 
+router.post('/blastn', blastnController.runBlastn);
 module.exports = router;

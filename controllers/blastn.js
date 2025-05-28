@@ -95,6 +95,19 @@ const getZipFile = async(req, res) => {
   }
 }
 
+const runBlastn = async (req, res) => {
+  try {
+    const {subUrl, queryUrl} = req.body;
+    let result = await blastnService.runBlastn(subUrl, queryUrl);
+    return res.status(200).json({
+      data: result
+    })
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+}
 
 module.exports = {
     runBlastmTool,
@@ -102,5 +115,6 @@ module.exports = {
     getFolderInfo,
     downloadFile,
     getFileInfo,
-    getZipFile
+    getZipFile,
+    runBlastn
 };
