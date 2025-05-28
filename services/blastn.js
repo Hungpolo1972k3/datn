@@ -508,7 +508,10 @@ const runBlastn = async(path1, path2) => {{
         maxBodyLength: Infinity,
       }
     )
-    const rawOutput = response.data;
+    console.log(response.data)
+    const rawOutput = typeof response.data === 'string'
+      ? response.data
+      : response.data.output || JSON.stringify(response.data);
     const querySequences = parseFasta(filePath1);
     const subjectSequences = parseFasta(filePath2);
 
