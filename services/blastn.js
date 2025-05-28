@@ -154,14 +154,14 @@ const runBlastnWithTwoFiles = (queryPath, subjectPath) => {
     const outFile = path.join('uploads', `blastn_result_${Date.now()}.txt`);
     const cmd = `blastn -query ${queryPath} -subject ${subjectPath} -out ${outFile} -outfmt 7`;
 
-    exec(cmd, (error, stdout, stderr) => {
+    exec(cmd, async (error, stdout, stderr) => {
       if (error) {
         return reject(new Error(stderr || error.message));
       }
 
       try {
-        const output = fs.readFileSync(outFile, 'utf-8');
-        fs.unlinkSync(outFile); 
+        const output = await fs.readFile(outFile, 'utf-8');
+        await fs.unlink(outFile); 
         resolve(output);
       } catch (readErr) {
         reject(readErr);
