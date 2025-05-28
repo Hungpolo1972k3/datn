@@ -102,6 +102,5 @@ module.exports = {
     getFolderInfo,
     downloadFile,
     getFileInfo,
-    getZipFile,
-    addBlastn
+    getZipFile
 };
