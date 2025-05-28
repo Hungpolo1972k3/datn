@@ -16,3 +16,4 @@ services:
       BIOTOOL_URL: http://103.159.50.207:5000
     volumes:
       - ../FastA:/app/FastA
+      - ../Blastn:/app/Blastn
