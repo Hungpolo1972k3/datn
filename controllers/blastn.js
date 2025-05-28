@@ -4,10 +4,11 @@ const blastnService = require('../services/blastn');
 const runBlastmTool = async (req, res) => {
     try {
       const { file } = req;
+      const { id } = req.params.id;
       if (!file) {
         return res.status(400).json({ message: 'Không có file được tải lên' });
       }
-      const result = await blastnService.runBlastnTool(file.path);
+      const result = await blastnService.runBlastnTool(file.path, id);
       return res.status(200).json({ 
         message: 'Thành công', 
         data: result 

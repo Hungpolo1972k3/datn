@@ -17,10 +17,9 @@ const generateRandomId = (length = 10) => {
     .slice(0, length);
 };
 
-const runBlastnTool = async (inputFilePath) => {
+const runBlastnTool = async (inputFilePath, id) => {
   const form = new FormData();
   form.append('fasta', fs.createReadStream(inputFilePath)); 
-  const id = generateRandomId();
   try {
     const response = await axios.post(
       `${process.env.BIOTOOL_URL}/api/blastn/blastn/${id}`,
@@ -33,14 +32,14 @@ const runBlastnTool = async (inputFilePath) => {
     );
     return {
       file: response.file,
+      url: inputFilePath,
       id: id
     }; 
   } catch (error) {
-    throw new Error(`Error executing blastn: ${error.message}`);
-  } finally {
     if (fs.existsSync(inputFilePath)) {
       fs.unlinkSync(inputFilePath);
     }
+    throw new Error(`Error executing blastn: ${error.message}`);
   }
 };
 
