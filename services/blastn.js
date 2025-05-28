@@ -149,10 +149,29 @@ const runBlastn = async (queryFastaPath, id, res) => {
     }
 };
 
+const runBlastnWithTwoFiles = (queryPath, subjectPath) => {
+  return new Promise((resolve, reject) => {
+    const outFile = path.join('uploads', `blastn_result_${Date.now()}.txt`);
+    const cmd = `blastn -query ${queryPath} -subject ${subjectPath} -out ${outFile} -outfmt 7`;
 
+    exec(cmd, (error, stdout, stderr) => {
+      if (error) {
+        return reject(new Error(stderr || error.message));
+      }
 
+      try {
+        const output = fs.readFileSync(outFile, 'utf-8');
+        fs.unlinkSync(outFile); 
+        resolve(output);
+      } catch (readErr) {
+        reject(readErr);
+      }
+    });
+  });
+};
 
 module.exports = {
     runBlastn,
-    getGzipFile
+    getGzipFile,
+    runBlastnWithTwoFiles
 };
