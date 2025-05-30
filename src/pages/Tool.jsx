@@ -116,6 +116,7 @@ const ButtonReset = styled.button`
 const Tool = () => {
   const { t } = useTranslation();
   const fileInputRef = useRef(null);
+  const resultRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const { showNotice } = useNotice();
   const [file, setFile] = useState(null);
@@ -179,6 +180,9 @@ const Tool = () => {
       showNotice(1, t("toolPage.successConfirm"));
       setIsSuccessConfirm(true);
       setIsLoading(false);
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
     } catch (error) {
       showNotice(0, t("toolPage.failConfirm"));
       setIsLoading(false);
@@ -213,11 +217,13 @@ const Tool = () => {
         </ButtonWrapper>
         {isLoading && <LoadingSpinner />}
         {isSuccessConfirm && (
-          <ResultComponent
-            fastaInfo={fastaInfo}
-            virulenceInfo={virulenceInfo}
-            amrInfo={amrInfo}
-          />
+          <div ref={resultRef}>
+            <ResultComponent
+              fastaInfo={fastaInfo}
+              virulenceInfo={virulenceInfo}
+              amrInfo={amrInfo}
+            />
+          </div>
         )}
       </Wrapper>
     </Container>

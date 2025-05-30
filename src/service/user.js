@@ -73,5 +73,16 @@ export const apiGetUserById = async (token) => {
     }
   };
   
-   
+export const apiEditPassword = async (id, newpassword) => {
+  try {
+    const response = await axiosConfig.put(
+      `/api/user/editpassword?user_id=${id}`,
+      { newpassword }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data?.message || error.message;
+  }
+};
+
   

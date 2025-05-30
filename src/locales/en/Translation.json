@@ -1,290 +1,311 @@
 {
-  "navbarComponent": {
-    "home": "Home",
-    "experiment": "Experiment",
-    "sample": "Sample",
-    "statistic": "Statistics",
-    "users": "Users",
-    "login": "Login",
-    "logout": "Logout",
-    "account_info": "View account info",
-    "confirm_logout": "Are you sure you want to log out?",
-    "yes": "Yes",
-    "cancel": "Cancel",
-    "language": "Language",
-    "logoutSuccess": "Logout successfully",
-    "experiment-management": "Experiments",
-    "abdataset": "AB Dataset"
-  },
-  "homePage": {
-    "title1": "Acinetobacter baumannii",
-    "content1": "Acinetobacter baumannii is a Gram-negative, aerobic bacterium...",
-    "content2": "However, when conditions are favorable such as weakened immunity...",
-    "title2": "Who is at risk?",
-    "content3": "Anyone can be infected, especially:\n– Weak immune system\n– Poor hygiene\n– Long hospital stay...",
-    "title3": "What diseases does it cause?",
-    "content4": "It can cause serious diseases such as:\n– Pneumonia\n– Bloodstream infection...",
-    "title4": "Symptoms",
-    "content5": "Common symptoms include:\n– Fever\n– Pain or swelling at wound site...",
-    "title5": "Prevention",
-    "content6": "– Wash hands frequently...\n– Clean and cover wounds..."
-  },
-  "headerComponent": {
-    "organism_name": "Acinetobacter baumannii",
-    "organism_description": "A multidrug-resistant pathogen frequently causing severe hospital-acquired infections"
-  },
-  "footerComponent": {
-    "about_us": "About Us",
-    "introduction": "Introduction",
-    "contact": "Contact",
-    "blog": "Blog",
-    "support": "Support",
-    "faqs": "FAQs",
-    "privacy_policy": "Privacy Policy",
-    "terms_of_use": "Terms of Use",
-    "connect_with_us": "Connect with Us",
-    "copyright": "Acinetobacter Baumannii. All rights reserved."
-  },
-  "engineersPage": {
-    "title": "User List",
-    "full_name": "Full Name:",
-    "gender": "Gender:",
-    "phone": "Phone:",
-    "birth_year": "Birth Year:",
-    "email": "Email:",
-    "address": "Address:",
-    "career": "Career:",
-    "workplace": "Workplace:",
-    "experiments": "Experiments:",
-    "samples": "Samples:",
-    "adduser": "Add user",
-    "selectGender": "Select gender",
-    "delete_user": "Delete user",
-    "total_users": "Total users"
-  },
-  "experimentPage": {
-    "experimentList": "Experiment List",
-    "addExperiment": "Add Experiment",
-    "no": "Index",
-    "experimentName": "Experiment Name",
-    "experimentCode": "Experiment Code",
-    "performer": "Performer",
-    "createdTime": "Created Time",
-    "detail": "Detail",
-    "edit": "Edit",
-    "username": "Author",
-    "delete": "Delete"
-  },
-  "authForm": {
-    "title": "Login",
-    "email_placeholder": "Email",
-    "password_placeholder": "Password",
-    "login_button": "Log In",
-    "invalid_email": "Invalid email format (e.g. example@gmail.com)",
-    "login_success": "Login successful",
-    "login_failed": "Login failed. Please check your information.",
-    "system_error": "Login failed. System error."
-  },
-  "statisticPage": {
-    "all": "All",
-    "account": "Account",
-    "experiment": "Experiment",
-    "sample": "Sample"
-  },
-  "submitPage": {
-    "title": "Add Sample",
-    "selectExperiment": "Select Experiment",
-    "sampleNamePlaceholder": "Sample Name",
-    "chooseFile": "Choose FASTA File",
-    "submitBtn": "Submit",
-    "resetBtn": "Reset",
-    "error": {
-      "selectExperiment": "Please select an experiment.",
-      "sampleName": "Please enter sample name.",
-      "file": "Please choose a FASTA file."
+    "navbarComponent":{
+        "home": "Home",
+        "experiment": "Experiment",
+        "sample": "Sample",
+        "statistic": "Statistics",
+        "users": "Users",
+        "login": "Login",
+        "logout": "Logout",
+        "account_info": "View account info",
+        "confirm_logout": "Are you sure you want to log out?",
+        "yes": "Yes",
+        "cancel": "Cancel",
+        "language": "Language",
+        "logoutSuccess": "Logout successfully",
+        "experiment-management": "Experiments",
+        "abdataset": "AB Dataset",
+        "tokenExpired": "Session has expired.",
+        "tool": "Tool",
+        "dataset": "Dataset",
+        "statistics": "Statistic",
+        "blastn": "Blast Tool"
     },
-    "success": "Sample added successfully",
-    "fail": "Failed to add sample"
-  },
-  "experimentAddComponent": {
-    "title": "Add Experiment",
-    "nameLabel": "Experiment Name",
-    "namePlaceholder": "Enter experiment name",
-    "nameError": "Experiment name cannot be empty",
-    "engineerLabel": "Added By",
-    "engineerPlaceholder": "Enter name of person adding",
-    "engineerError": "Added by field cannot be empty",
-    "codeLabel": "Experiment Code",
-    "codePlaceholder": "Enter experiment code",
-    "codeError": "Experiment code cannot be empty",
-    "timeLabel": "Creation Time",
-    "timePlaceholder": "Enter creation time (e.g., 2025-04-05 10:00)",
-    "submitBtn": "Add Experiment",
-    "success": "Experiment added successfully",
-    "fail": "Failed to add experiment"
-  },
-  "experimentEditComponent": {
-    "title": "Edit Experiment",
-    "codePlaceholder": "Experiment Code",
-    "namePlaceholder": "Experiment Name",
-    "engineerPlaceholder": "Engineer",
-    "timePlaceholder": "Creation Time",
-    "cancelBtn": "Cancel",
-    "saveBtn": "Save",
-    "success": "Experiment edited successfully",
-    "fail": "Failed to edit experiment"
-  },
-  "experimentInfoComponent": {
-    "title": "Experiment Information",
-    "index": "Index",
-    "sampleName": "Sample Name",
-    "sampleCode": "Sample Code",
-    "header": "Header",
-    "length": "Sample Length",
-    "fileName": "FASTA File Name",
-    "createdTime": "Created Time",
-    "details": "Details",
-    "downloadFile": "Download FASTA file"
-  },
-  "fastaComponent": {
-    "title": "Sample Information",
-    "field": "Field",
-    "value": "Value",
-    "name": "Sample Name",
-    "header": "Header",
-    "length": "Length",
-    "createdTime": "Created Time"
-  },
-  "amrComponent": {
-    "title": "Antimicrobial Resistance (AMR) Data",
-    "notAvailable": "N/A",
-    "fields": {
-      "Index": "Index",
-      "gene": "Gene",
-      "nucleic": "Nucleic Sequence",
-      "identity": "Identity",
-      "coverage": "Coverage",
-      "resistance": "Resistance",
-      "model": "Model",
-      "database": "Database"
-    }
-  },
-  "noticeComponent": {
-    "success": "Success",
-    "error": "Error"
-  },
-  "resultComponent": {
-    "analysisResult": "Sample Analysis Result",
-    "fasta": "Fasta",
-    "virulence": "Virulence",
-    "amr": "AMR",
-    "nucleoid": "Nucleoid (DNA)",
-    "ribosomes": "Ribosomes",
-    "cytoplasm": "Cytoplasm",
-    "plasmid": "Plasmid",
-    "pili": "Pili",
-    "inclusionBodies": "Inclusion Bodies",
-    "flagellum": "Flagellum",
-    "cytoplasmicMembrane": "Cytoplasmic Membrane",
-    "cellWall": "Cell Wall",
-    "capsule": "Capsule"
-  },
-  "resultPopupComponent": {
-    "analysisResult": "Sample Analysis Result",
-    "fasta": "Fasta",
-    "virulence": "Virulence",
-    "amr": "AMR",
-    "nucleoid": "Nucleoid (DNA)",
-    "ribosomes": "Ribosomes",
-    "cytoplasm": "Cytoplasm",
-    "plasmid": "Plasmid",
-    "pili": "Pili",
-    "inclusionBodies": "Inclusion Bodies",
-    "flagellum": "Flagellum",
-    "cytoplasmicMembrane": "Cytoplasmic Membrane",
-    "cellWall": "Cell Wall",
-    "capsule": "Capsule"
-  },
-  "userInfoComponent": {
-    "title": "User Information",
-    "edit": "Edit",
-    "confirm": "Confirm",
-    "email": "Email",
-    "name": "Full Name",
-    "address": "Address",
-    "phone": "Phone Number",
-    "birthday": "Date of Birth",
-    "gender": "Gender",
-    "career": "Occupation",
-    "workplace": "Workplace",
-    "male": "Male",
-    "female": "Female",
-    "gender_placeholder": "-- Select gender --",
-    "role": "Role",
-    "username": "Full name",
-    "error": {
-      "invalid_email": "Invalid email address",
-      "name_required": "Full name is required",
-      "invalid_phone": "Invalid phone number",
-      "address_required": "Address is required",
-      "birthday_required": "Date of birth is required",
-      "gender_required": "Please select gender",
-      "career_required": "Occupation is required",
-      "workplace_required": "Workplace is required",
-      "update_failed": "An error occurred while updating"
+    "homePage": {
+      "title1": "Acinetobacter baumannii",
+      "content1": "Acinetobacter baumannii is a Gram-negative, aerobic bacterium belonging to the Neisseriaceae family. This bacterium can live on the body of a healthy person, residing in the throat, skin, or bodily secretions without causing disease.",
+      "content2": "However, under favorable conditions such as when the body's immune system is weakened, Acinetobacter baumannii can become a disease-causing agent.\n\nAcinetobacter baumannii is capable of surviving for a long time in the external environment and is resistant to several disinfectants commonly used in hospitals, making standard cleaning agents ineffective against it. This makes it one of the most difficult pathogens to treat effectively.\n\nIn particular, this bacterium can resist almost all antibiotics used to treat common Acinetobacter infections, leading to major challenges in treatment and a rising mortality rate due to hospital-acquired infections.",
+      "title2": "Who is at risk of infection?",
+      "content3": "Anyone can become infected with Acinetobacter baumannii. You are more likely to get an Acinetobacter baumannii infection if you have underlying conditions such as diabetes or COPD. Additionally, your risk increases if you:\n\n+ Have a weakened immune system.\n\n+ Practice poor hygiene, such as improper or infrequent hand washing.\n\n+ Have stayed in an intensive care unit or are using a ventilator.\n\n+ Have open wounds from injuries or accidents.\n\n+ Are in close contact with someone infected with Acinetobacter baumannii.\n\n+ Have used antibiotics and been hospitalized for a long period.\n\n+ Undergo treatment involving invasive devices such as urinary catheters.",
+      "title3": "What illnesses does Acinetobacter baumannii cause?",
+      "content4": "Acinetobacter baumannii can cause serious and sometimes life-threatening infections. You may not realize you are infected until you experience the following issues:\n\n+ Pneumonia\n\n+ Bloodstream infection\n\n+ Meningitis\n\n+ Urinary tract infection\n\n+ Skin or wound infection",
+      "title4": "Signs and symptoms",
+      "content5": "Infection with Acinetobacter baumannii can present the following signs and symptoms:\n\n+ Fever\n\n+ Redness, swelling, heat, or pain at a skin area or wound\n\n+ Rough, orange-colored skin with blisters\n\n+ Cough, chest pain, or difficulty breathing\n\n+ Burning sensation when urinating\n\n+ Drowsiness, headache, or stiff neck",
+      "title5": "Preventing the spread of infection",
+      "content6": "Handwashing: Use soap and water to wash your hands after using the restroom, before eating, and after coughing or sneezing. Use antibacterial hand sanitizer if water is unavailable. Wash your hands regularly.\n\nKeep wounds covered: Ensure all wounds are clean and covered with a bandage until they are fully healed.\n\nCover open wounds properly: Disinfect wounds thoroughly and cover them with a clean bandage. Change the bandage daily until healing occurs.\n\nAlways follow your doctor’s instructions when using antibiotics: Take the full course at the prescribed dosage, even if you start to feel better. Bacteria can become resistant (harder to kill) if you don’t follow medical instructions. Never use antibiotics without a doctor’s prescription."
     },
-    "success": {
-      "update_user": "User information updated successfully"
-    }
-  },
-  "virulenceComponent": {
-    "title": "Virulence Data",
-    "index": "Index",
-    "sequence": "Sequence",
-    "gene": "Gene",
-    "start": "Start",
-    "stop": "Stop",
-    "strand": "Strand",
-    "identity": "Identity (%)",
-    "coverage": "Coverage (%)",
-    "accession": "Accession",
-    "nucleic": "Nucleic"
-  },
-  "virulenceList": {
-    "total": "Total records",
-    "download_csv": "Download CSV",
-    "fields": {
-      "index": "Index",
-      "sequence": "Sequence",
-      "gene": "Gene",
-      "start": "Start",
-      "stop": "Stop",
-      "strand": "Strand",
-      "identity": "Identity (%)",
-      "coverage": "Coverage (%)",
-      "accession": "Accession",
-      "description": "Description",
-      "group": "Group",
-      "vfdb_id": "VFDB ID",
-      "function_group": "Function Group",
-      "function_group_id": "Function Group ID",
-      "nucleic": "Nucleic",
-      "protein": "Protein Sequence (Amino Acids)"
+    "headerComponent":{
+        "organism_name": "Acinetobacter baumannii",
+        "organism_description": "A multidrug-resistant pathogen frequently causing severe hospital-acquired infections"
     },
-    "groups": {
-      "nucleoid": "Nucleoid (DNA)",
-      "ribosomes": "Ribosomes",
-      "cytoplasm": "Cytoplasm",
-      "plasmid": "Plasmid",
-      "pili": "Pili",
-      "inclusion": "Inclusion Bodies",
-      "flagellum": "Flagellum",
-      "cytoplasmicMembrane": "Cytoplasmic Membrane",
-      "cellWall": "Cell Wall",
-      "capsule": "Capsule"
-    }
-  },
-  "addUserComponent": {
+    "footerComponent":{
+        "about_us": "About Us",
+        "introduction": "Introduction",
+        "contact": "Contact",
+        "blog": "Blog",
+        "support": "Support",
+        "faqs": "FAQs",
+        "privacy_policy": "Privacy Policy",
+        "terms_of_use": "Terms of Use",
+        "connect_with_us": "Connect with Us",
+        "copyright":
+          "Acinetobacter Baumannii. All rights reserved."
+    },
+    "engineersPage": {
+        "title": "User List",
+        "full_name": "Full Name:",
+        "gender": "Gender:",
+        "phone": "Phone:",
+        "birth_year": "Birth Year:",
+        "email": "Email:",
+        "address": "Address:",
+        "career": "Career:",
+        "workplace": "Workplace:",
+        "experiments": "Experiments:",
+        "samples": "Samples:",
+        "adduser": "Add user",
+        "selectGender": "Select gender",
+        "delete_user": "Delete user",
+        "total_users": "Total users",
+        "searchPlaceholder": "Search by username or phone...",
+        "change_password": "Edit password"
+      },
+    "experimentPage":{
+        "experimentList": "Experiment List",
+        "addExperiment": "Add Experiment",
+        "no": "Index",
+        "experimentName": "Experiment Name",
+        "experimentCode": "Experiment Code",
+        "performer": "Performer",
+        "createdTime": "Created Time",
+        "detail": "Detail",
+        "edit": "Edit",
+        "username": "Author",
+        "delete": "Delete",
+        "searchPlaceholder": "Search by name, code, or performer...",
+        "allPerformers": "All performers"
+      },
+    "authForm": {
+        "title": "Login",
+        "email_placeholder": "Email",
+        "password_placeholder": "Password",
+        "login_button": "Log In",
+        "invalid_email": "Invalid email format (e.g. example@gmail.com)",
+        "login_success": "Login successful",
+        "login_failed": "Login failed. Please check your information.",
+        "system_error": "Login failed. System error."
+    },
+    "statisticPage":{
+        "all": "All",
+        "account": "Account",
+        "experiment": "Experiment",
+        "sample": "Sample",
+        "user_statistics": "System Statistic"
+      },
+    "submitPage": {
+        "title": "Add Sample",
+        "selectExperiment": "Select Experiment",
+        "sampleNamePlaceholder": "Sample Name",
+        "chooseFile": "Choose FASTA File",
+        "submitBtn": "Submit",
+        "resetBtn": "Reset",
+        "error": {
+        "selectExperiment": "Please select an experiment.",
+        "sampleName": "Please enter sample name.",
+        "file": "Please choose a FASTA file."
+        },
+        "success": "Sample added successfully",
+        "fail": "Failed to add sample"
+    },
+    "experimentAddComponent":{
+        "title": "Add Experiment",
+        "nameLabel": "Experiment Name",
+        "namePlaceholder": "Enter experiment name",
+        "nameError": "Experiment name cannot be empty",
+        "engineerLabel": "Added By",
+        "engineerPlaceholder": "Enter name of person adding",
+        "engineerError": "Added by field cannot be empty",
+        "codeLabel": "Experiment Code",
+        "codePlaceholder": "Enter experiment code",
+        "codeError": "Experiment code cannot be empty",
+        "timeLabel": "Creation Time",
+        "timePlaceholder": "Enter creation time (e.g., 2025-04-05 10:00)",
+        "submitBtn": "Add Experiment",
+        "success": "Experiment added successfully",
+        "fail": "Failed to add experiment"
+      },
+    "experimentEditComponent":{
+        "title": "Edit Experiment",
+        "codePlaceholder": "Experiment Code",
+        "namePlaceholder": "Experiment Name",
+        "engineerPlaceholder": "Engineer",
+        "timePlaceholder": "Creation Time",
+        "cancelBtn": "Cancel",
+        "saveBtn": "Save",
+        "success": "Experiment edited successfully",
+        "fail": "Failed to edit experiment"
+      },
+    "experimentInfoComponent":{
+        "title": "Experiment Information",
+        "index": "Index",
+        "sampleName": "Sample Name",
+        "sampleCode": "Sample Code",
+        "header": "Header",
+        "length": "Sample Length",
+        "fileName": "FASTA File Name",
+        "createdTime": "Created Time",
+        "details": "Details",
+        "downloadFile": "Download FASTA file"
+      },
+    "fastaComponent":{
+        "title": "Sample Information",
+        "field": "Field",
+        "value": "Value",
+        "name": "Sample Name",
+        "header": "Header",
+        "length": "Length",
+        "createdTime": "Created Time"
+      },
+    "amrComponent":{
+        "title": "Antimicrobial Resistance (AMR) Data",
+        "notAvailable": "N/A",
+        "fields": {
+          "Index": "Index",
+          "gene": "Gene",
+          "nucleic": "Nucleic Sequence",
+          "identity": "Identity",
+          "coverage": "Coverage",
+          "resistance": "Resistance",
+          "model": "Model",
+          "database": "Database"
+        },
+        "columns": {
+          "Index": "Index",
+          "contig_id": "Contig ID",
+          "start": "Start",
+          "stop": "Stop",
+          "strand": "Strand",
+          "gene_symbol": "Gene Symbol",
+          "element_name": "Element Name",
+          "nucleic": "Nucleic Sequence"
+        }
+      },
+    "noticeComponent": {
+        "success": "Success",
+        "error": "Error"
+      },
+    "resultComponent": {
+        "analysisResult": "Sample Analysis Result",
+        "fasta": "Sequence",
+        "virulence": "Virulence",
+        "amr": "AMR",
+        "nucleoid": "Nucleoid (DNA)",
+        "ribosomes": "Ribosomes",
+        "cytoplasm": "Cytoplasm",
+        "plasmid": "Plasmid",
+        "pili": "Pili",
+        "inclusionBodies": "Inclusion Bodies",
+        "flagellum": "Flagellum",
+        "cytoplasmicMembrane": "Cytoplasmic Membrane",
+        "cellWall": "Cell Wall",
+        "capsule": "Capsule"
+      },
+    "resultPopupComponent": {
+        "analysisResult": "Sample Analysis Result",
+        "fasta": "Sequence",
+        "virulence": "Virulence",
+        "amr": "AMR",
+        "nucleoid": "Nucleoid (DNA)",
+        "ribosomes": "Ribosomes",
+        "cytoplasm": "Cytoplasm",
+        "plasmid": "Plasmid",
+        "pili": "Pili",
+        "inclusionBodies": "Inclusion Bodies",
+        "flagellum": "Flagellum",
+        "cytoplasmicMembrane": "Cytoplasmic Membrane",
+        "cellWall": "Cell Wall",
+        "capsule": "Capsule"
+      },
+    "userInfoComponent": {
+        "title": "User Information",
+        "edit": "Edit",
+        "confirm": "Confirm",
+        "email": "Email",
+        "name": "Full Name",
+        "address": "Address",
+        "phone": "Phone Number",
+        "birthday": "Date of Birth",
+        "gender": "Gender",
+        "career": "Occupation",
+        "workplace": "Workplace",
+        "male": "Male",
+        "female": "Female",
+        "gender_placeholder": "-- Select gender --",
+        "role": "Role",
+        "username": "Full name",
+        "error": {
+            "invalid_email": "Invalid email address",
+            "name_required": "Full name is required",
+            "invalid_phone": "Invalid phone number",
+            "address_required": "Address is required",
+            "birthday_required": "Date of birth is required",
+            "gender_required": "Please select gender",
+            "career_required": "Occupation is required",
+            "workplace_required": "Workplace is required",
+            "update_failed": "An error occurred while updating"
+        },
+        "success": {
+            "update_user": "User information updated successfully"
+        }
+    },
+    "virulenceComponent":{
+        "title": "Virulence Data",
+        "index": "Index",
+        "sequence": "Sequence",
+        "gene": "Gene",
+        "start": "Start",
+        "stop": "Stop",
+        "strand": "Strand",
+        "identity": "Identity (%)",
+        "coverage": "Coverage (%)",
+        "accession": "Accession",
+        "nucleic": "Nucleic"
+      },
+    "virulenceList": {
+        "total": "Total records",
+        "download_csv": "Download CSV",
+        "fields": {
+            "index": "Index",
+            "sequence": "Sequence",
+            "gene": "Gene",
+            "start": "Start",
+            "stop": "Stop",
+            "strand": "Strand",
+            "identity": "Identity (%)",
+            "coverage": "Coverage (%)",
+            "accession": "Accession",
+            "description": "Description",
+            "group": "Group",
+            "vfdb_id": "VFDB ID",
+            "function_group": "Function Group",
+            "function_group_id": "Function Group ID",
+            "nucleic": "Nucleic",
+            "protein": "Protein Sequence (Amino Acids)"
+        },
+        "groups": {
+            "nucleoid": "Nucleoid (DNA)",
+            "ribosomes": "Ribosomes",
+            "cytoplasm": "Cytoplasm",
+            "plasmid": "Plasmid",
+            "pili": "Pili",
+            "inclusion": "Inclusion Bodies",
+            "flagellum": "Flagellum",
+            "cytoplasmicMembrane": "Cytoplasmic Membrane",
+            "cellWall": "Cell Wall",
+            "capsule": "Capsule"
+        }
+    },
+    "addUserComponent": {
     "title": "Add User",
     "email": "Email",
     "password": "Password",
@@ -323,19 +344,125 @@
     "fail": "Error deleting experiment"
   },
   "datasetAB": {
-    "title": "AB Bacteria",
-    "description": "Dataset table about AB bacteria",
-    "column": {
-      "name": "Name"
-    },
-    "filterPlaceholder": "Search by name",
+    "title": "Genome List",
+    "filterPlaceholder": "Search by name or keyword...",
     "default": "Default",
     "all": "All",
+    "column": {
+      "name": "Genome Name",
+      "id": "Sequence ID",
+      "description": "Description"
+    },
+    "download": "Download",
+    "index": "No.",
     "pagination": {
-      "first": "First",
-      "last": "Last",
-      "next": "Next",
-      "previous": "Previous"
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "downloadAll": "Download All Dataset",
+    "downloadFail": "Download fail",
+    "downloadSuccess": "Download successfully"
+  },
+  "toolPage":{
+    "title": "Tool",
+    "chooseFile": "Choose FASTA File",
+    "submitBtn": "Submit",
+    "resetBtn": "Reset",
+    "successConfirm": "Run tool success",
+    "failConfirm": "Fail to run tool",
+    "uploadFile": "Please upload fasta file",
+    "header": "Header",
+    "length": "Length"
+  },
+  "datasetStatistic": {
+    "title": "Dataset Statistic"
+  },
+  "statistics_viewer":{
+    "title": "Statistics Viewer",
+    "histogram": "MIC Plot",
+    "amr_plot": "AMR Plot",
+    "vfactors_plot": "VFactors Plot"
+  },
+  "editPassword": {
+    "title": "Change Password",
+    "email": "Email",
+    "name": "Fullname",
+    "phone": "Phone Number",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "enter_new_password": "Enter new password",
+    "confirm_new_password": "Confirm new password",
+    "submit": "Update Password",
+    "submitting": "Updating Password",
+    "errors": {
+      "required_password": "Please enter the password.",
+      "password_mismatch": "Password confirmation does not match.",
+      "password_updated_fail": "Fail to update password",
+      "password_too_short": "Password must be at least 6 characters long"
+    },
+    "success": {
+      "password_updated": "Password updated successfully!"
     }
-  }
+  },
+  "resultPage": {
+    "title": "BLASTn Results",
+    "enterRid": "Enter Sequence ID",
+    "search": "Search",
+    "upload": "Upload File",
+    "uploadError": "This result does not exist",
+    "error": {
+      "existfile": "File does not exist on the server"
+    },
+    "rowsPerPage": "Rows per page",
+    "prev": "Previous",
+    "next": "Next",
+    "all": "All",
+    "reset":"Reset",
+    "uploadFile": "Choose a fasta file",
+    "tableHeaders": {
+      "name": "Sequence ID",
+      "bacteria": "Genome Name",
+      "avgIdentity": "Avg Identity",
+      "bitScore": "Bit Score",
+      "alignmentLength": "Alignment Length",
+      "mismatches": "Mismatches",
+      "gapOpens": "Gap Opens",
+      "coverage": "Coverage",
+      "index": "No.",
+      "detail": "Detail"
+    },
+    "noData": "No data",
+    "time": "Upload time",
+    "success": "Success to blastn file !",
+    "previousIds": "Saved BLASTN IDs",
+    "filename":"FASTA File",
+    "createdAt": "Created Time",
+    "download": "Download",
+    "viewDetails": "Detail"
+  },
+  "blastn": {
+    "index": "Index",
+    "query": "Query",
+    "subject": "Subject",
+    "identity": "Identity (%)",
+    "bitScore": "Bit Score",
+    "evalue": "E-value",
+    "alignmentLength": "Alignment Length",
+    "mismatches": "Mismatches",
+    "gapOpens": "Gap Opens",
+    "qStart": "Query Start",
+    "qEnd": "Query End",
+    "sStart": "Subject Start",
+    "sEnd": "Subject End",
+    "avgIdentity": "Average Identity (%)",
+    "avgBitScore": "Average Bit Score",
+    "avgAlignmentLength": "Average Alignment Length",
+    "avgMismatch": "Average Mismatches",
+    "avgGapOpens": "Average Gap Opens",
+    "avgEValue": "Average E-value",
+    "avgCoverage": "Average Coverage",
+    "detail": "Detail",
+    "noData": "No BLASTN data available"
+  }              
 }
+  

@@ -7,6 +7,7 @@ const ContentContainer = styled.div`
   display: flex;
   flex-direction: column;
   max-height: 500px;
+  margin-bottom: 100px;
 `;
 
 const FileName = styled.h3`

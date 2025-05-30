@@ -15,7 +15,7 @@ const Container = styled.div`
 `;
 
 const Wrapper = styled.div`
-  width: 80%;
+  width: 100%;
   max-width: 1200px;
   display: flex;
   flex-direction: column;
@@ -71,7 +71,7 @@ const ClickArea = styled.div`
   transition: background 0.3s;
 
   &:hover {
-    background: rgba(255, 33, 66, 0.15);
+    background: rgba(115, 216, 249, 0.15);
   }
 `;
 
@@ -79,9 +79,15 @@ const ResultComponent = ({ fastaInfo, virulenceInfo, amrInfo }) => {
   const [selectedTab, setSelectedTab] = useState("Fasta");
   const [label, setLabel] = useState("");
   const { t } = useTranslation();
-
+  const [showImage, setShowImage] = useState(false);
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
+    if (tab !== "Virulence") {
+      setLabel(""); 
+      setShowImage(false);
+    } else {
+      setShowImage(true);
+    }
   };
 
   return (
@@ -104,21 +110,25 @@ const ResultComponent = ({ fastaInfo, virulenceInfo, amrInfo }) => {
         {selectedTab === "Virulence" && <VirulenceTable data={virulenceInfo} />}
         {selectedTab === "AMR" && <AmrTable data={amrInfo} />}
 
-        <ImageWrapper>
-          <Image src="/Bacteria-Cell.jpg" alt="Bacteria" />
-          <ClickArea style={{ top: "17%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel(t("resultComponent.nucleoid"))} />
-          <ClickArea style={{ top: "15%", left: "0%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultComponent.ribosomes"))} />
-          <ClickArea style={{ top: "10%", left: "27%", width: "20%", height: "8%" }} onClick={() => setLabel(t("resultComponent.cytoplasm"))} />
-          <ClickArea style={{ top: "40%", left: "82%", width: "20%", height: "12%" }} onClick={() => setLabel(t("resultComponent.plasmid"))} />
-          <ClickArea style={{ top: "23%", left: "80%", width: "15%", height: "10%" }} onClick={() => setLabel(t("resultComponent.pili"))} />
-          <ClickArea style={{ top: "62%", left: "70%", width: "25%", height: "15%" }} onClick={() => setLabel(t("resultComponent.inclusionBodies"))} />
-          <ClickArea style={{ top: "80%", left: "57%", width: "25%", height: "12%" }} onClick={() => setLabel(t("resultComponent.flagellum"))} />
-          <ClickArea style={{ top: "79%", left: "29%", width: "25%", height: "12%" }} onClick={() => setLabel(t("resultComponent.cytoplasmicMembrane"))} />
-          <ClickArea style={{ top: "76%", left: "8%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultComponent.cellWall"))} />
-          <ClickArea style={{ top: "66%", left: "3%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultComponent.capsule"))} />
-        </ImageWrapper>
+        {selectedTab === "Virulence" && showImage && (
+              <ImageWrapper>
+              <Image src="/Bacteria-Cell.png" alt="Bacteria" />
+              <ClickArea style={{ top: "17%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.nucleoid"))} />
+              <ClickArea style={{ top: "15%", left: "0%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.ribosomes"))} />
+              <ClickArea style={{ top: "10%", left: "27%", width: "20%", height: "8%" }} onClick={() => setLabel(t("resultPopupComponent.cytoplasm"))} />
+              <ClickArea style={{ top: "40%", left: "82%", width: "20%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.plasmid"))} />
+              <ClickArea style={{ top: "23%", left: "80%", width: "15%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.pili"))} />
+              <ClickArea style={{ top: "62%", left: "70%", width: "25%", height: "15%" }} onClick={() => setLabel(t("resultPopupComponent.inclusionBodies"))} />
+              <ClickArea style={{ top: "80%", left: "57%", width: "25%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.flagellum"))} />
+              <ClickArea style={{ top: "79%", left: "29%", width: "25%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.cytoplasmicMembrane"))} />
+              <ClickArea style={{ top: "76%", left: "8%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.cellWall"))} />
+              <ClickArea style={{ top: "66%", left: "3%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.capsule"))} />
+            </ImageWrapper>
+            )}
 
-        {label && <VirulenceListResult label={label} data={virulenceInfo} />}
+        {selectedTab === "Virulence" && label && (
+          <VirulenceListResult label={label} data={virulenceInfo} />
+        )}
       </Wrapper>
     </Container>
   );

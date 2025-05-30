@@ -21,13 +21,14 @@ const ModalContainer = styled.div`
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
+  width: 50%;
+  height: 50%;
   position: relative;
 `;
 
 const ModalHeader = styled.h3`
   margin: 0;
+  font-size: 40px;
   text-align: center;
 `;
 
@@ -40,6 +41,7 @@ const ModalBody = styled.div`
 
 const Input = styled.input`
   padding: 10px;
+  margin: 0px 30px;
   border-radius: 5px;
   border: 1px solid #dee2e6;
   font-size: 16px;
@@ -57,7 +59,8 @@ const ModalFooter = styled.div`
 `;
 
 const Button = styled.button`
-  padding: 10px 15px;
+  padding: 10px 25px;
+  margin: 0px 30px;
   background-color: ${(props) => (props.primary ? '#007bff' : '#f8f9fa')};
   color: ${(props) => (props.primary ? 'white' : '#007bff')};
   border: 1px solid ${(props) => (props.primary ? '#007bff' : '#dee2e6')};
@@ -72,9 +75,10 @@ const Button = styled.button`
 
 const CloseIcon = styled.div`
   position: absolute;
+  margin-right: 30px;
   top: 10px;
   right: 10px;
-  font-size: 30px;
+  font-size: 35px;
   cursor: pointer;
   color: #888;
   &:hover {

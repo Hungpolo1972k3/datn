@@ -8,6 +8,7 @@ const initialState = {
   token: null,
   loading: false,
   error: null,
+  issuedAt: null,
 };
 
 export const userSlice = createSlice({
@@ -23,6 +24,7 @@ export const userSlice = createSlice({
       state.userId = action.payload.userId;
       state.token = action.payload.token;
       state.isLogin = true;
+      state.issuedAt = Date.now();
 
       if (action.payload.role === "ADMIN") {
         state.isLoginAdmin = true;
@@ -39,6 +41,7 @@ export const userSlice = createSlice({
       state.isLogin = false;
       state.token = null;
       state.isLoginAdmin = false; 
+      state.issuedAt = null;
     },
   },
 });

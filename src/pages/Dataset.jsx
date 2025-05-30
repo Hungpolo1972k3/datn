@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { Eye, EyeOff, Download, X, Link } from "lucide-react";
-import FileViewer from "../components/FileViewer";
+import { Search, Download} from "lucide-react";
+import DatasetPopup from "../components/DatasetPopup";
+import { apiDownloadFolder, apiGetFolderInfo } from "../service/blastn";
+import datasetFolder from '../utils/datasetFolder.json';
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useNotice } from "../context/NoticeContext";
+import datasetGeneVirulence from "../utils/datasetGeneVirulence.json"
+import datasetGeneAmr from "../utils/datasetGeneAmr.json"
+import { useLocation } from "react-router-dom";
+
 const TableWrapper = styled.div`
   padding: 20px;
 `;
 
 const Title = styled.h1`
-  font-size: 40px;
+  font-size: 50px;
   font-weight: bold;
   margin-bottom: 1rem;
+  color: #1e3a8a;
+  text-align: center
 `;
 
 const StyledTable = styled.table`
@@ -22,19 +32,32 @@ const TableHead = styled.thead`
   background-color: #f0f0f0;
 `;
 
-const TableRow = styled.tr``;
+const TableRow = styled.tr`
+  &:nth-child(even) {
+    background-color: #e0f7fa; /* Xanh nhạt */
+  }
+
+  &:nth-child(odd) {
+    background-color: white;
+  }
+
+`;
 
 const TableHeaderCell = styled.th`
   padding: 10px;
   border: 1px solid #ddd;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  font-size: 20px
 `;
 
 const TableCell = styled.td`
   padding: 15px;
   border: 1px solid #ddd;
   cursor: pointer;
+  text-align: center;
 `;
 
 const Pagination = styled.div`
@@ -60,86 +83,104 @@ const Tool = styled.div`
   display: flex;
   gap: 10px;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
+  margin: 30px 0px;
+`;
+
+const SearchWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+`;
+
+const SearchIcon = styled(Search)`
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  pointer-events: none;
 `;
 const SearchInput = styled.input`
-  padding: 10px;
-  margin-bottom: 20px;
-  width: 60%;
+  padding: 12px 16px 12px 40px;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 16px;
+  outline: none;
+  transition: 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+  &:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+  }
 `;
 const ItemPerPageSelector = styled.select`
-  padding: 10px;
-  margin-bottom: 20px;
+  padding: 12px 16px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 16px;
   max-width: 200px;
-`;
-
-const PopupOverlay = styled.div`
-  position: fixed;
-  inset: 0;
-  background: white;
-  z-index: 1000;
-  padding: 24px;
-  overflow: auto;
-`;
-
-const PopupHeader = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
+  background-color: white;
   cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    border-color: #007bff;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+  }
 `;
 
-const SectionRow = styled.div`
+const ToolRight = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-`;
-const ActionButtons = styled.div`
-  display: flex;
   gap: 8px;
-`;
-const generateData = () => {
-  const genomes = Array.from({ length: 850 }, (item, i) => ({
-    index: i + 1,
-    genomeId: `GID${i + 1}`,
-    name: `Genome ${i + 1}`,
-    sraLink: `https://sra-link.com/data/${i + 1}`,
-    amr: `gene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistancegene,resistance
-blaTEM,ampicillin
-mecA,methicillin
-blaNDM-1,carbapenems,
-mecA,methicillin,
-mecA,methicillin,
-mecA,methicillin,
-mecA,methicillin,
-mecA,methicillin,
-mecA,methicillin`,
-    virulence: `gene,effect
-hlyA,hemolysis
-stx,shiga-toxin`,
-    resistance: `antibiotic,result
-penicillin,Resistant
-tetracycline,Susceptible`,
-  }));
-  return genomes;
-};
+  padding: 12px 20px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 
+  &:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 12px rgba(0, 86, 179, 0.3);
+  }
+
+  span {
+    white-space: nowrap;
+  }
+`;
 const PaginatedTable = () => {
   const { t } = useTranslation();
-  const data = generateData();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const [itemPerPage, setItemPerPage] = useState(50);
-
   const [selectedGenome, setSelectedGenome] = useState(null);
-
+  const [dataset, setDataset] = useState();
+  const [isDownloading, setIsDownloading] = useState(false);
+  const { showNotice } = useNotice();
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const searchParam = params.get("search");
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+  }, [location.search]);
   const handleSort = (key) => {
     if (sortKey === key) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -149,11 +190,27 @@ const PaginatedTable = () => {
     }
   };
 
-  const filteredData = data.filter((item) =>
-    Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  const term = searchTerm.toLowerCase();
+
+  const matchedNames = [
+    ...datasetGeneVirulence,
+    ...datasetGeneAmr
+  ]
+    .filter((g) =>
+      g.gene.some((geneName) => geneName.toLowerCase().includes(term))
     )
-  );
+    .map((g) => g.name);
+
+  const filteredData = datasetFolder.filter((item) => {
+    const matchesBasicInfo =
+      item.name.toLowerCase().includes(term) ||
+      item.bacteria.toLowerCase().includes(term) ||
+      item.description.toLowerCase().includes(term);
+
+    const matchesGene = matchedNames.includes(item.name);
+
+    return matchesBasicInfo || matchesGene;
+  });
 
   const sortedData = [...filteredData].sort((a, b) => {
     if (!sortKey) return 0;
@@ -243,91 +300,6 @@ const PaginatedTable = () => {
 
     return buttons;
   };
-  const GenomePopup = ({ genome, onClose }) => {
-    const [visibleSections, setVisibleSections] = useState({
-      amr: false,
-      virulence: false,
-      resistance: false,
-    });
-
-    const toggleSection = (key) => {
-      setVisibleSections({ ...visibleSections, [key]: !visibleSections[key] });
-    };
-
-    return (
-      <PopupOverlay>
-        <PopupHeader>
-          <CloseButton onClick={onClose}>
-            <X />
-          </CloseButton>
-        </PopupHeader>
-        <h2
-          style={{
-            fontSize: "1.25rem",
-            fontWeight: "bold",
-            marginBottom: "1rem",
-          }}
-        >
-          {genome.name} - {genome.genomeId}
-        </h2>
-
-        <div>
-          <SectionRow>
-            <span>contig.fasta</span>
-            <CloseButton>
-              <Download />
-            </CloseButton>
-          </SectionRow>
-
-          <SectionRow>
-            <span>AMR Genes</span>
-            <ActionButtons>
-              <CloseButton onClick={() => toggleSection("amr")}>
-                {visibleSections.amr ? <EyeOff /> : <Eye />}
-              </CloseButton>
-              <CloseButton>
-                <Download />
-              </CloseButton>
-            </ActionButtons>
-          </SectionRow>
-
-          <SectionRow>
-            <span>Virulences</span>
-            <ActionButtons>
-              <CloseButton onClick={() => toggleSection("virulence")}>
-                {visibleSections.virulence ? <EyeOff /> : <Eye />}
-              </CloseButton>
-              <CloseButton>
-                <Download />
-              </CloseButton>
-            </ActionButtons>
-          </SectionRow>
-
-          <SectionRow>
-            <span>Kháng sinh (CSV)</span>
-            <ActionButtons>
-              <CloseButton onClick={() => toggleSection("resistance")}>
-                {visibleSections.resistance ? <EyeOff /> : <Eye />}
-              </CloseButton>
-              <CloseButton>
-                <Download />
-              </CloseButton>
-            </ActionButtons>
-          </SectionRow>
-
-          <div style={{ marginTop: "24px" }}>
-            {visibleSections.amr && <FileViewer content={genome.amr} />}
-            {visibleSections.virulence && (
-              <FileViewer content={genome.virulence} />
-            )}
-            {visibleSections.resistance && (
-              <FileViewer content={genome.resistance} />
-            )}
-          </div>
-        </div>
-      </PopupOverlay>
-    );
-  };
   useEffect(() => {
     if (selectedGenome) {
       document.body.style.overflow = "hidden";
@@ -339,15 +311,42 @@ const PaginatedTable = () => {
       document.body.style.overflow = "auto";
     };
   }, [selectedGenome]);
+  const handleShowDatasetPopup = async(item) => {
+    try {
+      let data = await apiGetFolderInfo(item.downloadUrl);
+      setSelectedGenome(data);
+      setDataset(item);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const handleDownloadFolder = async (e,url) => {
+    e.preventDefault();
+    try {
+      setIsDownloading(true);
+      await apiDownloadFolder(url);
+      showNotice(1, t('datasetAB.downloadSuccess'));
+    } catch (error) {
+      console.error("Download failed:", error);
+      showNotice(0, t('datasetAB.downloadFail'))
+    }
+    finally {
+      setIsDownloading(false);
+    }
+  }
   return (
     <TableWrapper>
       <Title>{t("datasetAB.title")}</Title>
       <Tool>
-        <SearchInput
-          placeholder={t("datasetAB.filterPlaceholder")}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <SearchWrapper>
+          <SearchIcon size={20} />
+          <SearchInput
+            placeholder={t("datasetAB.filterPlaceholder")}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </SearchWrapper>
         <ItemPerPageSelector
           value={itemPerPage}
           onChange={(e) => setItemPerPage(e.target.value)}
@@ -359,56 +358,57 @@ const PaginatedTable = () => {
           <option value="200">200</option>
           <option value="all">{t("datasetAB.all")}</option>
         </ItemPerPageSelector>
+        <ToolRight
+          onClick={(e) => handleDownloadFolder(e, '/')}
+          title={t("datasetAB.downloadAll")}
+        >
+          <Download size={20} />
+          <span>{t("datasetAB.downloadAll")}</span>
+        </ToolRight>
       </Tool>
       <StyledTable>
-        <TableHead>
-          <TableRow>
-            <TableHeaderCell onClick={() => handleSort("index")}>
-              Index
-            </TableHeaderCell>
-            <TableHeaderCell onClick={() => handleSort("genome_id")}>
-              GenomeId
-            </TableHeaderCell>
-            <TableHeaderCell onClick={() => handleSort("name")}>
-              {t("datasetAB.column.name")}
-            </TableHeaderCell>
-            <TableHeaderCell>SRA LINK</TableHeaderCell>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>{t("datasetAB.index")}</TableHeaderCell>
+          <TableHeaderCell onClick={() => handleSort("name")}>
+            {t("datasetAB.column.id")}
+          </TableHeaderCell>
+          <TableHeaderCell>{t("datasetAB.column.name")}</TableHeaderCell>
+          <TableHeaderCell>{t("datasetAB.column.description")}</TableHeaderCell>
+          <TableHeaderCell>{t("datasetAB.download")}</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <tbody>
+        {paginatedData.map((item, index) => (
+          <TableRow key={item.name} onClick={() => handleShowDatasetPopup(item)}>
+            <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
+            <TableCell>
+              <a href={item.ncbiUrl} target="_blank" rel="noopener noreferrer">
+                {item.name}
+              </a>
+            </TableCell>
+            <TableCell>{item.bacteria}</TableCell>
+            <TableCell>{item.description}</TableCell>
+            <TableCell
+              onClick={(e) => handleDownloadFolder(e,item.downloadUrl)}
+              style={{ textAlign: "center", cursor: "pointer" }}
+            >
+              <Download size={18} />
+            </TableCell>
           </TableRow>
-        </TableHead>
-        <tbody>
-          {paginatedData.map((item) => (
-            <TableRow key={item.id} onClick={() => setSelectedGenome(item)}>
-              <TableCell>{item.index}</TableCell>
-              <TableCell>{item.genomeId}</TableCell>
-              <TableCell>{item.name}</TableCell>
-              <TableCell>
-                <a
-                  href={item.sraLink}
-                  target="_blank"
-                  onClick={(e) => e.stopPropagation()}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "4px",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Link size={16} />
-                  SRA
-                </a>
-              </TableCell>
-            </TableRow>
-          ))}
-        </tbody>
+        ))}
+      </tbody>
       </StyledTable>
 
       <Pagination>{renderPageNumbers()}</Pagination>
       {selectedGenome && (
-        <GenomePopup
+        <DatasetPopup
+          dataset={dataset}
           genome={selectedGenome}
           onClose={() => setSelectedGenome(null)}
         />
       )}
+      {isDownloading && <LoadingSpinner />}
     </TableWrapper>
   );
 };

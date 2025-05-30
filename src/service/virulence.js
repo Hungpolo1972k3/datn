@@ -24,3 +24,20 @@ export const apiGetVirulencesBySampleId = async ( sample_id) => {
         throw error.response?.data || error.message;
     }
 };
+
+export const apiRunVirulenceTool = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append('fasta', file);
+
+        const response = await axiosConfig.post(`/api/virulence/runvirulencetool`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Accept': 'application/json',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || error.message;
+    }
+};

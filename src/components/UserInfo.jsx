@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import {apiUpdateUserById} from "../service/user";
+import { apiUpdateUserById } from "../service/user";
 import { useNotice } from "../context/NoticeContext";
 import { useTranslation } from "react-i18next";
 
@@ -9,11 +9,11 @@ const PopupContainer = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50%;
+  width: 60%;
   padding: 20px;
   background-color: white;
   border-radius: 8px;
-  border: 3px solid rgb(162, 166, 171); 
+  border: 3px solid rgb(162, 166, 171);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
@@ -23,7 +23,7 @@ const Title = styled.h2`
   text-align: center;
   margin-bottom: 20px;
   position: relative;
-  font-size: 30px;
+  font-size: 40px;
   font-weight: bold;
 `;
 
@@ -46,6 +46,7 @@ const InfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 15px;
+  padding-left: 10%;
 `;
 
 const InfoRow = styled.div`
@@ -66,11 +67,11 @@ const InputField = styled.input`
   margin: 5px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 60%;
+  width: 100%;
 `;
 
 const ValueText = styled.span`
-  width: 60%;
+  width: 100%;
   text-align: left;
   padding: 10px;
 `;
@@ -78,16 +79,17 @@ const ValueText = styled.span`
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin: 30px 80px 10px 80px;
 `;
 
 const Button = styled.button`
-  padding: 10px 15px;
+  padding: 10px 25px;
   background-color: #007bff;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 15px;
 
   &:disabled {
     background-color: #ccc;
@@ -123,14 +125,6 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
 
   const validateFields = () => {
     const newErrors = {};
-
-    if (!editableInfo.email || !/\S+@\S+\.\S+/.test(editableInfo.email)) {
-      newErrors.email = t("userInfoComponent.error.invalid_email");
-    }
-
-    if (!editableInfo.username) {
-      newErrors.username = t("userInfoComponent.error.name_required");
-    }
 
     if (!editableInfo.phone || !/^0\d{9}$/.test(editableInfo.phone)) {
       newErrors.phone = t("userInfoComponent.error.invalid_phone");
@@ -174,8 +168,6 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
     try {
       const {
         _id,
-        email,
-        username,
         phone,
         address,
         birthday,
@@ -186,8 +178,8 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
 
       await apiUpdateUserById(
         _id,
-        email,
-        username,
+        editableInfo.email,
+        editableInfo.username,
         phone,
         address,
         birthday,
@@ -203,18 +195,23 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
     }
   };
 
+  const handleClosePopup = () => {
+    setIsEditing(false);
+    closePopup();
+  };
+
   return (
     openPopup && (
       <PopupContainer>
         <Title>{t("userInfoComponent.title")}</Title>
-        <CloseButton onClick={closePopup}>×</CloseButton>
+        <CloseButton onClick={handleClosePopup}>×</CloseButton>
         <InfoWrapper>
           {Object.entries(fieldMap).map(([key, label]) => (
             <InfoRow key={key}>
               <Label>{t(label)}</Label>
-              {isEditing ? (
-                <div style={{ width: "60%" }}>
-                  {key === "gender" ? (
+              <div style={{ width: "60%" }}>
+                {isEditing && key !== "email" && key !== "username" ? (
+                  key === "gender" ? (
                     <>
                       <select
                         name="gender"
@@ -222,10 +219,9 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
                         onChange={handleChange}
                         style={{
                           padding: "10px",
-                          margin: "5px 0",
                           border: "1px solid #ccc",
                           borderRadius: "4px",
-                          width: "80px",
+                          width: "100%",
                         }}
                       >
                         <option value="">{t("userInfoComponent.gender_placeholder")}</option>
@@ -256,15 +252,15 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
                         </div>
                       )}
                     </>
-                  )}
-                </div>
-              ) : (
-                <ValueText>
-                  {key === "birthday" && editableInfo[key]
-                    ? new Date(editableInfo[key]).toISOString().split("T")[0]
-                    : editableInfo?.[key] || ""}
-                </ValueText>
-              )}
+                  )
+                ) : (
+                  <ValueText>
+                    {key === "birthday" && editableInfo[key]
+                      ? new Date(editableInfo[key]).toISOString().split("T")[0]
+                      : editableInfo?.[key] || ""}
+                  </ValueText>
+                )}
+              </div>
             </InfoRow>
           ))}
         </InfoWrapper>

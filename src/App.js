@@ -13,7 +13,9 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import ExperimentManagement from "./pages/ExperimentManagement";
 import Dataset from "./pages/Dataset";
 import Tool from "./pages/Tool";
-import DatasetStatistic from "./pages/DatasetStatistic";
+import DatasetStatistic from "./pages/StatisticsView";
+import StatisticAdmin from "./pages/StatisticAdmin";
+import ResultPage from "./pages/ResultPage";
 
 const Container = styled.div`
   display: flex;
@@ -38,6 +40,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/tool" element={<Tool />} />
               <Route path="/dataset_statistics" element={<DatasetStatistic/>} />
+              <Route path="/blastn-result" element={<ResultPage/>}/>
               <Route
                 path="/submit"
                 element={
@@ -75,6 +78,14 @@ function App() {
                 element={
                   <ProtectedRoute requireAdmin>
                     <ExperimentManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/statistic-admin"
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <StatisticAdmin/>
                   </ProtectedRoute>
                 }
               />

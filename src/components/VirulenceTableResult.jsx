@@ -94,16 +94,16 @@ const VirulenceListResult = ({ label, data }) => {
   const [visibleRows, setVisibleRows] = useState({});
 
   const groups = {
-    [t("virulenceList.groups.nucleoid")]: ["Quorum sensing", "BfmRS"], 
+    [t("virulenceList.groups.nucleoid")]: ["Quorum sensing", "BfmRS", "HSI-3","HSI-1"], 
     [t("virulenceList.groups.ribosomes")]: [],
-    [t("virulenceList.groups.cytoplasm")]: ["HemO cluster", "AdeFGH efflux pump"], 
-    [t("virulenceList.groups.plasmid")]: ["T2SS", "TFP"],
-    [t("virulenceList.groups.pili")]: ["Csu fimbriae", "TFP"],
+    [t("virulenceList.groups.cytoplasm")]: ["HemO cluster","AdeFGH efflux pump","Type VII secretion system","Xcp secretion system","Pyoverdine","Staphylokinase","Isd","PVL","Aureolysin","Clumping factor","Gamma-hemolysin","FnBPs","Eap/Map","V8 protease","Staphopain","SCIN","RpoS","Aerobactin","Sal","Ent","RcsAB","AcrAB","Fur","Allantion utilization","Yersiniabactin","Ybt","CHIPS","SE","VWbp","BopD","Cytolysin","Ebp pili","Curli fibers"], 
+    [t("virulenceList.groups.plasmid")]: ["T2SS", "TFP", "Xcp secretion system", "T6SS"],
+    [t("virulenceList.groups.pili")]: ["Csu fimbriae", "TFP","Type IV pili","Type 1 fimbriae","Type 3 fimbriae","Ebp pili","P fimbriae"], 
     [t("virulenceList.groups.inclusion")]: [], 
-    [t("virulenceList.groups.flagellum")]: [], 
-    [t("virulenceList.groups.cytoplasmicMembrane")]: ["AdeFGH efflux pump", "Phospholipase D", "Phospholipase C", "OmpA"], 
-    [t("virulenceList.groups.cellWall")]: ["OmpA", "PNAG"], 
-    [t("virulenceList.groups.capsule")]: ["Capsule", "Bap", "PNAG", "Acinetobactin", "LPS"]
+    [t("virulenceList.groups.flagellum")]: ["Flagella"], 
+    [t("virulenceList.groups.cytoplasmicMembrane")]: ["AdeFGH efflux pump", "Phospholipase D", "Phospholipase C", "OmpA","Acinetobactin","Type I fimbriae","Afa/Dr family","Intercellular adhesion proteins","Lipase","Aureolysin","Clumping factor","Sbi","Hyaluronate lyase"], 
+    [t("virulenceList.groups.cellWall")]: ["OmpA", "PNAG","PbpG","Capsule","Bap"], 
+    [t("virulenceList.groups.capsule")]: ["Capsule", "Bap", "PNAG", "Acinetobactin", "LPS","Pyocyanin","PVL","Staphylokinase"]
   };
 
   const group = groups[label] || [];

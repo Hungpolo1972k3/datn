@@ -113,9 +113,15 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
   const [selectedTab, setSelectedTab] = useState("Fasta");
   const [label, setLabel] = useState("");
   const { t } = useTranslation();
-
+  const [showImage, setShowImage] = useState(false);
   const handleTabClick = (tab) => {
     setSelectedTab(tab);
+    if (tab !== "Virulence") {
+      setLabel(""); 
+      setShowImage(false);
+    } else {
+      setShowImage(true);
+    }
   };
   if (!showModal) return null;
 
@@ -142,8 +148,9 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
             {selectedTab === "Virulence" && <VirulenceTable data={virulenceInfo} />}
             {selectedTab === "AMR" && <AmrTable data={amrInfo} />}
 
+            {selectedTab === "Virulence" && showImage && (
             <ImageWrapper>
-              <Image src="/Bacteria-Cell.jpg" alt="Bacteria" />
+              <Image src="/Bacteria-Cell.png" alt="Bacteria" />
               <ClickArea style={{ top: "17%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.nucleoid"))} />
               <ClickArea style={{ top: "15%", left: "0%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.ribosomes"))} />
               <ClickArea style={{ top: "10%", left: "27%", width: "20%", height: "8%" }} onClick={() => setLabel(t("resultPopupComponent.cytoplasm"))} />
@@ -155,8 +162,11 @@ const ResultPopup = ({ fastaInfo, virulenceInfo, amrInfo, showModal, closeModal 
               <ClickArea style={{ top: "76%", left: "8%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.cellWall"))} />
               <ClickArea style={{ top: "66%", left: "3%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.capsule"))} />
             </ImageWrapper>
+            )}
 
-            {label && <VirulenceListResult label={label} data={virulenceInfo} />}
+            {selectedTab === "Virulence" && label && (
+              <VirulenceListResult label={label} data={virulenceInfo} />
+            )}
           </Wrapper>
         </Container>
       </PopUpForm>

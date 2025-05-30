@@ -442,7 +442,7 @@
     },
     {
         "name": "SRR3112313",
-        "downloadUrl": "/SRR3112313",
+        "downloadUrl": "/SRR3112313,SRR3666035",
         "ncbiUrl": "https://www.ncbi.nlm.nih.gov/search/all/?term=SRR3112313",
         "bacteria": "Acinetobacter baumannii",
         "description": "Collection of bacterial pathogens that are assembled to challenge assays that detect carbapenemase production representing a range of gram-negative bacteria",
@@ -451,7 +451,7 @@
     },
     {
         "name": "SRR3666035",
-        "downloadUrl": "/SRR3666035",
+        "downloadUrl": "/SRR3112313,SRR3666035",
         "ncbiUrl": "https://www.ncbi.nlm.nih.gov/search/all/?term=SRR3666035",
         "bacteria": "Acinetobacter baumannii",
         "description": "Collection of bacterial pathogens that are assembled to challenge assays that detect carbapenemase production representing a range of gram-negative bacteria",
@@ -7372,7 +7372,7 @@
     },
     {
         "name": "SRR5891473",
-        "downloadUrl": "/SRR5891473",
+        "downloadUrl": "/SRR5891473,SRR5891474",
         "ncbiUrl": "https://www.ncbi.nlm.nih.gov/search/all/?term=SRR5891473",
         "bacteria": "Acinetobacter baumannii",
         "description": "This study aims to evaluate the evolution of single strain of Acinetobacter baumannii present in the woulds of a single patient with suspected transmission to other patients within the ICU.",
@@ -7381,12 +7381,12 @@
     },
     {
         "name": "SRR5891474",
-        "downloadUrl": "/SRR5891474",
+        "downloadUrl": "/SRR5891473,SRR5891474",
         "ncbiUrl": "https://www.ncbi.nlm.nih.gov/search/all/?term=SRR5891474",
         "bacteria": "Acinetobacter baumannii",
         "description": "This study aims to evaluate the evolution of single strain of Acinetobacter baumannii present in the woulds of a single patient with suspected transmission to other patients within the ICU.",
         "title": "WGS of A. baumannii: wound infection",
-        "sequencingSystem": "MinION"
+        "sequencingSystem": "Illumina HiSeq 2500"
     },
     {
         "name": "SRR5891475",

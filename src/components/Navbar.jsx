@@ -205,6 +205,56 @@ const LanguageItem = styled.div`
   }
 `;
 
+const SubMenu = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 8px 0;
+  z-index: 10;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  animation: fadeIn 0.2s ease-in-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+const SubMenuItem = styled(NavLink)`
+  display: block;
+  padding: 12px 24px;
+  color: #333;
+  text-decoration: none;
+  font-size: 18px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #eaf2fb;
+    color: #007bff;
+    padding-left: 28px;
+  }
+
+  &.active {
+    font-weight: 600;
+    color: #007bff;
+  }
+`;
+
+const WrapperItem = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
 const Navbar = () => {
   const dispatch = useDispatch();
   const { showNotice } = useNotice();
@@ -228,7 +278,6 @@ const Navbar = () => {
     showNotice(1, t('navbarComponent.logoutSuccess')) 
   };
 
-  // Cancel logout
   const cancelLogout = () => {
     setShowModal(false);
   };
@@ -252,18 +301,64 @@ const Navbar = () => {
       setShowLanguageDropdown(false);
       window.location.reload(); 
     });
+    setShowLanguageDropdown(!showLanguageDropdown);
   };
   
-  
+  const { issuedAt } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const checkTokenExpiration = () => {
+      if (issuedAt) {
+        const now = Date.now();
+        const ONE_DAY = 1 * 24 * 60 * 60 * 1000;
+
+        if (now - issuedAt > ONE_DAY) {
+          dispatch(logout());
+          navigate("/");
+          showNotice(0, t('navbarComponent.tokenExpired'));
+        }
+      }
+    };
+
+    checkTokenExpiration();
+
+    const intervalId = setInterval(checkTokenExpiration, 5 * 60 * 1000); 
+
+    return () => clearInterval(intervalId);
+  }, [issuedAt, dispatch, navigate, showNotice, t, showDropdown]);
+
+  const [showAbDatasetSubMenu, setShowAbDatasetSubMenu] = useState(false);
+
   return (
     <Container>
       <Wrapper>
         <NavLink to="/">
           {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.home')}</Button>}
         </NavLink>
-        <NavLink to="/dataset">
-          {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.abdataset')}</Button>}
-        </NavLink>
+          <WrapperItem>
+            <Button
+              isActive={false}
+              onClick={() => setShowAbDatasetSubMenu(!showAbDatasetSubMenu)}
+            >
+              {t('navbarComponent.abdataset')}
+            </Button>
+            {showAbDatasetSubMenu && (
+              <SubMenu>
+                <SubMenuItem to="/dataset" onClick={() => setShowAbDatasetSubMenu(false)}>
+                  {t('navbarComponent.dataset')}
+                </SubMenuItem>
+                <SubMenuItem to="/dataset_statistics" onClick={() => setShowAbDatasetSubMenu(false)}>
+                  {t('navbarComponent.statistics')}
+                </SubMenuItem>
+                <SubMenuItem to="/tool" onClick={() => setShowAbDatasetSubMenu(false)}>
+                  {t('navbarComponent.tool')}
+                </SubMenuItem>
+                <SubMenuItem to="/blastn-result" onClick={() => setShowAbDatasetSubMenu(false)}>
+                  {t('navbarComponent.blastn')}
+                </SubMenuItem>
+              </SubMenu>
+            )}
+          </WrapperItem>
         {isLogin && !isLoginAdmin && (
           <NavLink to="/experiment">
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.experiment')}</Button>}
@@ -274,8 +369,13 @@ const Navbar = () => {
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.sample')}</Button>}
           </NavLink>
         )}
-        {isLogin && (
+        {isLogin && !isLoginAdmin &&(
           <NavLink to="/statistic">
+            {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.statistic')}</Button>}
+          </NavLink>
+        )}
+        {isLogin && isLoginAdmin &&(
+          <NavLink to="/statistic-admin">
             {({ isActive }) => <Button isActive={isActive}>{t('navbarComponent.statistic')}</Button>}
           </NavLink>
         )}

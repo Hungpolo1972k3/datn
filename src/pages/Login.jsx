@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
 import { apiUserLogin } from "../service/user";
 import { loginSuccess } from "../redux/userSlice";
 import { useNotice } from "../context/NoticeContext";
@@ -33,7 +32,6 @@ const Form = styled.form`
 
 const Input = styled.input`
   padding: 10px;
-  padding-right: 40px; /* space for icon */
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
@@ -67,11 +65,11 @@ const InputWrapper = styled.div`
 
 const ToggleIcon = styled.span`
   position: absolute;
-  right: 12px;
+  right: 10%;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 1.8rem;
   user-select: none;
   color: #666;
 
@@ -160,7 +158,7 @@ const AuthForm = () => {
             placeholder={t("authForm.password_placeholder")}
           />
           <ToggleIcon onClick={() => setShowPassword(!showPassword)}>
-            {showPassword ? "🙈" : "👁"}
+            {showPassword ? "🙈" : "👁️"}
           </ToggleIcon>
         </InputWrapper>
         {errors.password && <ErrorText>{errors.password}</ErrorText>}

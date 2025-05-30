@@ -24,7 +24,7 @@ const PopupContainer = styled.div`
   border-radius: 8px;
   border: 3px solid rgb(162, 166, 171); 
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  z-index: 999;  // Đặt popup lên trên overlay
+  z-index: 999;
 `;
 
 const Title = styled.h2`

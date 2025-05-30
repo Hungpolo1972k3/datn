@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 
@@ -56,16 +56,20 @@ const EyeIcon = styled.span`
   }
 `;
 
+const NucleicContent = styled.div`
+  margin-bottom: 16px;
+  word-break: break-word;
+  max-width: 100%;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-left: 4px solid #007bff;
+  transition: all 0.3s ease;
+`;
+
 const VirulenceTable = ({ data }) => {
   const { t } = useTranslation();
-  const [visibleRows, setVisibleRows] = useState({});
-
-  const toggleNucleic = (index) => {
-    setVisibleRows((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
-  };
+  const [selectedRow, setSelectedRow] = useState(null);
+  const titleRef = useRef(null);
 
   const headers = [
     t("virulenceComponent.index"),
@@ -80,9 +84,47 @@ const VirulenceTable = ({ data }) => {
     t("virulenceComponent.nucleic"),
   ];
 
+  const toggleNucleic = (index) => {
+    setSelectedRow((prev) => (prev === index ? null : index));
+    setTimeout(() => {
+      titleRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
   return (
     <TableContainer>
-      <Title>{t("virulenceComponent.title")}</Title>
+      <Title ref={titleRef}>{t("virulenceComponent.title")}</Title>
+
+      {selectedRow !== null && (
+        <NucleicContent>
+          {headers.map((header, i) => {
+            const key = [
+              "index",
+              "sequence",
+              "gene",
+              "start",
+              "stop",
+              "strand",
+              "identity",
+              "coverage",
+              "accession",
+              "nucleic",
+            ][i];
+
+            const value =
+              key === "index"
+                ? selectedRow + 1
+                : data[selectedRow]?.[key] || "N/A";
+
+            return (
+              <div key={i}>
+                <strong>{header}:</strong> {value}
+              </div>
+            );
+          })}
+        </NucleicContent>
+      )}
+
       <TableWrapper>
         <Table>
           <thead>
@@ -97,7 +139,16 @@ const VirulenceTable = ({ data }) => {
               <tr key={index}>
                 <Td>{index + 1}</Td>
                 <Td>{item.sequence}</Td>
-                <Td>{item.gene}</Td>
+                <Td>
+                  <a
+                    href={`/dataset?search=${encodeURIComponent(item.gene)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    {item.gene}
+                  </a>
+                </Td>
                 <Td>{item.start}</Td>
                 <Td>{item.stop}</Td>
                 <Td>{item.strand}</Td>
@@ -106,13 +157,8 @@ const VirulenceTable = ({ data }) => {
                 <Td>{item.accession}</Td>
                 <Td>
                   <EyeIcon onClick={() => toggleNucleic(index)}>
-                    {visibleRows[index] ? "🙈" : "👁️"}
+                    {selectedRow === index ? "🙈" : "👁️"}
                   </EyeIcon>
-                  {visibleRows[index] && (
-                    <div style={{ marginTop: "8px", wordBreak: "break-word", maxWidth: "400px" }}>
-                      {item.nucleic || "N/A"}
-                    </div>
-                  )}
                 </Td>
               </tr>
             ))}

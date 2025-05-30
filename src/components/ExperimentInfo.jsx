@@ -22,8 +22,8 @@ const PopUpForm = styled.div`
   background-color: white;
   padding: 20px;
   border-radius: 8px;
-  width: 90%;
-  max-height: 80%;
+  width: 95%;
+  height: 90%;
   overflow-y: auto;
   position: relative;
 `;

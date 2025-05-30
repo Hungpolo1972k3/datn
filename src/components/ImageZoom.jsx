@@ -6,7 +6,7 @@ const Button = styled.button`
   top: 10px;
   right: 10px;
   padding: 10px 20px;
-  background-color: #4caf50;
+  background-color: #0066cc;
   color: white;
   border: none;
   border-radius: 5px;
@@ -15,7 +15,7 @@ const Button = styled.button`
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #45a049;
+    background-color: #0066cc;
   }
 `;
 const ButtonReset = styled.button`
@@ -23,7 +23,7 @@ const ButtonReset = styled.button`
   right: -80px;
   top: -3px;
   padding: 8px 10px;
-  background-color: #6c757d;
+  background-color: #0066cc;
   color: white;
   border: none;
   border-radius: 5px;
@@ -32,7 +32,7 @@ const ButtonReset = styled.button`
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #5a6268;
+    background-color:rgb(17, 21, 235);
   }
 `;
 const Wrapper = styled.div`
@@ -45,18 +45,18 @@ const DropdownButton = styled.button`
   justify-content: space-between;
   gap: 0.5rem;
   padding: 1rem 1.25rem;
-  background-color: #212529;
+  background-color:rgb(72, 153, 234);
   color: #f8f9fa;
   font-size: 1rem;
   font-weight: 600;
-  border: 1px solid #343a40;
+  border: 1px solidrgb(0, 73, 147);
   border-radius: 10px;
   margin-bottom: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    background-color: #343a40;
+    background-color: rgb(17, 21, 235);
     transform: translateY(-1px);
   }
 

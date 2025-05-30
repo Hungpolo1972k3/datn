@@ -16,9 +16,9 @@ const Popup = styled.div`
   background: white;
   padding: 30px;
   border-radius: 10px;
-  width: 500px;
+  width: 70%;
   position: relative;
-  max-height: 80vh;
+  height: 70%;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -35,7 +35,7 @@ const CloseButton = styled.button`
 `;
 
 const Title = styled.h2`
-  font-size: 36px;
+  font-size: 40px;
   font-weight: bold;
   margin-bottom: 30px;
   text-align: center;
@@ -43,7 +43,7 @@ const Title = styled.h2`
 
 const InputGroup = styled.div`
   margin-bottom: 15px;
-  width: 100%;
+  width: 80%;
 `;
 
 const Label = styled.label`
@@ -78,8 +78,9 @@ const Button = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  width: 100%;
+  width: 15%;
   margin-top: 20px;
+  font-size: 15px
 `;
 
 const ErrorMsg = styled.div`
@@ -126,7 +127,6 @@ const AddUserPopup = ({ onClose }) => {
     if (Object.keys(validationErrors).length > 0) return;
   
     try {
-      console.log(formData);
       const a = await apiAddUser(formData);
       const translatedMessage = t("addUserComponent.addUserSuccess");
       showNotice(1, translatedMessage);
@@ -222,9 +222,9 @@ const AddUserPopup = ({ onClose }) => {
                 style={{ fontSize: "15px", padding: "5px", width: "35%" }} 
             >
                 <option value="">{t("addUserComponent.selectGender")}</option>
-                <option value="Male">{t("addUserComponent.male")}</option>
-                <option value="Female">{t("addUserComponent.female")}</option>
-            </select>
+                <option value={t("addUserComponent.male")}>{t("addUserComponent.male")}</option>
+                <option value={t("addUserComponent.female")}>{t("addUserComponent.female")}</option>
+              </select>
             {errors.gender && <ErrorMsg>{errors.gender}</ErrorMsg>}
             </InputGroup>
         <InputGroup>

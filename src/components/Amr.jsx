@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 
@@ -56,35 +56,68 @@ const EyeIcon = styled.span`
   }
 `;
 
-const AmrTable = ({ data = []}) => {
-  const { t } = useTranslation();
-  const [visibleRows, setVisibleRows] = useState({});
+const NucleicContent = styled.div`
+  margin-bottom: 16px;
+  word-break: break-word;
+  max-width: 100%;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-left: 4px solid #007bff;
+  transition: all 0.3s ease;
+`;
 
-  const hiddenFields = ["sample_id", "protein_identifier", "_id", "__v", "createdAt", "updatedAt"];
+const AmrTable = ({ data = [] }) => {
+  const { t } = useTranslation();
+  const [selectedRow, setSelectedRow] = useState(null);
+  const titleRef = useRef(null);
 
   const headers = [
     "Index",
-    ...(Array.isArray(data) && data.length > 0
-      ? Object.keys(data[0]).filter((key) => !hiddenFields.includes(key))
-      : []),
+    "contig_id",
+    "start",
+    "stop",
+    "strand",
+    "gene_symbol",
+    "element_name",
+    "nucleic",
   ];
 
   const toggleNucleic = (index) => {
-    setVisibleRows((prev) => ({
-      ...prev,
-      [index]: !prev[index],
-    }));
+    setSelectedRow((prev) => (prev === index ? null : index));
+
+    setTimeout(() => {
+      titleRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
 
   return (
     <TableContainer>
-      <Title>{t("amrComponent.title")}</Title>
+      <Title ref={titleRef}>{t("amrComponent.title")}</Title>
+
+      {selectedRow !== null && (
+        <NucleicContent>
+          {headers.map((header, i) => {
+            const key = headers[i] === "Index" ? null : headers[i];
+            const value =
+              headers[i] === "Index"
+                ? selectedRow + 1
+                : data[selectedRow]?.[key] || t("amrComponent.notAvailable");
+
+            return (
+              <div key={i}>
+                <strong>{t(`amrComponent.columns.${headers[i]}`)}:</strong> {value}
+              </div>
+            );
+          })}
+        </NucleicContent>
+      )}
+
       <TableWrapper>
         <Table>
           <thead>
             <tr>
               {headers.map((header, index) => (
-                <Th key={index}>{header}</Th>
+                <Th key={index}>{t(`amrComponent.columns.${header}`)}</Th>
               ))}
             </tr>
           </thead>
@@ -95,16 +128,9 @@ const AmrTable = ({ data = []}) => {
                 {headers.slice(1).map((key, cellIndex) => (
                   <Td key={cellIndex}>
                     {key === "nucleic" ? (
-                      <>
-                        <EyeIcon onClick={() => toggleNucleic(rowIndex)}>
-                          {visibleRows[rowIndex] ? "🙈" : "👁️"}
-                        </EyeIcon>
-                        {visibleRows[rowIndex] && (
-                          <div style={{ marginTop: "8px", maxWidth: "400px", wordBreak: "break-word" }}>
-                            {row[key] || t("amrComponent.notAvailable")}
-                          </div>
-                        )}
-                      </>
+                      <EyeIcon onClick={() => toggleNucleic(rowIndex)}>
+                        {selectedRow === rowIndex ? "🙈" : "👁️"}
+                      </EyeIcon>
                     ) : (
                       row[key] || t("amrComponent.notAvailable")
                     )}

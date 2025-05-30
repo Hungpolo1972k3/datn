@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import StatisticsView from "../components/StatisticsView";
+
+// Styled components
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -56,20 +57,23 @@ const Home = () => {
       <Wrapper>
         <Title>{t("homePage.title1")}</Title>
         <MultilineText text={t("homePage.content1")} />
+
         <Image src="/Acinetobacter-baumannii.jpg" alt="Bacteria" />
         <MultilineText text={t("homePage.content2")} />
+
         <Title>{t("homePage.title2")}</Title>
-        <Image src="/nguyco.jpg" alt="Risk" />
+        <Image src="/nguyco.png" alt="Risk" />
         <MultilineText text={t("homePage.content3")} />
+
         <Title>{t("homePage.title3")}</Title>
         <MultilineText text={t("homePage.content4")} />
+
         <Title>{t("homePage.title4")}</Title>
-        <Image src="/dauhieunhiemtrung.jpg" alt="Symptoms" />
+        <Image src="/dauhieunhiemtrung.png" alt="Symptoms" />
         <MultilineText text={t("homePage.content5")} />
+
         <Title>{t("homePage.title5")}</Title>
         <MultilineText text={t("homePage.content6")} />
-
-        <StatisticsView />
       </Wrapper>
     </Container>
   );
