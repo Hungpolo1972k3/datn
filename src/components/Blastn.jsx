@@ -1,7 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-
+import AlignmentViewer from "./AlignmentViewer";
+import CompareAMR from "./CompareAMR";
+import { apiGetFileInfo } from "../service/blastn";
 const Overlay = styled.div`
   position: fixed;
   top: 0;
@@ -96,6 +98,25 @@ const DetailBox = styled.div`
   margin-bottom: 20px;
   box-shadow: 0 2px 8px rgb(37 99 235 / 0.15);
 `;
+const ButtonGroup = styled.div`
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+`;
+
+const ToggleButton = styled.button`
+  font-weight: ${({ active }) => (active ? "bold" : "normal")};
+  cursor: pointer;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  background-color: ${({ active }) => (active ? "#eee" : "white")};
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
 
 const NucleicContent = styled.div`
   margin-bottom: 16px;
@@ -162,11 +183,32 @@ const BacteriaName = styled.div`
   color: #475569;
   font-style: italic;
 `;
-const BlastnModal = ({ blastn, onClose, info, bacteria }) => {
+const BlastnModal = ({ blastn, onClose, info, bacteria, amr }) => {
+  const [jsonFileContent, setJsonFileContent] = useState([]);
+  {
+    console.log("amr", amr);
+  }
+  const handleGetAMR = async () => {
+    try {
+      const result = await apiGetFileInfo(
+        "/" + info.name + "/Platon_output/plasmid/amrfinder.txt"
+      );
+      if (result.data.parsed && Array.isArray(result.data.parsed)) {
+        setJsonFileContent(result.data.parsed);
+      } else {
+        setJsonFileContent([]);
+      }
+    } catch (error) {
+    } finally {
+    }
+  };
+  useEffect(() => {
+    handleGetAMR();
+  }, [info.name]);
   const { t } = useTranslation();
   const modalRef = useRef();
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const [viewMode, setViewMode] = useState("info");
   if (!Array.isArray(blastn)) return null;
   const keyToLabel = {
     avgIdentity: t("blastn.avgIdentity"),
@@ -213,11 +255,13 @@ const BlastnModal = ({ blastn, onClose, info, bacteria }) => {
       setSelectedRow(null);
     } else {
       setSelectedRow({ data: item, index: idx });
+      setViewMode("info");
       setTimeout(() => {
         modalRef.current?.scrollTo({ top: 0, behavior: "smooth" });
       }, 100);
     }
   };
+
   return (
     <Overlay>
       <Modal ref={modalRef}>
@@ -243,27 +287,59 @@ const BlastnModal = ({ blastn, onClose, info, bacteria }) => {
                   ))}
               </tbody>
             </InfoTable>
+            {amr && (
+              <CompareAMR
+                amrUploaded={amr}
+                amrReference={jsonFileContent}
+                referenceName={info.name}
+              />
+            )}
           </InfoBox>
         )}
         {selectedRow && (
           <DetailBox>
+            <ButtonGroup>
+              <ToggleButton
+                active={viewMode === "info"}
+                onClick={() => setViewMode("info")}
+              >
+                Info
+              </ToggleButton>
+              <ToggleButton
+                active={viewMode === "alignment"}
+                marginRight
+                onClick={() => setViewMode("alignment")}
+              >
+                Alignment
+              </ToggleButton>
+            </ButtonGroup>
             <NucleicContent>
-              {headers.map((header, i) => {
-                const key = keys[i];
-                let value;
+              {viewMode === "alignment" ? (
+                <AlignmentViewer
+                  query={selectedRow.data.queryFragment}
+                  subject={selectedRow.data.subjectFragment}
+                  qStart={selectedRow.data.qStart}
+                  sStart={selectedRow.data.sStart}
+                  lineLength={60}
+                />
+              ) : (
+                headers.map((header, i) => {
+                  const key = keys[i];
+                  let value;
 
-                if (key === "index") {
-                  value = selectedRow.index + 1;
-                } else {
-                  value = selectedRow.data[key] ?? "N/A";
-                }
+                  if (key === "index") {
+                    value = selectedRow.index + 1;
+                  } else {
+                    value = selectedRow.data[key] ?? "N/A";
+                  }
 
-                return (
-                  <div key={i}>
-                    <strong>{header}:</strong> {value}
-                  </div>
-                );
-              })}
+                  return (
+                    <div key={i}>
+                      <strong>{header}:</strong> {value}
+                    </div>
+                  );
+                })
+              )}
             </NucleicContent>
           </DetailBox>
         )}

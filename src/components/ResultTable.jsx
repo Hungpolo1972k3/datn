@@ -3,8 +3,10 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import datasetFolder from "../utils/datasetFolder.json";
 import { apiRunBlastnTwoFiles, apiGetFileInfo } from "../service/blastn";
+import { apiRunAmrTool } from "../service/amr";
 import LoadingSpinner from "./LoadingSpinner";
 import BlastnModal from "./Blastn";
+import AlignmentViewer from "./AlignmentViewer";
 
 const Table = styled.table`
   width: 100%;
@@ -61,7 +63,8 @@ const PageControls = styled.div`
 
 const PageButton = styled.button`
   padding: 6px 12px;
-  background-color: ${(props) => (props.active === "true" ? "#1e40af" : "#2563eb")};
+  background-color: ${(props) =>
+    props.active === "true" ? "#1e40af" : "#2563eb"};
   color: white;
   border: none;
   border-radius: 4px;
@@ -95,8 +98,9 @@ const formatDateVN = (isoDate) => {
 
 const ResultTable = ({ results, blastnInfo }) => {
   const { t } = useTranslation();
-  const findInfoByName = (name) => datasetFolder.find(item => item.name === name);
-
+  const findInfoByName = (name) =>
+    datasetFolder.find((item) => item.name === name);
+  const [amrData, setAmrData] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(30);
   const [isLoading, setIsLoading] = useState(false);
@@ -129,21 +133,284 @@ const ResultTable = ({ results, blastnInfo }) => {
   const [modalInfo, setModalInfo] = useState(null);
 
   const handleViewDetails = async (url, name, info, bacteria) => {
-    let url2 = `/app/FastA/${name}/Spades_output/contigs.fasta`;
     setIsLoading(true);
     try {
-      const result = await apiRunBlastnTwoFiles(url, url2);
-      setIsLoading(false);
-      setBlastnData(result.data);
-      setModalInfo(info);  
+      let url2 = `/app/FastA/${name}/Spades_output/contigs.fasta`;
+      const blastnResult = await apiRunBlastnTwoFiles(url, url2);
+      setBlastnData(blastnResult.data);
+      setModalInfo(info);
       setShowModal(true);
       setBacteriaInfo(bacteria);
     } catch (error) {
-      setIsLoading(false);
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
-
+  const sampleAMR = [
+    {
+      protein_identifier: null,
+      contig_id: "NODE_11_length_94746_cov_108.497661",
+      start: 5667,
+      stop: 6479,
+      strand: "+",
+      gene_symbol: "aph(3')-Ia",
+      element_name: "aminoglycoside O-phosphotransferase APH(3')-Ia",
+      closest_reference_name: "aminoglycoside O-phosphotransferase APH(3')-Ia",
+      scope: "core",
+      element_type: "AMR",
+      class: "AMINOGLYCOSIDE",
+      subclass: "KANAMYCIN",
+      method: "EXACTX",
+      length: 271,
+      reference_length: 271,
+      alignment_length: 271,
+      coverage: 100,
+      identity: 100,
+      accession: "WP_000018326.1",
+      nucleic:
+        "ATGAGCCATATTCAACGGGAAACGTCTTGCTCGAGGCCGCGATTAAATTCCAACCTGGATGCTGATTTATATGGGTATAGATGGGCTCGCGATAATGTCGGGCAATCAGGTGCGACAATCTATCGATTGTATGGGAAGCCCAATGCGCCAGAGTTGTTTCTGAAACATGGCAAAGGTAGCGTTGCCAATGATGTTACAGATGAGATGGTCAGACTAAACTGGCTGACGGCATTTATGCCTCTTCCGACCATCAAGCATTTTATCCGTACTCCTGATGATGCATGGTTACTCACCACTGCGATCCCCGGGAAAACAGCATTCCAGGTATTAGAAGAATATCCTGATTCAGGTGAAAATATTGTTGATGCGCTGGCAGTGTTCCTGCGCCGGTTGCATTCGATTCCTGTTTGTAATTGTCCTTTTAACAGCGATCGCGTATTTCGTCTCGCTCAGGCGCAATCACGAATGAATAACGGTTTGGTTGATGCTAGTGATTTTGATGACGAGCGTAATGGCTGGCCTGTTGAACAAGTCTGGAAAGAAATGCATAAGCTTTTGCCATTCTCACCGGATTCAGTCGTCACTCATGGTGATTTCTCACTTGATAACCTTATTTTTGACGAGGGGAAATTAATAGGTTGTATTGATGTTGGACGAGTCGGAATCGCAGACCGATACCAGGATCTTGCCATCCTATGGAACTGCCTCGGTGAGTTTTCTCCTTCATTACAGAAACGGCTTTTTCAAAAATATGGTATTGATAATCCTGATATGAATAAATTGCAGTTTCATTTGATGCTCGATGAGTTTTTC",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_25_length_43123_cov_121.439096",
+      start: 7699,
+      stop: 8484,
+      strand: "+",
+      gene_symbol: "ant(3'')-IIa",
+      element_name: "aminoglycoside nucleotidyltransferase ANT(3'')-IIa",
+      closest_reference_name:
+        "aminoglycoside nucleotidyltransferase ANT(3'')-IIa",
+      scope: "core",
+      element_type: "AMR",
+      class: "AMINOGLYCOSIDE",
+      subclass: "SPECTINOMYCIN/STREPTOMYCIN",
+      method: "EXACTX",
+      length: 262,
+      reference_length: 262,
+      alignment_length: 262,
+      coverage: 100,
+      identity: 100,
+      accession: "WP_001279062.1",
+      nucleic:
+        "ATGTCTGATTTCATTCAGTTAGAATATCTACAAGAAAAATTACAGCAACTTTTAGCGGAATCATTATTTGCAATCTATCTTTATGGTTCAGCTGTTGATGGTGGCTTAGGGCCAGAAAGTGACCTTGATGTTCTGGTCGTGGTTACTCAACCATTAACATCTGCTTTACGCGAGCAGCTTGCACAAGAATTACTAAAAATTTCACAGCCTGTTGGAGAATTACAAAGACCATTAGAAGTTACTATTTTATTAAAAGACGAGATTCAGTCTGGAAATTATCCTTTAAGTTATGAAATGCAGTTTGGTGAATGGCTACGTGAAGAACTTAAAGAAGGTGGAACATTAAGTTCGCAGAAAGACCCAGATATTAGTATATTGCTTAGAAAAGCGAGATTTCATCATGCAGTTTTATTTGGTCCAGCTTTAGACCAATGGGCACCTGAAATTTCTGATCAAGAACTATGGCAAGCAATGTCTGATACTTATCCCGAAATTGTAGCTCATTGGGATGAGGATGCAGATGAAAGAAACCAGATTTTAGCTTTATGCCGGATCTATTTTAGTTTAGTCATGAAGGATATTGCTTCAAAAGGCAATGCAGCTCGATGGGTTATGCCTCAGCTTCCTCCTGAGCAGAAATTCGTATTGCAGCGGCTTATACAGGAATATAGAGGGGAAATCGGTAAACAAAATTGGCAAGAGGAACATTATGCTTTGCAGCCTATTGTTAATTTTCTGAGTTCAAAAATTGAAGAGCAGTTTGAGCAGAAAAGAAATTTGATCACA",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_32_length_40475_cov_113.976225",
+      start: 39265,
+      stop: 40413,
+      strand: "-",
+      gene_symbol: "blaADC",
+      element_name: "ADC family extended-spectrum class C beta-lactamase",
+      closest_reference_name:
+        "extended-spectrum class C beta-lactamase ADC-199",
+      scope: "core",
+      element_type: "AMR",
+      class: "BETA-LACTAM",
+      subclass: "CEPHALOSPORIN",
+      method: "BLASTX",
+      length: 383,
+      reference_length: 388,
+      alignment_length: 388,
+      coverage: 100,
+      identity: 98.45,
+      accession: "WP_114166683.1",
+      nucleic:
+        "ATGCAATTTAAAAAAATTTCTTGTCTACTTTTATCCCCGCTTTTTATTTTTAGTACCTCAATTTATGCGGACAATACACCAAAAGACCAAGAAATTAAAAAACTGGTAGATCAAAATTTTAAACCATTATTAGAAAAATATGATGTGCCGGGTATGGCTGTGGGTGTTATTCAAAATAATAAAAAGTATGAAATGTATTATGGTCTTCAATCTGTTCAAGATAAAAAAGCCGTAAATAGCAGTACTATTTTTGAGCTAGGTTCTGTCAGTAAATTATTTAACGCGACAGCAGGTGGATATGCAAAAAATAAAGGAAAAATCTCTTTTGACGATACGCCTGGTAAATATTGGAAAGAGCTAAAAAATACACCGATTGACCAAGTTAACTTACTTCAACTCGCGACGTATACAAGTGGTAACCTTGCCTTGCAGTTCCCAGATGAAGTACAAACAGATCAACAAGTTTTAACTTTTTTCAAAGACTGGAAACCTAAAAACCCAATCGGTGAATACAGACAATATTCAAATCCAAGTATTGGCCTATTTGGAAAGGTTGTAGCTTTGTCTATGAATAAACCTTTCGACCAAGTGTTAGAAAAAACAATTTTTCCGGCCCTTGGCTTAAAACATAGCTATGTAAATGTACCTAAGACCCAAATGCAAAACTATGCTTTTGGCTATAACCAAGAAAATCAGCCGATTCGAGTTAACCCCGGCCCACTCGATGCCCCAGCATATGGCGTCAAATCGACACTACCCGACATGTTGAGTTTTATTCATGCCAACCTTAACCCACAGAAATATCCGGCAGATATTCAACGGGCAATTAATGAAACACATCAAGGGTTCTATCAAGTAAATACCATGTATCAGGCACTCGGTTGGGAAGAGTTTTCTTATCCGGCAACGTTACAAACTTTATTAGACAGTAATTCAGAACAGATTGTGATGAAACCTAATAAAGTGACTGCTATTTCAAAGGAACCTTCAGTTAAGATGTACCATAAAACTGGCTCAACTACCGGTTTCGGAACATATGTAGTGTTTATTCCTAAAGAAAATATTGGTTTAGTCATGTTAACCAATAAACGTATTCCAAATGAAGAGCGCATTAAGGCAGCTTATGCTGTGCTGAATGCAATAAAGAAA",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_42_length_31148_cov_108.556878",
+      start: 26347,
+      stop: 27168,
+      strand: "+",
+      gene_symbol: "blaOXA-69",
+      element_name:
+        "OXA-51 family carbapenem-hydrolyzing class D beta-lactamase OXA-69",
+      closest_reference_name:
+        "OXA-51 family carbapenem-hydrolyzing class D beta-lactamase OXA-69",
+      scope: "core",
+      element_type: "AMR",
+      class: "BETA-LACTAM",
+      subclass: "CARBAPENEM",
+      method: "ALLELEX",
+      length: 274,
+      reference_length: 274,
+      alignment_length: 274,
+      coverage: 100,
+      identity: 100,
+      accession: "WP_001021779.1",
+      nucleic:
+        "ATGAACATTAAAGCACTCTTACTTATAACAAGCGCTATTTTTATTTCAGCCTGCTCACCTTATATAGTGACTGCTAATCCAAATCACAGTGCTTCAAAATCTGATGACAAAGCAGAGAAAATTAAAAATTTATTTAACGAAGCACACACTACGGGTGTTTTAGTTATCCATCAAGGTCAAACTCAACAAAGCTATGGTAATGATCTTGCTCGTGCTTCGACCGAGTATGTACCTGCTTCGACCTTCAAAATGCTTAATGCTTTGATCGGCCTTGAGCACCATAAGGCAACCACCACAGAAGTATTTAAATGGGATGGGGAAAAAAGGCTATTCCCAGAATGGGAAAAGAACATGACCCTAGGCGATGCTATGAAAGCTTCCGCTATTCCGGTTTATCAAGATTTAGCTCGTCGTATTGGACTTGAGCTCATGTCTAAGGAAGTGAAGCGTGTTGGTTATGGCAATGCAGATATCGGTACCCAAGTCGATAATTTTTGGCTGGTGGGTCCTCTAAAAATTACTCCTCAGCAAGAGGCACAGTTTGCTTACAAGCTAGCTAATAAAACGCTTCCATTTAGCCAAAAAGTCCAAGATGAAGTGCAATCCATGCTATTCATAGAAGAAAAGAATGGAAATAAAATATACGCAAAAAGTGGTTGGGGATGGGATGTAAACCCACAAGTAGGCTGGTTAACTGGATGGGTTGTTCAGCCTCAAGGGAATATTGTAGCGTTCTCCCTTAACTTAGAAATGAAAAAAGGAATACCTAGCTCTGTTCGAAAAGAGATTACTTATAAAAGTTTAGAACAATTAGGTATTTTA",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_65_length_15533_cov_86.080501",
+      start: 74,
+      stop: 886,
+      strand: "+",
+      gene_symbol: "sul2",
+      element_name: "sulfonamide-resistant dihydropteroate synthase Sul2",
+      closest_reference_name:
+        "sulfonamide-resistant dihydropteroate synthase Sul2",
+      scope: "core",
+      element_type: "AMR",
+      class: "SULFONAMIDE",
+      subclass: "SULFONAMIDE",
+      method: "EXACTX",
+      length: 271,
+      reference_length: 271,
+      alignment_length: 271,
+      coverage: 100,
+      identity: 100,
+      accession: "WP_001043260.1",
+      nucleic:
+        "ATGAATAAATCGCTCATCATTTTCGGCATCGTCAACATAACCTCGGACAGTTTCTCCGATGGAGGCCGGTATCTGGCGCCAGACGCAGCCATTGCGCAGGCGCGTAAGCTGATGGCCGAGGGGGCAGATGTGATCGACCTCGGTCCGGCATCCAGCAATCCCGACGCCGCGCCTGTTTCGTCCGACACAGAAATCGCGCGTATCGCGCCGGTGCTGGACGCGCTCAAGGCAGATGGCATTCCCGTCTCGCTCGACAGTTATCAACCCGCGACGCAAGCCTATGCCTTGTCGCGTGGTGTGGCCTATCTCAATGATATTCGCGGTTTTCCAGACGCTGCGTTCTATCCGCAATTGGCGAAATCATCTGCCAAACTCGTCGTTATGCATTCGGTGCAAGACGGGCAGGCAGATCGGCGCGAGGCACCCGCTGGCGACATCATGGATCACATTGCGGCGTTCTTTGACGCGCGCATCGCGGCGCTGACGGGTGCCGGTATCAAACGCAACCGCCTTGTCCTTGATCCCGGCATGGGGTTTTTTCTGGGGGCTGCTCCCGAAACCTCGCTCTCGGTGCTGGCGCGGTTCGATGAATTGCGGCTGCGCTTCGATTTGCCGGTGCTTCTGTCTGTTTCGCGCAAATCCTTTCTGCGCGCGCTCACAGGCCGTGGTCCGGGGGATGTCGGGGCCGCGACACTCGCTGCAGAGCTTGCCGCCGCCGCAGGTGGAGCTGACTTCATCCGCACACACGAGCCGCGCCCCTTGCGCGACGGGCTGGCGGTATTGGCGGCGCTGAAAGAAACCGCAAGAATTCGT",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_77_length_9122_cov_123.866439",
+      start: 8331,
+      stop: 8840,
+      strand: "+",
+      gene_symbol: "dfrA44",
+      element_name: "trimethoprim-resistant dihydrofolate reductase DfrA44",
+      closest_reference_name:
+        "trimethoprim-resistant dihydrofolate reductase DfrA44",
+      scope: "core",
+      element_type: "AMR",
+      class: "TRIMETHOPRIM",
+      subclass: "TRIMETHOPRIM",
+      method: "EXACTX",
+      length: 170,
+      reference_length: 170,
+      alignment_length: 170,
+      coverage: 100,
+      identity: 100,
+      accession: "WP_031380727.1",
+      nucleic:
+        "ATGGCATTTCAGGATTTAGAAGTCGTTCATGTCGTTGCAATGGATCAGCAGCGCTGTATTGGTAAGGACAATGACCTGCCTTGGCATATCTCAGCAGATCTAAAACATTTTAAGGAAATCACCCAGGGCGGTGTAATTGTAATGGGACGTAAGACCCTTGAATCCATGGGACGTGCCTTGCCTAAACGTGTCAACTGGGTCATTACCCGTGATACAGACTGGTCTTTTGAAGGTACTAAAGTCGCACACACGATTGAAGATGCCTTGAACCAAGCTGTTGCAGATGTAAAAGCGTCAGAAAAACCGGAGTCTATTTATATTATTGGGGGTGGTGAAATCTTCAAACAGACAATGAGTATTGCTGACCGTCTGGAACTGACCCATGTCGAACTGGATGTACAAGGTCATGCCTTCTACCCGGAAATTCCTGCTGAATTCAAAAAAGTTTTTTCCGAACAACATATCGACGACAAAACTGGGATTGCTTTTGAGTTTGCAACTTATAGAAAA",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_82_length_6133_cov_447.840902",
+      start: 5794,
+      stop: 6132,
+      strand: "+",
+      gene_symbol: "ant(2'')-Ia",
+      element_name: "aminoglycoside nucleotidyltransferase ANT(2'')-Ia",
+      closest_reference_name:
+        "aminoglycoside nucleotidyltransferase ANT(2'')-Ia",
+      scope: "core",
+      element_type: "AMR",
+      class: "AMINOGLYCOSIDE",
+      subclass: "GENTAMICIN/KANAMYCIN/TOBRAMYCIN",
+      method: "PARTIAL_CONTIG_ENDX",
+      length: 113,
+      reference_length: 177,
+      alignment_length: 113,
+      coverage: 63.84,
+      identity: 98.23,
+      accession: "WP_000381803.1",
+      nucleic:
+        "ATGGACACAACGCAGGTCGCATTGATACACCAAATTCTAGCTGCGGCAGATGAGCGAAATCTGCCGCTCTGGATCGGTGGGGGCTGGGCGATCGATGCACGGCTAGGGCGTGTAACACGCAAGCACGATGATATTGATCTGACTTTTCCCGGCGAGAGGCGCGGCGAGCTCGAGGCAATAGTTGAAATGCTCGGCGGGCGCGTCACGGAGGAGTTGGACTATGGATTCTTAGCGGAGATCGGGGATGAGTTACTTGACTGCGAACCTGCTTGGTGGGCAGACGAAGCGTATGAAATCGCGGAGGCTCCGCAGGGCTCGTGCCCAGAGGCGGCTGAGGGT",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_83_length_5734_cov_1020.321535",
+      start: 3159,
+      stop: 3935,
+      strand: "+",
+      gene_symbol: "aph(3')-VIa",
+      element_name: "aminoglycoside O-phosphotransferase APH(3')-VIa",
+      closest_reference_name: "aminoglycoside O-phosphotransferase APH(3')-VIa",
+      scope: "core",
+      element_type: "AMR",
+      class: "AMINOGLYCOSIDE",
+      subclass: "AMIKACIN/KANAMYCIN",
+      method: "BLASTX",
+      length: 259,
+      reference_length: 259,
+      alignment_length: 259,
+      coverage: 100,
+      identity: 99.23,
+      accession: "WP_000422636.1",
+      nucleic:
+        "ATGGAATTGCCCAATATTATTCAACAATTTATTGGAAACAGTGTTTTAGAGCCAAATAAAATTGGTCAGTCGCCATCGGATGTTTATTCTTTTAATCGAAATAATGAAACTTTTTTTCTTAAGCGATCTAGCACTTTATATACAGAGACCACATACAGTGTCTCTCGCGAAGCGAAAATGTTGAGTTGGCTCTCTGAGAAATTAAAGGTGCCTGAACTCATCATGACTTTTCAGGATGAGCAGTTTGAATTCATGATCACTAAAGCGATCAATGCAAAACCAATTTCAGCGCTTTTTTTAACAGACCAAGAATTGCTTGCTATCTATAAGGAGGCACTCAATCTGTTAAATTCAGTTGCTATTATTGATTGTCCATTTATTTCAAACATTGATCATCGGTTAAAAGAGTCAAAATTTTTTATTGATAACCAACTCCTTGACGATATAGATCAAGATGATTTTGACGCTGAATTATGGGGAGACCATAAAACTTACCTAAGTCTATGGAATGAGTTAACTGAGACTCGTGTTGAAGAAAGATTGGTTTTTTCTCATGGCGATATCACGGATAGTAATATTTTTATAGATAAATTCAATGAAATTTATTTTTTAGATCTTGGCCGTGCTGGGTTAGCAGATGAATTTGTAGATATATCCTTTGTTGAACGTTGCCTAAGAGAGGATGCATCGGAGGAAACTGCTAAAATATTTTTAAAGCATTTAAAAAATGATAGACCTGACAAAAGGAATTATTTTTTAAAACTTGATGAATTGAAT",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_92_length_3016_cov_118.369912",
+      start: 457,
+      stop: 1929,
+      strand: "+",
+      gene_symbol: "msr(E)",
+      element_name: "ABC-F type ribosomal protection protein Msr(E)",
+      closest_reference_name: "ABC-F type ribosomal protection protein Msr(E)",
+      scope: "core",
+      element_type: "AMR",
+      class: "MACROLIDE/STREPTOGRAMIN",
+      subclass: "AZITHROMYCIN/ERYTHROMYCIN/STREPTOGRAMIN",
+      method: "EXACTX",
+      length: 491,
+      reference_length: 491,
+      alignment_length: 491,
+      coverage: 100,
+      identity: 100,
+      accession: "WP_000052512.1",
+      nucleic:
+        "ATGAGTTTAATTATTAAAGCGAGAAACATACGCTTGGATTATGCTGGGCGTGATGTTTTGGATATTGATGAATTGGAAATTCACTCTTATGACCGTATTGGTCTTGTGGGTGATAACGGAGCAGGAAAGAGTAGTTTACTCAAAGTACTTAATGGCGAAATTGTTTTAGCCGAAGCGACATTACAGCGTTTTGGTGATTTTGCACATATCAGCCAACTGGGCGGAATCGAAATAGAAACGGTCGAAGACCGGGCAATGTTATCTCGCCTTGGTGTTTCCAATGTACAAAACGACACAATGAGTGGCGGAGAGGAAACTCGTGCAAAAATTGCTGCCGCATTTTCCCAACAAGTACATGGCATTCTAGCGGATGAACCAACCAGCCACCTTGATCTCAATGGAATAGATCTACTTATTGGTCAACTTAAAGCATTTGATGGAGCATTACTTGTTATCAGTCATGACCGATATTTTCTTGATATGGTTGTAGACAAGATATGGGAGTTAAAAGACGGTAAAATTACGGAATATTGGGGTGGTTACTCGGATTACTTGCGTCAAAAAGAAGAAGAGCGACAACACCAAGCCGTAGAATATGAGCTGATGATGAAGGAACGGGAGCGATTAGAATCTGCTGTGCAAGAAAAACGCCAGCAAGCTAATCGATTAGACAATAAGAAAAAAGGAGAAAAATCCAAAAACTCTACCGAAAGTGCTGGACGACTTGGGCATGCAAAAATGACTGGCACCAAGCAAAGAAAACTGTATCAGGCAGCTAAGAGTATGGAAAAGCGTTTGGCTGCATTAGAAGATATTCAAGCACCAGAGCATTTGCGTTCTATTCGTTTTCGTCAAAGTTCAGCCCTAGAACTGCACAATAAGTTCCCGATTACGGCAGATGGTCTGAGCTTAAAATTTGGTAGCCGTACTATCTTTGATGACGCTAACTTTATAATACCGCTTGGCGCTAAAGTCGCTATAACTGGATCGAATGGAACAGGGAAAACGTCCTTGTTAAAAATGATATCAGAACGTGCTGATGGATTAACCATATCTCCAAAAGCTGAAATTGGCTACTTTACACAAACAGGATATAAATTTAACACGCATAAATCTGTGCTCTCCTTTATGCAGGAAGAGTGCGAGTACACAGTTGCGGAAATTCGTGCAGTATTGGCTTCAATGGGGATCGGAGCGAATGATATTCAAAAAAACTTATCCGACTTATCGGGAGGTGAAATCATCAAACTGCTTTTATCCAAAATGCTTTTAGGAAAATATAATATTTTGCTTATGGATGAACCAGGAAACTATCTTGACCTAAAAAGTATTGCCGCATTAGAAACAATGATGAAGTCCTATGCAGGAACTATTATCTTCGTATCTCATGACAAGCAATTGGTCGATAATATTGCTGACATTATCTACGAGATCAAAGACCACAAAATCATCAAGACTTTTGAGAGAGATTGT",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_92_length_3016_cov_118.369912",
+      start: 1988,
+      stop: 2869,
+      strand: "+",
+      gene_symbol: "mph(E)",
+      element_name: "Mph(E) family macrolide 2'-phosphotransferase",
+      closest_reference_name: "Mph(E) family macrolide 2'-phosphotransferase",
+      scope: "core",
+      element_type: "AMR",
+      class: "MACROLIDE",
+      subclass: "ERYTHROMYCIN",
+      method: "EXACTX",
+      length: 294,
+      reference_length: 294,
+      alignment_length: 294,
+      coverage: 100,
+      identity: 100,
+      accession: "WP_000155092.1",
+      nucleic:
+        "ATGACAATTCAAGATATTCAATCACTTGCTGAAGCACACGGCTTGTTGCTTACGGACAAAATGAATTTCAATGAAATGGGCATTGATTTTAAGGTCGTTTTTGCTCTTGATACAAAGGGGCAACAATGGTTGCTGCGTATTCCTCGTCGTGATGGCATGAGGGAACAAATCAAGAAAGAAAAACGCATTTTAGAATTGGTAAAAAAACATCTTTCTGTAGAGGTTCCTGATTGGAGAATTTCATCTACAGAATTAGTGGCTTATCCCATACTTAAAGATAATCCTGTTTTAAATTTGGATGCTGAAACCTATGAAATAATTTGGAATATGGACAAAGATAGCCCGAAATACATAACATCTTTGGCAAAAACCTTATTTGAAATCCATAGTATTCCTGAAAAAGAAGTTCGGGAAAATGATTTGAAAATTATGAAACCTTCAGATTTAAGACCTGAAATAGCAAACAATTTGCAGTTAGTAAAATCTGAAATTGGTATAAGTGAGCAATTGGAAACCCGCTACAGAAAATGGTTGGATAATGATGTTCTATGGGCAGATTTCACCCAATTTATACATGGCGATTTATATGCTGGGCATGTACTAGCTTCAAAGGATGGAGCTGTTTCAGGCGTTATTGATTGGTCAACAGCCCATATAGATGACCCAGCGATTGATTTTGCTGGGCATGTAACTTTGTTTGGAGAAGAAAGCCTCAAAACTCTAATCATCGAGTATGAAAAACTAGGGGGTAAAGTTTGGAATAAACTATATGAACAGACTTTAGAAAGAGCAGCGGCCTCTCCTTTGATGTATGGTTTATTTGCCTTAGAAACTCAAAATGAAAGCCTTATCGTTGGAGCAAAAGCTCAGTTGGGAGTTATA",
+    },
+    {
+      protein_identifier: null,
+      contig_id: "NODE_97_length_2547_cov_127.898475",
+      start: 88,
+      stop: 906,
+      strand: "+",
+      gene_symbol: "blaOXA-23",
+      element_name:
+        "OXA-23 family carbapenem-hydrolyzing class D beta-lactamase OXA-23",
+      closest_reference_name:
+        "OXA-23 family carbapenem-hydrolyzing class D beta-lactamase OXA-23",
+      scope: "core",
+      element_type: "AMR",
+      class: "BETA-LACTAM",
+      subclass: "CARBAPENEM",
+      method: "ALLELEX",
+      length: 273,
+      reference_length: 273,
+      alignment_length: 273,
+      coverage: 100,
+      identity: 100,
+      accession: "WP_001046004.1",
+      nucleic:
+        "ATGAATAAATATTTTACTTGCTATGTGGTTGCTTCTCTTTTTCTTTCTGGTTGTACGGTTCAGCATAATTTAATAAATGAAACCCCGAGTCAGATTGTTCAAGGACATAATCAGGTGATTCATCAATACTTTGATGAAAAAAACACCTCAGGTGTGCTGGTTATTCAAACAGATAAAAAAATTAATCTATATGGTAATGCTCTAAGCCGCGCAAATACAGAATATGTGCCAGCCTCTACATTTAAAATGTTGAATGCCCTGATCGGATTGGAGAACCAGAAAACGGATATTAATGAAATATTTAAATGGAAGGGCGAGAAAAGGTCATTTACCGCTTGGGAAAAAGACATGACACTAGGAGAAGCCATGAAGCTTTCTGCAGTCCCAGTCTATCAGGAACTTGCGCGACGTATCGGTCTTGATCTCATGCAAAAAGAAGTAAAACGTATTGGTTTCGGTAATGCTGAAATTGGACAGCAGGTTGATAATTTCTGGTTGGTAGGACCATTAAAGGTTACGCCTATTCAAGAGGTAGAGTTTGTTTCCCAATTAGCACATACACAGCTTCCATTTAGTGAAAAAGTGCAGGCTAATGTAAAAAATATGCTTCTTTTAGAAGAGAGTAATGGCTACAAAATTTTTGGAAAGACTGGTTGGGCAATGGATATAAAACCACAAGTGGGCTGGTTGACCGGCTGGGTTGAGCAGCCAGATGGAAAAATTGTCGCTTTTGCATTAAATATGGAAATGCGGTCAGAAATGCCGGCATCTATACGTAATGAATTATTGATGAAATCATTAAAACAGCTGAATATTATT",
+    },
+  ];
   return (
     <>
       {blastnInfo && Object.keys(blastnInfo).length > 0 && (
@@ -159,8 +426,13 @@ const ResultTable = ({ results, blastnInfo }) => {
           }}
         >
           <div>
-            <div><strong>{t("resultPage.filename")}:</strong> {blastnInfo.filename}</div>
-            <div><strong>{t("resultPage.createdAt")}:</strong> {formatDateVN(blastnInfo.createdAt)}</div>
+            <div>
+              <strong>{t("resultPage.filename")}:</strong> {blastnInfo.filename}
+            </div>
+            <div>
+              <strong>{t("resultPage.createdAt")}:</strong>{" "}
+              {formatDateVN(blastnInfo.createdAt)}
+            </div>
           </div>
         </div>
       )}
@@ -194,7 +466,12 @@ const ResultTable = ({ results, blastnInfo }) => {
 
               return (
                 <Tr key={idx}>
-                  <Td>{(currentPage - 1) * (rowsPerPage === "all" ? results.length : rowsPerPage) + idx + 1}</Td>
+                  <Td>
+                    {(currentPage - 1) *
+                      (rowsPerPage === "all" ? results.length : rowsPerPage) +
+                      idx +
+                      1}
+                  </Td>
                   <Td>{r.name}</Td>
                   <Td>
                     {ncbiUrl ? (
@@ -217,8 +494,14 @@ const ResultTable = ({ results, blastnInfo }) => {
                   <Td>{r.result.avgCoverage}</Td>
                   <Td>
                     <span
-                      style={{ cursor: "pointer", fontSize: "1.8rem", userSelect: "none" }}
-                      onClick={() => handleViewDetails(blastnInfo.url, r.name, r, bacteria)}
+                      style={{
+                        cursor: "pointer",
+                        fontSize: "1.8rem",
+                        userSelect: "none",
+                      }}
+                      onClick={() =>
+                        handleViewDetails(blastnInfo.url, r.name, r, bacteria)
+                      }
                       title={t("resultPage.viewDetails")}
                     >
                       👁️
@@ -236,12 +519,15 @@ const ResultTable = ({ results, blastnInfo }) => {
         </div>
       )}
       {showModal && (
-        <BlastnModal
-          blastn={blastnData}
-          onClose={() => setShowModal(false)}
-          info={modalInfo}
-          bacteria={bacteriaInfo}
-        />
+        <>
+          <BlastnModal
+            blastn={blastnData}
+            onClose={() => setShowModal(false)}
+            info={modalInfo}
+            bacteria={bacteriaInfo}
+            amr={sampleAMR}
+          />
+        </>
       )}
       {results.length > 0 && (
         <PaginationWrapper>
@@ -254,10 +540,13 @@ const ResultTable = ({ results, blastnInfo }) => {
               <option value="all">{t("resultPage.all")}</option>
             </Select>
           </div>
-          
+
           {rowsPerPage !== "all" && (
             <PageControls>
-              <PageButton onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
+              <PageButton
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
                 {t("resultPage.prev")}
               </PageButton>
               {[...Array(totalPages)].map((_, index) => (
@@ -269,7 +558,10 @@ const ResultTable = ({ results, blastnInfo }) => {
                   {index + 1}
                 </PageButton>
               ))}
-              <PageButton onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>
+              <PageButton
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
                 {t("resultPage.next")}
               </PageButton>
             </PageControls>

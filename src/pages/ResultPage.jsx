@@ -3,9 +3,14 @@ import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import ResultTable from "../components/ResultTable";
 import { useTranslation } from "react-i18next";
-import { apiRunBlastnTool, apiGetZipFile, apiGetBlastnInfo } from "../service/blastn";
+import {
+  apiRunBlastnTool,
+  apiGetZipFile,
+  apiGetBlastnInfo,
+} from "../service/blastn";
 import { useNotice } from "../context/NoticeContext";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { apiRunAmrTool } from "../service/amr";
 
 const Container = styled.div`
   margin: 40px auto;
@@ -128,19 +133,39 @@ const IconButton = styled(Button)`
 `;
 
 const UploadIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" width="20" height="20">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    stroke="white"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+  >
     <path d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
   </svg>
 );
 
 const SearchIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" width="20" height="20">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    stroke="white"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    viewBox="0 0 24 24"
+    width="20"
+    height="20"
+  >
     <circle cx="11" cy="11" r="7" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
 );
 
-const FIFTEEN_MINUTES = 15 * 60 * 1000; 
+const FIFTEEN_MINUTES = 15 * 60 * 1000;
 
 const ResultPage = () => {
   const { showNotice } = useNotice();
@@ -152,10 +177,12 @@ const ResultPage = () => {
   const [uploadedIdList, setUploadedIdList] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
   const [countdown, setCountdown] = useState(FIFTEEN_MINUTES);
-  const [blastnInfo, setBlastnInfo] = useState({})
-
+  const [blastnInfo, setBlastnInfo] = useState({});
+  const [amrInfo, setAmrInfo] = useState([]);
   useEffect(() => {
-    const storedUploadedIds = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
+    const storedUploadedIds = JSON.parse(
+      localStorage.getItem("uploadedIdList") || "[]"
+    );
     setUploadedIdList(storedUploadedIds);
 
     if (storedUploadedIds.length > 0) {
@@ -224,7 +251,7 @@ const ResultPage = () => {
         setResults(result.data.data);
       }
       const data = await apiGetBlastnInfo(search);
-      setBlastnInfo(data.data)
+      setBlastnInfo(data.data);
     } catch (error) {
       showNotice(0, t("resultPage.uploadError"));
     } finally {
@@ -233,14 +260,14 @@ const ResultPage = () => {
   };
 
   const generateRandomId = (length = 10) => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
     for (let i = 0; i < length; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
   };
-
   const addBlastIdToUploadedList = (id, time, fileName) => {
     let list = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
     const exists = list.find((item) => item.id === id);
@@ -250,28 +277,55 @@ const ResultPage = () => {
       setUploadedIdList(updatedList);
     }
   };
+  // const addAmrInfoToList = (id, data = null) => {
+  //   let list = JSON.parse(localStorage.getItem("amrInfoList") || "[]");
+  //   const exists = list.find((item) => item.id === id);
+  //   if (!exists) {
+  //     list.unshift({ id, data });
+  //   } else {
+  //     list = list.map((item) => (item.id === id ? { ...item, data } : item));
+  //   }
+  //   localStorage.setItem("amrInfoList", JSON.stringify(list));
+  // };
 
   const handleFileUpload = async () => {
     if (!file) return;
 
     const id = generateRandomId();
-
     addBlastIdToUploadedList(id, new Date().toISOString(), file.name);
-    try {
-      const result = await apiRunBlastnTool(file, id);
+    // addAmrInfoToList(id);
 
-      const response = await apiGetZipFile(result.data.id);
-      if (response.data.status === 0) {
+    try {
+      const [blastResult, amrResult] = await Promise.all([
+        apiRunBlastnTool(file, id),
+        // apiRunAmrTool(file),
+      ]);
+
+      // if (amrResult?.data) {
+      //   addAmrInfoToList(id, amrResult.data);
+      //   return;
+      // }
+
+      if (!blastResult?.data?.id) {
+        showNotice(0, t("resultPage.uploadError"));
+        return;
+      }
+
+      const zipResponse = await apiGetZipFile(blastResult.data.id);
+      const { status, data } = zipResponse.data;
+
+      if (status === 0) {
         showNotice(0, t("resultPage.error.existfile"));
       } else {
-        setResults(response.data.data);
+        setResults(data);
         showNotice(1, t("resultPage.success"));
         setIsLocked(true);
         window.location.reload();
       }
     } catch (error) {
+      console.error("Upload error:", error);
       showNotice(0, t("resultPage.uploadError"));
-    } 
+    }
   };
 
   const handleResetFile = () => {
@@ -282,7 +336,9 @@ const ResultPage = () => {
 
   const formatCountdown = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
+    const minutes = Math.floor(totalSeconds / 60)
+      .toString()
+      .padStart(2, "0");
     const seconds = (totalSeconds % 60).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
   };
@@ -378,7 +434,14 @@ const ResultPage = () => {
             aria-hidden="true"
             focusable="false"
           >
-            <circle cx="50" cy="50" r="48" stroke="#ef4444" strokeWidth="4" fill="none" />
+            <circle
+              cx="50"
+              cy="50"
+              r="48"
+              stroke="#ef4444"
+              strokeWidth="4"
+              fill="none"
+            />
 
             <text
               x="50"
@@ -404,35 +467,50 @@ const ResultPage = () => {
             {uploadedIdList.map((item, index) => (
               <li
                 key={index}
-                style={{ marginBottom: "6px", display: "flex", alignItems: "center", gap: "4px" }}
+                style={{
+                  marginBottom: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px",
+                }}
               >
                 <button
-                    onDoubleClick={() => {
-                      const filteredList = uploadedIdList.filter((_, i) => i !== index);
-                      localStorage.setItem("uploadedIdList", JSON.stringify(filteredList));
-                      setUploadedIdList(filteredList);
-                    }}
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      color: "#ef4444",
-                      fontWeight: "900",
-                      cursor: "pointer",
-                      fontSize: "1.8rem",
-                      userSelect: "none",
-                      paddingRight: "20px",    
-                      lineHeight: "1",     
-                    }}
-                  >
-                    x
-                  </button>
+                  onDoubleClick={() => {
+                    const filteredList = uploadedIdList.filter(
+                      (_, i) => i !== index
+                    );
+                    localStorage.setItem(
+                      "uploadedIdList",
+                      JSON.stringify(filteredList)
+                    );
+                    setUploadedIdList(filteredList);
+                  }}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: "#ef4444",
+                    fontWeight: "900",
+                    cursor: "pointer",
+                    fontSize: "1.8rem",
+                    userSelect: "none",
+                    paddingRight: "20px",
+                    lineHeight: "1",
+                  }}
+                >
+                  x
+                </button>
                 <a
                   href={`/blastn-result?search=${item.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "#2563eb", textDecoration: "underline", flex: 1 }}
+                  style={{
+                    color: "#2563eb",
+                    textDecoration: "underline",
+                    flex: 1,
+                  }}
                 >
-                  {item.id} - {new Date(item.time).toLocaleString()} - {item.fileName}
+                  {item.id} - {new Date(item.time).toLocaleString()} -{" "}
+                  {item.fileName}
                 </a>
               </li>
             ))}
@@ -440,8 +518,8 @@ const ResultPage = () => {
         </div>
       )}
 
-      <ResultTable results={results} blastnInfo={blastnInfo}/>
-      
+      <ResultTable results={results} blastnInfo={blastnInfo} id={search} />
+
       {isLoading && (
         <div style={{ marginTop: "200px" }}>
           <LoadingSpinner />
