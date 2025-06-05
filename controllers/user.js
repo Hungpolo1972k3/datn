@@ -67,49 +67,6 @@ const updateUserInfo = async (req, res) => {
     }
 };
 
-const getAllUsers = async(req, res) => {
-    try {
-        const users = await userService.getAllUsers();
-        return res.status(200).json({
-            message: "Lấy danh sách người dùng thành công",
-            data: users
-        });
-    } catch (error) {
-        return res.status(500).json({ message: "Lỗi: " + error.message });
-    }
-}
-
-const addUser = async(req, res) => {
-    try {
-        const {email, password, username, address, phone, birthday, gender, career, workplace, role} = req.body;
-        const isExistUser = await userService.checkUser(email);
-        if(isExistUser) {
-            return res.status(400).json({
-                message: "Đã tồn tại người dùng",
-                data: null
-            })
-        }
-        const newuser = await userService.addUser({email, password, username, address, phone, birthday, gender, career, workplace, role});
-        return res.status(200).json({
-            message: "Thêm người dùng thành công",
-            data: newuser
-        })
-    } catch (error) {
-        return res.status(500).json({ message: "Lỗi: " + error.message });
-    }
-}
-
-const deleteUser = async (req, res) => {
-    try {
-        const {id} = req.query;
-        await userService.deleteUser(id);
-        return res.status(200).json({
-            message: "Xóa người dùng thành công"
-        })
-    } catch (error) {
-        return res.status(500).json({ message: "Lỗi: " + error.message });
-    }
-}
 
 const refreshToken = async (req, res) => {
     try {
@@ -147,16 +104,4 @@ const refreshToken = async (req, res) => {
     }
   };
 
-const editPassword = async (req, res) => {
-    try {
-        let {user_id} = req.query;
-        let {newpassword} = req.body;
-        await userService.editPassword(user_id, newpassword);
-        return res.status(200).json({
-            message:"Đổi mật khẩu thành công"
-        });
-    } catch (error) {
-        return res.status(500).json({ message: "Server error", error: error.message });
-    }
-}
-module.exports = { loginUser, getUserById, updateUserInfo, getAllUsers, addUser, deleteUser, refreshToken, editPassword };
+module.exports = { loginUser, getUserById, updateUserInfo, refreshToken };

@@ -2,7 +2,7 @@ const experimentService = require('../services/experiment.js');
 
 const createExperiment = async (req, res) => {
     try {
-        const {name, code, engineer, createdTime} = req.body
+        const {name, code} = req.body
         const {user_id} = req.query
         if(!name || !code || !engineer){
             return res.status(400).json({message: "Thiếu thông tin"})
@@ -33,11 +33,11 @@ const getExperimentsByUserId = async(req,res) =>{
 const editExperiment = async(req, res) =>{
     try {
         const {id} = req.query;
-        const {name, code, engineer, createdTime} = req.body;
+        const {name, code} = req.body;
         if(!name || !code || !engineer){
             return res.status(400).json({message: "Thiếu thông tin"})
         }
-        const newExperiment = await experimentService.editExperiment(id,name, code, engineer, createdTime)
+        const newExperiment = await experimentService.editExperiment(id,name, code)
         return res.status(200).json({
             message: "Chỉnh sửa mẫu thí nghiệm thành công",
             data: newExperiment

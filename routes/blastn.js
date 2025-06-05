@@ -21,15 +21,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/runblastntool/:id', upload.single('fasta'), blastnController.runBlastmTool);
-
-router.get('/downloadfolder', blastnController.downloadFolder);
-
-router.get('/getfolderinfo', blastnController.getFolderInfo);
-router.get('/getfileinfo', blastnController.getFileInfo);
-router.get('/downloadfile', blastnController.downloadFile);
-router.get('/getzipfile', blastnController.getZipFile );
-
 router.post('/blastn', blastnController.runBlastn);
 
 router.get("/getblastnbycode", blastnController.getBlastnByCode);
+router.get('/downloadfile', blastnController.downloadFile);
 module.exports = router;

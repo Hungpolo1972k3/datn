@@ -12,14 +12,6 @@ const experimentSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
-    engineer: {
-        type: String,
-        default: ""
-    },
-    createdTime:{
-        type: String,
-        default: ""
-    },
     status: {
         type: Boolean,
         default: true

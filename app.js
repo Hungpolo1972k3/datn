@@ -7,6 +7,8 @@ const AmrRoutes = require('./routes/amr')
 const SampleRoutes = require('./routes/sample')
 const ExperimentRoutes = require('./routes/experiment')
 const BlastnToolRoutes = require('./routes/blastn')
+const AdminRoutes = require('./routes/admin')
+const DatasetRoutes = require('./routes/dataset')
 connectDb();
 
 const app = express();
@@ -19,6 +21,8 @@ app.use('/api/amr', AmrRoutes);
 app.use('/api/sample', SampleRoutes);
 app.use('/api/experiment', ExperimentRoutes);
 app.use('/api/blastn', BlastnToolRoutes);
+app.use('/api/admin', AdminRoutes);
+app.use('/api/dataset', DatasetRoutes);
 app.get('/', (req, res) => {
     res.send('API is running...');
 });

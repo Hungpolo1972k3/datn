@@ -1,11 +1,8 @@
 const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
-const archiver = require('archiver');
-const { exec } = require('child_process');
 const path = require('path');
 const cheerio = require('cheerio');
-const crypto = require("crypto");
 const Blastn = require('../models/blastn');
 
 const dataDir = path.join('/app', 'FastA');
@@ -186,29 +183,6 @@ const getSubFolderAmrs = async (dirPath) => {
   return result;
 };
 
-
-const getFullFolderPath = (relativePath) => {
-  const fullPath = path.join(dataDir, relativePath);
-  if (!fs.existsSync(fullPath)) {
-    throw new Error('Folder not found'+ fullPath + dataDir);
-  }
-
-  if (!fs.statSync(fullPath).isDirectory()) {
-    throw new Error('Path is not a folder');
-  }
-  return fullPath;
-};
-
-const zipFolderAndSend = (folderPath, res) => {
-  res.setHeader('Content-Disposition', `attachment; filename="${path.basename(folderPath)}.zip"`);
-  res.setHeader('Content-Type', 'application/zip');
-
-  const archive = archiver('zip', { zlib: { level: 9 } });
-  archive.directory(folderPath, false);
-  archive.pipe(res); 
-  archive.finalize(); 
-};
-
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const fetchFolderInfo = async (folder) => {
@@ -258,29 +232,6 @@ const fetchFolderInfo = async (folder) => {
   };
 };
 
-
-const getFolderInfoss = async () => {
-    try {
-        const folders = await fs.promises.readdir(dataDir, { withFileTypes: true });
-        const subFolders = folders.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
-        const CONCURRENT_LIMIT = 5;
-        const results = [];
-
-        for (let i = 0; i < subFolders.length; i += CONCURRENT_LIMIT) {
-            const batch = subFolders.slice(i, i + CONCURRENT_LIMIT);
-            const batchResults = await Promise.all(batch.map(fetchFolderInfo));
-            results.push(...batchResults);
-            console.log(`Đã xử lý ${results.length}/${subFolders.length}`);
-            await sleep(500); 
-        }
-
-        return results;
-    } catch (error) {
-        console.error('Lỗi khi đọc thư mục:', error);
-        return [];
-    }
-};
-
 const getFilesRecursively = (dirPath, baseUrlPath = '') => {
   const result = [];
   const items = fs.readdirSync(dirPath, { withFileTypes: true });
@@ -311,99 +262,6 @@ const getFilesRecursively = (dirPath, baseUrlPath = '') => {
   return result;
 };
 
-const getFolderInfoService = async(relativePath = "") => {
-  const targetPath = path.join(dataDir, relativePath);
-  if (!fs.existsSync(targetPath)) {
-    throw new Error("Folder not found");
-  }
-  return getFilesRecursively(targetPath, relativePath);
-};
-
-const getFileForDownload = async (relativePath) => {
-  try {
-    const filePath = path.join(dataDir, relativePath);
-    
-    if (!fs.existsSync(filePath)) {
-      throw new Error('File not found');
-    }
-    const fileContent = fs.readFileSync(filePath);
-    
-    const fileName = path.basename(filePath);
-    const mimeType = 'application/octet-stream'; 
-
-    return {
-      name: fileName,
-      mimeType: mimeType,
-      content: fileContent,
-    };
-  } catch (error) {
-    console.error('Error in getFileForDownload:', error);
-    throw new Error('Error reading file');
-  }
-};
-
-const csvToJson = (csvText, delimiter = "\t") => {
-  const lines = csvText.trim().split("\n");
-  const headers = lines[0].split(delimiter);
-
-  return lines.slice(1).map((line) => {
-    const values = line.split(delimiter);
-    const entry = {};
-    headers.forEach((header, index) => {
-      entry[header.trim()] = values[index]?.trim() || "";
-    });
-    return entry;
-  });
-}
-
-const parseTxtFileToJson = (fileContent) => {
-  const lines = fileContent.trim().split('\n');
-  const headers = lines[0].split('\t');
-
-  const jsonArray = lines.slice(1).map(line => {
-    const values = line.split('\t');
-    const row = {};
-    headers.forEach((header, index) => {
-      row[header.trim()] = values[index]?.trim() || '';
-    });
-    return row;
-  });
-
-  return jsonArray;
-}
-
-const getFileInfo = async (relativePath) => {
-  try {
-    const safePath = path.normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, '').replace(/^[/\\]/, '');
-    const fullPath = path.join(dataDir, safePath);
-
-    const content = await fs.promises.readFile(fullPath, 'utf8');
-    const ext = path.extname(fullPath).toLowerCase();
-
-    if (ext === '.tsv' || ext === '.csv') {
-      const delimiter = ext === '.csv' ? ',' : '\t';
-      const parsed = csvToJson(content, delimiter);
-      return { content, parsed };
-    } else if (ext === '.txt') {
-      const parsed = parseTxtFileToJson(content);
-      return { content, parsed };
-    } else {
-      return { content, parsed: null };
-    }
-  } catch (error) {
-    throw new Error(`Không thể đọc file: ${error.message}`);
-  }
-};
-
-const getZipFile = async(id) =>{
-  try {
-    const encodedUrl = encodeURIComponent(`/app/fastA/${id}.json.gz`);
-    const response = await axios.get(`${process.env.BIOTOOL_URL}/api/blastn/getzipfile?url=${encodedUrl}`);
-    return response.data;
-  } catch (error) {
-    throw new Error(`Lỗi: ${error.message}`);
-  }
-}
 const reverseComplement = (seq) => {
   const complement = {
     A: 'T',
@@ -547,14 +405,30 @@ const getBlastnByCode = async (code) => {
     throw new Error(`Lỗi: ${error.message}`);
   }
 }
+
+const getFileForDownload = async (filePath) => {
+  try {
+    if (!fs.existsSync(filePath)) {
+      throw new Error('File not found');
+    }
+    const fileContent = fs.readFileSync(filePath);
+    
+    const fileName = path.basename(filePath);
+    const mimeType = 'application/octet-stream'; 
+
+    return {
+      name: fileName,
+      mimeType: mimeType,
+      content: fileContent,
+    };
+  } catch (error) {
+    console.error('Error in getFileForDownload:', error);
+    throw new Error('Error reading file');
+  }
+};
 module.exports = {
   runBlastnTool,
-  getFullFolderPath,
-  zipFolderAndSend,
-  getFolderInfoService,
-  getFileForDownload,
-  getFileInfo,
-  getZipFile,
   runBlastn,
-  getBlastnByCode
+  getBlastnByCode,
+  getFileForDownload
 };

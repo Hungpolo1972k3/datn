@@ -4,14 +4,12 @@ const User = require('../models/user');
 const Virulence = require('../models/virulence');
 const Amr = require('../models/amr')
 
-const createExperiment = async ({user_id,name, code, engineer, createdTime}) => {
+const createExperiment = async ({user_id,name, code}) => {
     try {
         const newExperiment = new Experiment({
             name: name,
             user_id: user_id,
             code: code,
-            engineer: engineer,
-            createdTime: createdTime || ""
         });
         const savedExperiment = await newExperiment.save();
         return savedExperiment;
@@ -29,15 +27,13 @@ const getExperimentsByUserId = async(user_id) =>{
     }
 }
 
-const editExperiment = async (id, name, code, engineer, createdTime) => {
+const editExperiment = async (id, name, code) => {
     try {
         const newExperiment = await Experiment.findOneAndUpdate(
             {_id: id}, 
             {
                 name: name,
                 code: code,
-                engineer: engineer,
-                createdTime: createdTime || ""
             },
             { new: true } 
         );
