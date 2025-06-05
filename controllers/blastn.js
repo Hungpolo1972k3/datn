@@ -68,38 +68,26 @@ const downloadFile = async (req, res) => {
 };
 
 
-const getFileInfo = async (req, res) => {
+const getFileInfo = (req, res) => {
   const filePath = req.query.path;
 
   if (!filePath) {
     return res.status(400).json({ error: 'Missing file path' });
   }
-  const newFilePath = path.resolve(filePath);
-  try {
-    if (!fs.existsSync(newFilePath)) {
-      return res.status(404).json({ error: `File not found: ${newFilePath}` });
-    }
 
-    const fileStream = fs.createReadStream(newFilePath);
-    const file = {
-      stream: fileStream,
-      originalname: path.basename(newFilePath),
-      mimetype: 'text/plain',
-    };
-
-    const result = await virulenceService.runVirulenceTool(file);
-    const result2 = await amrService.runAmrTool(file);
-
-    return res.status(200).json({
-      virulence: result,
-      amr: result2,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      error: 'Internal server error while reading file',
-      message: err.message,
-    });
+  if (!fs.existsSync(filePath)) {
+    console.error('File not found:', filePath);
+    return res.status(404).json({ error: 'File not found or invalid path' });
   }
+
+  const fileName = path.basename(filePath);
+
+  res.download(filePath, fileName, (err) => {
+    if (err) {
+      console.error('Error sending file:', err);
+      res.status(500).json({ error: 'Internal server error while sending file' });
+    }
+  });
 };
 
 module.exports = {
