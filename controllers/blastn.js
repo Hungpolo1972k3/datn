@@ -55,7 +55,7 @@ const downloadFile = async (req, res) => {
   }
 
   try {
-    const file = await datasetService.getFileForDownload(filePath);
+    const file = await blastnService.getFileForDownload(filePath);
     res.setHeader('Content-Disposition', `attachment; filename="${file.name}"`);
     res.setHeader('Content-Type', file.mimeType || 'application/octet-stream');
     res.send(file.content);
