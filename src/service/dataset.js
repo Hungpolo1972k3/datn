@@ -1,3 +1,5 @@
+import axiosConfig from "../axiosConfig"
+
 export const apiDownloadFolder = async (relativePath) => {
     try {
       const response = await axiosConfig.get('/api/dataset/downloadfolder', {

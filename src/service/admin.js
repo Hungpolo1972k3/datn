@@ -1,3 +1,4 @@
+import axiosConfig from "../axiosConfig"
 export const apiEditPassword = async (id, newpassword) => {
   try {
     const response = await axiosConfig.put(
