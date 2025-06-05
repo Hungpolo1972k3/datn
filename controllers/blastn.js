@@ -74,23 +74,31 @@ const getFileInfo = async (req, res) => {
   if (!filePath) {
     return res.status(400).json({ error: 'Missing file path' });
   }
-
+  const newFilePath = path.resolve(filePath);
   try {
-    const fileBuffer = fs.readFileSync(filePath);
+    if (!fs.existsSync(newFilePath)) {
+      return res.status(404).json({ error: `File not found: ${newFilePath}` });
+    }
+
+    const fileStream = fs.createReadStream(newFilePath);
     const file = {
-      buffer: fileBuffer,
-      originalname: path.basename(filePath),
-      mimetype: 'text/plain', 
+      stream: fileStream,
+      originalname: path.basename(newFilePath),
+      mimetype: 'text/plain',
     };
+
     const result = await virulenceService.runVirulenceTool(file);
     const result2 = await amrService.runAmrTool(file);
 
-    return res.status(200).json({ 
+    return res.status(200).json({
       virulence: result,
-      amr: result2 
+      amr: result2,
     });
   } catch (err) {
-    return res.status(500).json({ error: 'Internal server error while reading file', message: err.message });
+    return res.status(500).json({
+      error: 'Internal server error while reading file',
+      message: err.message,
+    });
   }
 };
 
