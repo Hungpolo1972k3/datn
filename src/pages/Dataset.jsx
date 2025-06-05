@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Search, Download} from "lucide-react";
 import DatasetPopup from "../components/DatasetPopup";
-import { apiDownloadFolder, apiGetFolderInfo } from "../service/blastn";
+import { apiDownloadFolder, apiGetFolderInfo } from "../service/dataset";
 import datasetFolder from '../utils/datasetFolder.json';
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useNotice } from "../context/NoticeContext";

@@ -151,59 +151,27 @@ const ResultPage = () => {
   const [results, setResults] = useState([]);
   const [uploadedIdList, setUploadedIdList] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
-  const [countdown, setCountdown] = useState(FIFTEEN_MINUTES);
-  const [blastnInfo, setBlastnInfo] = useState({})
+  const [blastnInfo, setBlastnInfo] = useState({});
 
   useEffect(() => {
     const storedUploadedIds = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
     setUploadedIdList(storedUploadedIds);
 
-    if (storedUploadedIds.length > 0) {
-      const latestTime = storedUploadedIds.reduce((latest, item) => {
-        const itemTime = new Date(item.time).getTime();
-        return itemTime > latest ? itemTime : latest;
-      }, 0);
-
+    const lockUntilStr = localStorage.getItem("lockUntil");
+    if (lockUntilStr) {
+      const lockUntil = new Date(lockUntilStr);
       const now = Date.now();
-      if (now - latestTime < FIFTEEN_MINUTES) {
-        setIsLocked(true);
-      }
-    }
 
-    const lockStartTimeStr = localStorage.getItem("lockStartTime");
-    if (lockStartTimeStr) {
-      const lockStartTime = parseInt(lockStartTimeStr, 10);
-      const now = Date.now();
-      const elapsed = now - lockStartTime;
-      if (elapsed < FIFTEEN_MINUTES) {
+      if (now < lockUntil.getTime()) {
         setIsLocked(true);
-        setCountdown(FIFTEEN_MINUTES - elapsed);
+        const diffMs = lockUntil.getTime() - now;
+        const minutesLeft = Math.ceil(diffMs / (60 * 1000));
+        showNotice(0, t("resultPage.waitMessage", { minutes: minutesLeft }));
       } else {
-        localStorage.removeItem("lockStartTime");
-        setIsLocked(false);
-        setCountdown(FIFTEEN_MINUTES);
+        localStorage.removeItem("lockUntil");
       }
     }
   }, []);
-
-  useEffect(() => {
-    if (!isLocked) return;
-
-    const interval = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1000) {
-          localStorage.removeItem("lockStartTime");
-          setIsLocked(false);
-          clearInterval(interval);
-          window.location.reload();
-          return 0;
-        }
-        return prev - 1000;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isLocked]);
 
   useEffect(() => {
     if (isLocked) {
@@ -214,16 +182,17 @@ const ResultPage = () => {
   }, [isLocked]);
 
   const handleSearch = async () => {
-    if (!search) return;
+    const trimmedSearch = search.trim();
+  if (!trimmedSearch) return;
     setIsLoading(true);
     try {
-      const result = await apiGetZipFile(search);
+      const result = await apiGetZipFile(trimmedSearch);
       if (result.data.status === 0) {
         showNotice(0, t("resultPage.error.existfile"));
       } else {
         setResults(result.data.data);
       }
-      const data = await apiGetBlastnInfo(search);
+      const data = await apiGetBlastnInfo(trimmedSearch);
       setBlastnInfo(data.data)
     } catch (error) {
       showNotice(0, t("resultPage.uploadError"));
@@ -232,13 +201,8 @@ const ResultPage = () => {
     }
   };
 
-  const generateRandomId = (length = 10) => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
+  const generateTimeBasedId = () => {
+    return new Date().toISOString().replace(/[-:T.Z]/g, "") + Math.random().toString(36).substr(2, 5);
   };
 
   const addBlastIdToUploadedList = (id, time, fileName) => {
@@ -254,24 +218,26 @@ const ResultPage = () => {
   const handleFileUpload = async () => {
     if (!file) return;
 
-    const id = generateRandomId();
-
+    const id = generateTimeBasedId();
     addBlastIdToUploadedList(id, new Date().toISOString(), file.name);
     try {
+      const lockUntil = new Date(Date.now() + FIFTEEN_MINUTES);
+      localStorage.setItem("lockUntil", lockUntil.toISOString());
+      setIsLocked(true);
+      setResults([]);
+      setBlastnInfo({});
+      showNotice(0, t("resultPage.waitMessage", { minutes: 15 }));
       const result = await apiRunBlastnTool(file, id);
-
       const response = await apiGetZipFile(result.data.id);
       if (response.data.status === 0) {
         showNotice(0, t("resultPage.error.existfile"));
       } else {
         setResults(response.data.data);
         showNotice(1, t("resultPage.success"));
-        setIsLocked(true);
-        window.location.reload();
       }
     } catch (error) {
       showNotice(0, t("resultPage.uploadError"));
-    } 
+    }
   };
 
   const handleResetFile = () => {
@@ -280,12 +246,6 @@ const ResultPage = () => {
     setSearch("");
   };
 
-  const formatCountdown = (ms) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
-    const seconds = (totalSeconds % 60).toString().padStart(2, "0");
-    return `${minutes}:${seconds}`;
-  };
   const location = useLocation();
 
   useEffect(() => {
@@ -311,12 +271,12 @@ const ResultPage = () => {
           placeholder={t("resultPage.enterRid")}
           onChange={(e) => setSearch(e.target.value)}
           value={search}
-          disabled={file !== null || isLocked}
+          disabled={file !== null}
           aria-label={t("resultPage.enterRid")}
         />
         <IconButton
           onClick={handleSearch}
-          disabled={file !== null || !search || isLocked}
+          disabled={file !== null || !search}
           aria-label={t("resultPage.search")}
           title={t("resultPage.search")}
         >
@@ -359,43 +319,8 @@ const ResultPage = () => {
           </ResetButton>
         )}
       </FormGroup>
-      {isLocked && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: "20px 0",
-            fontWeight: "700",
-            color: "#ef4444",
-          }}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 100 100"
-            width="200"
-            height="200"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <circle cx="50" cy="50" r="48" stroke="#ef4444" strokeWidth="4" fill="none" />
 
-            <text
-              x="50"
-              y="58"
-              textAnchor="middle"
-              fontSize="28"
-              fill="#ef4444"
-              fontWeight="700"
-              fontFamily="Arial, sans-serif"
-            >
-              {formatCountdown(countdown)}
-            </text>
-          </svg>
-        </div>
-      )}
-
-      {uploadedIdList.length > 0 && !isLocked && (
+      {uploadedIdList.length > 0 && (
         <div style={{ marginTop: "20px" }}>
           <h3 style={{ color: "#1e3a8a", marginBottom: "8px" }}>
             {t("resultPage.previousIds")}
@@ -407,7 +332,7 @@ const ResultPage = () => {
                 style={{ marginBottom: "6px", display: "flex", alignItems: "center", gap: "4px" }}
               >
                 <button
-                    onDoubleClick={() => {
+                    onClick={() => {
                       const filteredList = uploadedIdList.filter((_, i) => i !== index);
                       localStorage.setItem("uploadedIdList", JSON.stringify(filteredList));
                       setUploadedIdList(filteredList);

@@ -92,21 +92,17 @@ const ExperimentEdit = ({ showModal, closeModal, experimentInfo }) => {
 
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
-  const [engineer, setEngineer] = useState('');
-  const [createdTime, setCreatedTime] = useState('');
 
   useEffect(() => {
     if (experimentInfo) {
       setCode(experimentInfo.code || '');
       setName(experimentInfo.name || '');
-      setEngineer(experimentInfo.engineer || '');
-      setCreatedTime(experimentInfo.createdTime || '');
     }
   }, [experimentInfo]);
 
   const handleSave = async () => {
     try {
-      await apiEditExperiment(experimentInfo._id, name, code, engineer, createdTime);
+      await apiEditExperiment(experimentInfo._id, name, code);
       showNotice(1, t('experimentEditComponent.success'));
       closeModal();
       window.location.reload();
@@ -133,18 +129,6 @@ const ExperimentEdit = ({ showModal, closeModal, experimentInfo }) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={t('experimentEditComponent.namePlaceholder')}
-          />
-          <Input
-            type="text"
-            value={engineer}
-            onChange={(e) => setEngineer(e.target.value)}
-            placeholder={t('experimentEditComponent.engineerPlaceholder')}
-          />
-          <Input
-            type="text"
-            value={createdTime}
-            onChange={(e) => setCreatedTime(e.target.value)}
-            placeholder={t('experimentEditComponent.timePlaceholder')}
           />
         </ModalBody>
         <ModalFooter>

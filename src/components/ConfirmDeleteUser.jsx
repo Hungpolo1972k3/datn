@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { apiDeleteUser } from "../service/user";
+import { apiDeleteUser } from "../service/admin";
 import { useNotice } from "../context/NoticeContext";
 
 const Overlay = styled.div`

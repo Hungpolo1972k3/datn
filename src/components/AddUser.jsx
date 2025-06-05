@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
-import { apiAddUser } from "../service/user";
+import { apiAddUser } from "../service/admin";
 import { useNotice } from "../context/NoticeContext";
 
 const Overlay = styled.div`

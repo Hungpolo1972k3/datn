@@ -10,7 +10,7 @@ import { useNotice } from "../context/NoticeContext";
 import { apiGetUserById } from "../service/user";
 import "../i18next";
 import { useTranslation } from "react-i18next";
-// Styles for components
+
 const Container = styled.div`
   position: sticky;
   top: 0;

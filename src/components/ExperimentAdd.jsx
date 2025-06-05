@@ -120,15 +120,12 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
   const { showNotice } = useNotice();
 
   const [experimentName, setExperimentName] = useState('');
-  const [experimenter, setExperimenter] = useState('');
   const [experimentCode, setExperimentCode] = useState('');
-  const [creationTime, setCreationTime] = useState('');
   const [errors, setErrors] = useState({});
 
   const validate = () => {
     const newErrors = {};
     if (!experimentName.trim()) newErrors.experimentName = t('experimentAddComponent.nameError');
-    if (!experimenter.trim()) newErrors.experimenter = t('experimentAddComponent.engineerError');
     if (!experimentCode.trim()) newErrors.experimentCode = t('experimentAddComponent.codeError');
     return newErrors;
   };
@@ -143,23 +140,18 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
       await createExperiment({
         user_id: userId,
         name: experimentName,
-        code: experimentCode,
-        engineer: experimenter,
-        createdTime: creationTime,
+        code: experimentCode
       });
       showNotice(1, t("experimentAddComponent.success"));
 
       setExperimentName('');
-      setExperimenter('');
       setExperimentCode('');
-      setCreationTime('');
       setErrors({});
       closeModal();
       setTimeout(() => {
         window.location.reload();
       }, 500);
     } catch (err) {
-      console.log(err);
       showNotice(0, t("experimentAddComponent.fail"));
     }
   };
@@ -181,19 +173,6 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
             />
             {errors.experimentName && <ErrorText>{errors.experimentName}</ErrorText>}
           </div>
-
-          <div>
-            <Label htmlFor="experimenter">{t('experimentAddComponent.engineerLabel')}</Label>
-            <Input
-              type="text"
-              id="experimenter"
-              value={experimenter}
-              onChange={(e) => setExperimenter(e.target.value)}
-              placeholder={t('experimentAddComponent.engineerPlaceholder')}
-            />
-            {errors.experimenter && <ErrorText>{errors.experimenter}</ErrorText>}
-          </div>
-
           <div>
             <Label htmlFor="experimentCode">{t('experimentAddComponent.codeLabel')}</Label>
             <Input
@@ -205,18 +184,6 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
             />
             {errors.experimentCode && <ErrorText>{errors.experimentCode}</ErrorText>}
           </div>
-
-          <div>
-            <Label htmlFor="creationTime">{t('experimentAddComponent.timeLabel')}</Label>
-            <Input
-              type="text"
-              id="creationTime"
-              value={creationTime}
-              onChange={(e) => setCreationTime(e.target.value)}
-              placeholder={t('experimentAddComponent.timePlaceholder')}
-            />
-          </div>
-
           <Button type="submit">{t('experimentAddComponent.submitBtn')}</Button>
         </Form>
       </ModalContainer>

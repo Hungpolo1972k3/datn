@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNotice } from "../context/NoticeContext";
 import { useTranslation } from "react-i18next";
-import { apiEditPassword } from "../service/user";
+import { apiEditPassword } from "../service/admin";
 import { X } from "lucide-react";
 
 const ModalBackground = styled.div`

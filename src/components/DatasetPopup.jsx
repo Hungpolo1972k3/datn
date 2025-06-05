@@ -1,8 +1,7 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
-import { Download, X } from "lucide-react";
-import { apiDownloadFile, apiGetFileInfo } from "../service/blastn";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { apiDownloadFile, apiGetFileInfo } from "../service/dataset";
+import { FiDownload, FiX, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import ShowFileContent from "./ShowFileContent";
 import LoadingSpinner from "./LoadingSpinner";
 import { useTranslation } from "react-i18next";
@@ -38,6 +37,7 @@ const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
+  font-size: 40px;
 `;
 
 const SectionRow = styled.div`
@@ -152,7 +152,7 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
       <PopupOverlay>
         <PopupHeader>
           <CloseButton onClick={onClose}>
-            <X />
+            <FiX />
           </CloseButton>
         </PopupHeader>
         <div
@@ -231,7 +231,7 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
                   onClick={() => toggleSection(section)}
                 >
                   {section}
-                  <span>{isOpen ? <ChevronDown size={20} /> : <ChevronRight size={20} />}</span>
+                  <span>{isOpen ? <FiChevronDown size={20} /> : <FiChevronRight size={20} />}</span>
                 </h2>
 
                 {isOpen &&
@@ -248,7 +248,7 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
                         >
                           {viewedFilePath === file.path ? "🧐" : "🔍"}
                         </span>
-                        <Download onClick={() => handleDownload(file.path)} />
+                        <FiDownload onClick={() => handleDownload(file.path)} />
                       </ActionButtons>
                     </SectionRow>
                   ))}

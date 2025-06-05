@@ -411,7 +411,9 @@
     "upload": "Upload File",
     "uploadError": "This result does not exist",
     "error": {
-      "existfile": "File does not exist on the server"
+      "existfile": "File does not exist on the server",
+      "detail": "Error viewing result details",
+      "download": "Error downloading file"
     },
     "rowsPerPage": "Rows per page",
     "prev": "Previous",
@@ -438,7 +440,8 @@
     "filename":"FASTA File",
     "createdAt": "Created Time",
     "download": "Download",
-    "viewDetails": "Detail"
+    "viewDetails": "Detail",
+    "waitMessage": "Please wait {{minutes}} more minutes to continue."
   },
   "blastn": {
     "index": "Index",
@@ -462,7 +465,58 @@
     "avgEValue": "Average E-value",
     "avgCoverage": "Average Coverage",
     "detail": "Detail",
-    "noData": "No BLASTN data available"
+    "noData": "No BLASTN data available",
+    "info": "BLASTN Comparison",
+    "virulenceFactor": "Virulence Factors",
+    "amrFactor": "AMR Resistance"
+  },
+  "finalExport": {
+    "showPoint": "Show Points",
+    "hidePoint": "Hide Points",
+    "exportSVG": "Download",
+    "reset": "Reset",
+    "unknownGene": "Unknown Gene",
+    "gene": "Gene",
+    "dataLabel": "Data Set {{index}}"
+  },
+  "amrCompare": {
+    "title": "AMR Gene Comparison",
+    "gene": "Gene",
+    "inFileUpload": "File upload",
+    "inReference": "Dataset reference",
+    "detailsForGene": "Details for gene",
+    "inReferenceDataset": "Reference dataset",
+    "noData": "No data",
+    "position": "Position",
+    "nucleic": "Nucleic",
+    "protein": "Protein",
+    "amrTitle": "AMR Data",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "itemsPerPage": "Items"
+  },
+  "virulenceCompare": {
+    "virulenceTitle": "Virulence Gene Comparison",
+    "detailFor": "Details for",
+    "uploadedData": "Uploaded Data",
+    "referenceData": "Reference Data",
+    "noData": "No data",
+    "position": "Position",
+    "strand": "Strand",
+    "nucleic": "Nucleic Acid",
+    "protein": "Protein",
+    "noGene": "No virulence genes found in either dataset.",
+    "gene": "Gene",
+    "uploaded": "Uploaded",
+    "reference": "Reference",
+    "no": "No",
+    "clickToDetail": "Click to view details",
+    "title": "Virulence Gene Comparison",
+    "itemsPerPage": "Items",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page"
   }              
 }
   

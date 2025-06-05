@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useNotice } from "../context/NoticeContext";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import datasetFolder from "../utils/datasetFolder.json";
-import { apiRunBlastnTwoFiles, apiGetFileInfo } from "../service/blastn";
+import { apiRunBlastnTwoFiles, apiDownloadFile, apiGetFileInfo2 } from "../service/blastn";
 import LoadingSpinner from "./LoadingSpinner";
 import BlastnModal from "./Blastn";
+import { FiDownload } from "react-icons/fi";
+import { apiRunVirulenceTool } from "../service/virulence";
+import { apiRunAmrTool } from "../service/amr";
 
 const Table = styled.table`
   width: 100%;
@@ -87,7 +91,28 @@ const Select = styled.select`
   background-color: white;
   color: #1e293b;
 `;
+const TabWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+`;
 
+const TabButton = styled.button`
+  padding: 10px 20px;
+  background-color: ${(props) => (props.active ? "#2563eb" : "#e2e8f0")};
+  color: ${(props) => (props.active ? "white" : "#1e293b")};
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: ${(props) => (props.active ? "#1e40af" : "#cbd5e1")};
+  }
+`;
 const formatDateVN = (isoDate) => {
   const date = new Date(isoDate);
   return date.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
@@ -95,6 +120,7 @@ const formatDateVN = (isoDate) => {
 
 const ResultTable = ({ results, blastnInfo }) => {
   const { t } = useTranslation();
+  const { showNotice } = useNotice();
   const findInfoByName = (name) => datasetFolder.find(item => item.name === name);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -127,20 +153,49 @@ const ResultTable = ({ results, blastnInfo }) => {
   };
 
   const [modalInfo, setModalInfo] = useState(null);
+  const [virulence, setVirulence] = useState([]);
+  const [amr, setAmr]= useState([]);
+  const [virulence2, setVirulence2] = useState([]);
+  const [amr2, setAmr2]= useState([]);
 
   const handleViewDetails = async (url, name, info, bacteria) => {
     let url2 = `/app/FastA/${name}/Spades_output/contigs.fasta`;
     setIsLoading(true);
     try {
-      const result = await apiRunBlastnTwoFiles(url, url2);
-      setIsLoading(false);
+      const [blob, blob2] = await Promise.all([
+        apiGetFileInfo2(url),
+        apiGetFileInfo2(url2),
+      ]);
+      const file = new File([blob], 'contigs.fasta', { type: 'text/plain' });
+      const file2 = new File([blob2], 'contigs2.fasta', { type: 'text/plain' });
+      const [result, virulence, amr, virulence2, amr2] = await Promise.all([
+        apiRunBlastnTwoFiles(url, url2),
+        apiRunVirulenceTool(file),
+        apiRunAmrTool(file),
+        apiRunVirulenceTool(file2),
+        apiRunAmrTool(file2),
+      ]);
+      setVirulence(virulence.data);
+      setAmr(amr.data);
+      setVirulence2(virulence2.data);
+      setAmr2(amr2.data);
       setBlastnData(result.data);
-      setModalInfo(info);  
+      setModalInfo(info);
       setShowModal(true);
       setBacteriaInfo(bacteria);
     } catch (error) {
+      showNotice(0, t("resultPage.error.detail"));
+    } finally {
       setIsLoading(false);
-      console.log(error);
+    }
+  };
+
+
+  const handleDownload = () => {
+    if (blastnInfo?.url) {
+      apiDownloadFile(blastnInfo.url);
+    } else {
+      showNotice(0,t("resultPage.error.download"))
     }
   };
 
@@ -151,7 +206,7 @@ const ResultTable = ({ results, blastnInfo }) => {
           style={{
             marginBottom: "12px",
             color: "#1e293b",
-            fontSize: "0.95rem",
+            fontSize: "1.2rem",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -159,7 +214,15 @@ const ResultTable = ({ results, blastnInfo }) => {
           }}
         >
           <div>
-            <div><strong>{t("resultPage.filename")}:</strong> {blastnInfo.filename}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "20px" }}>
+              <strong>{t("resultPage.filename")}:</strong> {blastnInfo.filename}
+              <FiDownload
+                size={24}
+                style={{ cursor: "pointer", color: "#2563eb" }}
+                title={t("resultPage.downloadFile")}
+                onClick={handleDownload}
+              />
+            </div>
             <div><strong>{t("resultPage.createdAt")}:</strong> {formatDateVN(blastnInfo.createdAt)}</div>
           </div>
         </div>
@@ -241,6 +304,10 @@ const ResultTable = ({ results, blastnInfo }) => {
           onClose={() => setShowModal(false)}
           info={modalInfo}
           bacteria={bacteriaInfo}
+          virulence={virulence}
+          virulenceDataset={virulence2}
+          amr={amr}
+          amrDataset={amr2}
         />
       )}
       {results.length > 0 && (

@@ -29,7 +29,7 @@ export const apiRunVirulenceTool = async (file) => {
     try {
         const formData = new FormData();
         formData.append('fasta', file);
-
+        
         const response = await axiosConfig.post(`/api/virulence/runvirulencetool`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',

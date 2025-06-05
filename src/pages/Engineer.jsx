@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { apiAllUsers } from "../service/user";
+import { apiAllUsers } from "../service/admin";
 import { useTranslation } from "react-i18next"; 
 import AddUserPopup from "../components/AddUser";
 import ConfirmDeleteUser from "../components/ConfirmDeleteUser";

@@ -108,7 +108,7 @@
         "sampleNamePlaceholder": "Tên mẫu thí nghiệm",
         "chooseFile": "Chọn tệp FASTA",
         "submitBtn": "Gửi",
-        "resetBtn": "Làm lại",
+        "resetBtn": "Cài lại",
         "error": {
         "selectExperiment": "Vui lòng chọn thí nghiệm.",
         "sampleName": "Vui lòng nhập tên mẫu thí nghiệm.",
@@ -367,7 +367,7 @@
     "title": "Công cụ",
     "chooseFile": "Chọn tệp FASTA",
     "submitBtn": "Xác nhận",
-    "resetBtn": "Làm lại",
+    "resetBtn": "Cài lại",
     "successConfirm": "Phân tích thành công",
     "failConfirm": "Phân tích thất bại",
     "uploadFile": "Vui lòng nhập vào file",
@@ -406,29 +406,31 @@
       } 
     },
     "resultPage": {
-       "title": "Kết quả BLASTn",
+      "title": "Kết quả BLASTN",
       "enterRid": "Nhập mã giải trình tự",
       "search": "Tìm kiếm",
       "upload": "Tải lên",
       "uploadError": "Không tồn tại kết quả này",
       "error": {
-        "existfile": "File đã tồn tại trên server."
+        "existfile": "File đã tồn tại trên server.",
+        "detail": "Lỗi xem chi tiết kết quả",
+        "download": "Lỗi khi tải xuống"
       },
       "rowsPerPage": "Số hàng mỗi trang",
       "prev": "Trước",
       "next": "Sau",
       "all": "Tất cả",
       "reset":"Cài lại",
-      "uploadFile": "Chọn 1 file fasta",
+      "uploadFile": "Tải lên 1 file fasta",
       "tableHeaders": {
         "name": "Mã giải trình tự",
         "bacteria": "Tên loài vi khuẩn",
-        "avgIdentity": "Độ đồng nhất TB",
+        "avgIdentity": "Độ đồng nhất",
         "bitScore": "Bit Score",
         "alignmentLength": "Chiều dài đối sánh",
         "mismatches": "Số lỗi",
         "gapOpens": "Số khoảng trống",
-        "coverage": "Phủ",
+        "coverage": "Độ phủ (%)",
         "index": "STT",
         "detail": "Chi tiết"
       },
@@ -439,7 +441,8 @@
       "filename":"Tên file phân tích",
       "createdAt": "Thời gian tạo",
       "download": "Tải xuống",
-      "viewDetails": "Xem chi tiết"
+      "viewDetails": "Xem chi tiết",
+      "waitMessage": "Vui lòng chờ {{minutes}} phút để tiếp tục."
     },
     "blastn": {
       "index": "STT",
@@ -463,7 +466,58 @@
       "avgEValue": "Trung bình giá trị E",
       "avgCoverage": "Trung bình độ phủ",
       "detail": "Chi tiết",
-      "noData": "Không có dữ liệu BLASTN"
+      "noData": "Không có dữ liệu BLASTN",
+      "info": "Thông tin so khớp",
+      "virulenceFactor": "Yếu tố độc lực",
+      "amrFactor": "Yếu tố kháng sinh"
+    },
+    "finalExport": {
+      "showPoint": "Hiển thị điểm",
+      "hidePoint": "Ẩn điểm",
+      "exportSVG": "Tải xuống",
+      "reset": "Cài lại",
+      "unknownGene": "Gen không xác định",
+      "gene": "Gen",
+      "dataLabel": "Bộ dữ liệu {{index}}"
+    },
+    "amrCompare": {
+      "title": "So sánh gen AMR",
+      "gene": "Gen",
+      "inFileUpload": "Dữ liệu tải lên",
+      "inReference": "Dữ liệu tham chiếu",
+      "detailsForGene": "Chi tiết gen",
+      "inReferenceDataset": "Dữ liệu tham chiếu",
+      "noData": "Không có dữ liệu",
+      "position": "Vị trí",
+      "nucleic": "Nucleic",
+      "protein": "Protein",
+      "amrTitle": "Dữ liệu Gene kháng kháng sinh",
+      "prev": "Trước",
+      "next": "Tiếp",
+      "page": "Trang",
+      "itemsPerPage": "Số trang"
+    },
+    "virulenceCompare": {
+      "virulenceTitle": "Dữ liệu Gene độc lực",
+      "detailFor": "Chi tiết cho",
+      "uploadedData": "Dữ liệu tải lên",
+      "referenceData": "Dữ liệu tham chiếu",
+      "noData": "Không có dữ liệu",
+      "position": "Vị trí",
+      "strand": "Mạch",
+      "nucleic": "Acid nucleic",
+      "protein": "Protein",
+      "noGene": "Không tìm thấy gen độc lực trong cả hai bộ dữ liệu.",
+      "gene": "Gen",
+      "uploaded": "Dữ liệu tải lên",
+      "reference": "Dữ liệu tham chiếu",
+      "no": "Không",
+      "clickToDetail": "Nhấn để xem chi tiết",
+      "title": "So sánh gen độc lực",
+      "itemsPerPage": "Số trang",
+      "prev": "Trước",
+      "next": "Tiếp",
+      "page": "Trang"
     }               
 }
   

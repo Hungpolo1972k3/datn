@@ -1,6 +1,8 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
+import AmrCompare from "./AmrCompare";
+import VirulenceCompare from "./VirulenceCommpare";
 
 const Overlay = styled.div`
   position: fixed;
@@ -37,6 +39,28 @@ const CloseButton = styled.button`
 
   &:hover {
     color: #1e293b;
+  }
+`;
+
+const TabBar = styled.div`
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+`;
+
+const TabButton = styled.button`
+  padding: 10px 20px;
+  background-color: ${(props) => (props.active ? "#2563eb" : "#e2e8f0")};
+  color: ${(props) => (props.active ? "white" : "#1e293b")};
+  border: none;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: ${(props) => (props.active ? "#1e40af" : "#cbd5e1")};
   }
 `;
 
@@ -89,6 +113,7 @@ const IconButton = styled.button`
     color: #1e40af;
   }
 `;
+
 const DetailBox = styled.div`
   background-color: #eef6ff;
   padding: 16px;
@@ -106,6 +131,7 @@ const NucleicContent = styled.div`
   border-left: 4px solid #007bff;
   transition: all 0.3s ease;
 `;
+
 const InfoBox = styled(DetailBox)`
   margin-bottom: 24px;
 `;
@@ -144,6 +170,7 @@ const InfoTr = styled.tr`
     border-radius: 0 0 6px 6px;
   }
 `;
+
 const InfoHeader = styled.div`
   margin-bottom: 16px;
   display: flex;
@@ -162,20 +189,32 @@ const BacteriaName = styled.div`
   color: #475569;
   font-style: italic;
 `;
-const BlastnModal = ({ blastn, onClose, info, bacteria }) => {
+const TabWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+`;
+
+
+const BlastnModal = ({ blastn, onClose, info, bacteria, virulence, virulenceDataset, amr, amrDataset }) => {
   const { t } = useTranslation();
   const modalRef = useRef();
-  if (!Array.isArray(blastn)) return null;
   const [selectedRow, setSelectedRow] = useState(null);
+  const [activeTab, setActiveTab] = useState("info");
+
+  if (!Array.isArray(blastn)) return null;
+
   const keyToLabel = {
-  avgIdentity: t("blastn.avgIdentity"),
-  avgBitScore: t("blastn.avgBitScore"),
-  avgAlignmentLength: t("blastn.avgAlignmentLength"),
-  avgMismatch: t("blastn.avgMismatch"),
-  avgGapOpens: t("blastn.avgGapOpens"),
-  avgEValue: t("blastn.avgEValue"),
-  avgCoverage: t("blastn.avgCoverage"),
-};
+    avgIdentity: t("blastn.avgIdentity"),
+    avgBitScore: t("blastn.avgBitScore"),
+    avgAlignmentLength: t("blastn.avgAlignmentLength"),
+    avgMismatch: t("blastn.avgMismatch"),
+    avgGapOpens: t("blastn.avgGapOpens"),
+    avgEValue: t("blastn.avgEValue"),
+    avgCoverage: t("blastn.avgCoverage"),
+  };
+
   const headers = [
     t("blastn.index"),
     t("blastn.query"),
@@ -191,6 +230,7 @@ const BlastnModal = ({ blastn, onClose, info, bacteria }) => {
     t("blastn.sStart"),
     t("blastn.sEnd"),
   ];
+
   const keys = [
     "index",
     "query",
@@ -217,15 +257,30 @@ const BlastnModal = ({ blastn, onClose, info, bacteria }) => {
       }, 100);
     }
   };
+
   return (
     <Overlay>
       <Modal ref={modalRef}>
         <CloseButton onClick={onClose} aria-label="Close">×</CloseButton>
-        {info && (
+
+        <TabWrapper>
+          <TabButton active={activeTab === "info"} onClick={() => setActiveTab("info")}>
+            🔬 {t("blastn.info")}
+          </TabButton>
+          <TabButton active={activeTab === "virulence"} onClick={() => setActiveTab("virulence")}>
+            🧫 {t("blastn.virulenceFactor")}
+          </TabButton>
+          <TabButton active={activeTab === "amr"} onClick={() => setActiveTab("amr")}>
+            💊 {t("blastn.amrFactor")}
+          </TabButton>
+        </TabWrapper>
+
+
+        {activeTab === "info" && info && (
           <InfoBox>
             <InfoHeader>
-                <GeneName>{info.name}</GeneName>
-                <BacteriaName>{bacteria}</BacteriaName>
+              <GeneName>{info.name}</GeneName>
+              <BacteriaName>{bacteria}</BacteriaName>
             </InfoHeader>
             <InfoTable>
               <tbody>
@@ -237,72 +292,73 @@ const BlastnModal = ({ blastn, onClose, info, bacteria }) => {
                 ))}
               </tbody>
             </InfoTable>
+            {selectedRow && (
+              <DetailBox>
+                <NucleicContent>
+                  {headers.map((header, i) => {
+                    const key = keys[i];
+                    let value = key === "index" ? selectedRow.index + 1 : selectedRow.data[key] ?? "N/A";
+                    return (
+                      <div key={i}>
+                        <strong>{header}:</strong> {value}
+                      </div>
+                    );
+                  })}
+                </NucleicContent>
+              </DetailBox>
+            )}
+            <Table>
+              <thead>
+                <tr>
+                  <Th>{t("blastn.index")}</Th>
+                  <Th>{t("blastn.query")}</Th>
+                  <Th>{t("blastn.subject")}</Th>
+                  <Th>{t("blastn.identity")}</Th>
+                  <Th>{t("blastn.bitScore")}</Th>
+                  <Th>{t("blastn.evalue")}</Th>
+                  <Th>{t("blastn.alignmentLength")}</Th>
+                  <Th>{t("blastn.mismatches")}</Th>
+                  <Th>{t("blastn.gapOpens")}</Th>
+                  <Th>{t("blastn.detail")}</Th>
+                </tr>
+              </thead>
+              <tbody>
+                {blastn.length === 0 ? (
+                  <Tr>
+                    <Td colSpan={12} style={{ textAlign: "center" }}>{t("blastn.noData")}</Td>
+                  </Tr>
+                ) : (
+                  blastn.map((item, idx) => (
+                    <Tr key={idx}>
+                      <Td>{idx + 1}</Td>
+                      <Td>{item.query}</Td>
+                      <Td>{item.subject}</Td>
+                      <Td>{item.identity}</Td>
+                      <Td>{item.bitScore}</Td>
+                      <Td>{item.evalue}</Td>
+                      <Td>{item.alignmentLength}</Td>
+                      <Td>{item.mismatches}</Td>
+                      <Td>{item.gapOpens}</Td>
+                      <Td>
+                        <IconButton onClick={() => toggleRow(item, idx)}>
+                          {selectedRow?.index === idx ? "🙈" : "👁️"}
+                        </IconButton>
+                      </Td>
+                    </Tr>
+                  ))
+                )}
+              </tbody>
+            </Table>
           </InfoBox>
         )}
-        {selectedRow && (
-          <DetailBox>
-            <NucleicContent>
-              {headers.map((header, i) => {
-                const key = keys[i];
-                let value;
 
-                if (key === "index") {
-                  value = selectedRow.index + 1;
-                } else {
-                  value = selectedRow.data[key] ?? "N/A";
-                }
-
-                return (
-                  <div key={i}>
-                    <strong>{header}:</strong> {value}
-                  </div>
-                );
-              })}
-            </NucleicContent>
-          </DetailBox>
+        {activeTab === "virulence" && (
+          <VirulenceCompare virulence={virulence} virulenceDataset={virulenceDataset} />
         )}
-        <Table>
-          <thead>
-            <tr>
-              <Th>{t("blastn.index")}</Th>
-              <Th>{t("blastn.query")}</Th>
-              <Th>{t("blastn.subject")}</Th>
-              <Th>{t("blastn.identity")}</Th>
-              <Th>{t("blastn.bitScore")}</Th>
-              <Th>{t("blastn.evalue")}</Th>
-              <Th>{t("blastn.alignmentLength")}</Th>
-              <Th>{t("blastn.mismatches")}</Th>
-              <Th>{t("blastn.gapOpens")}</Th>
-              <Th>{t("blastn.detail")}</Th>
-            </tr>
-          </thead>
-          <tbody>
-            {blastn.length === 0 ? (
-              <Tr>
-                <Td colSpan={12} style={{ textAlign: "center" }}>{t("blastn.noData")}</Td>
-              </Tr>
-            ) : (
-              blastn.map((item, idx) => (
-                <Tr key={idx}>
-                  <Td>{idx + 1}</Td>
-                  <Td>{item.query}</Td>
-                  <Td>{item.subject}</Td>
-                  <Td>{item.identity}</Td>
-                  <Td>{item.bitScore}</Td>
-                  <Td>{item.evalue}</Td>
-                  <Td>{item.alignmentLength}</Td>
-                  <Td>{item.mismatches}</Td>
-                  <Td>{item.gapOpens}</Td>
-                  <Td>
-                    <IconButton onClick={() => toggleRow(item, idx)}>
-                      {selectedRow?.index === idx ? "🙈" : "👁️"}
-                    </IconButton>
-                  </Td>
-                </Tr>
-              ))
-            )}
-          </tbody>
-        </Table>
+
+        {activeTab === "amr" && (
+          <AmrCompare amr={amr} amrDataset={amrDataset} />
+        )}
       </Modal>
     </Overlay>
   );

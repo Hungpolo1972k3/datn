@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
-import { FiChevronDown, FiChevronRight } from "react-icons/fi";
+import { FiChevronDown, FiChevronRight, FiRefreshCw } from "react-icons/fi";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
+
 const Button = styled.button`
   position: absolute;
   top: 10px;
@@ -20,20 +22,16 @@ const Button = styled.button`
 `;
 const ButtonReset = styled.button`
   position: absolute;
-  right: -80px;
-  top: -3px;
-  padding: 8px 10px;
-  background-color: #0066cc;
-  color: white;
-  border: none;
-  border-radius: 5px;
+  right: -50px;
+  top: -5px;
+  padding: 8px;
+  background-color: transparent;  
+  border: none;                
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color:rgb(17, 21, 235);
-  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 const Wrapper = styled.div`
   padding: 1rem;
@@ -143,6 +141,7 @@ const FinalExport = ({ file_dist }) => {
 };
 
 const DatasetSVG = ({ datasets, genes, antibiotics }) => {
+  const { t } = useTranslation();
   const [range, setRange] = useState({ start: 0, end: 0 });
   const [opacity, setOpacity] = useState(0);
   const containerRef = useRef(null);
@@ -293,10 +292,10 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
       style={{ width: "100%", position: "relative", marginBottom: "90px" }}
     >
       <Button onClick={handleButtonClick}>
-        {opacity === 0 ? "Show Point" : "Hide Point"}
+        {opacity === 0 ? t("finalExport.showPoint") : t("finalExport.hidePoint")}
       </Button>
       <Button style={{ right: 150 }} onClick={handleExportSVG}>
-        Export SVG
+        {t("finalExport.exportSVG")}
       </Button>
 
       <svg
@@ -448,12 +447,8 @@ const DatasetSVG = ({ datasets, genes, antibiotics }) => {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        <ButtonReset
-          onClick={(e) => {
-            setRange({ start: 0, end: dataLength });
-          }}
-        >
-          Reset
+        <ButtonReset onClick={() => setRange({ start: 0, end: dataLength })} title={t("finalExport.reset")}>
+          <FiRefreshCw size={20} color="#0066cc" />
         </ButtonReset>
         {selecting && (
           <div
