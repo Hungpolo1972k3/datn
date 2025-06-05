@@ -426,9 +426,19 @@ const getFileForDownload = async (filePath) => {
     throw new Error('Error reading file');
   }
 };
+
+const getFileInfo = async (filePath) => {
+  try {
+    const content = await fs.readFile(filePath, "utf-8");
+    return content;
+  } catch (error) {
+    throw new Error('Error reading file');
+  }
+}
 module.exports = {
   runBlastnTool,
   runBlastn,
   getBlastnByCode,
-  getFileForDownload
+  getFileForDownload,
+  getFileInfo
 };

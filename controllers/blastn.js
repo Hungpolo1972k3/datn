@@ -64,9 +64,21 @@ const downloadFile = async (req, res) => {
   }
 };
 
+const getFileInfo = async (req, res) => {
+  try {
+    const filePath = req.query.path;
+    let data = await blastnService.getFileInfo(filePath);
+    return res.status(200).json({
+      data: data
+    }) 
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
 module.exports = {
     runBlastmTool,
     runBlastn,
     getBlastnByCode,
-    downloadFile
+    downloadFile,
+    getFileInfo
 };

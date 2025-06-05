@@ -25,4 +25,5 @@ router.post('/blastn', blastnController.runBlastn);
 
 router.get("/getblastnbycode", blastnController.getBlastnByCode);
 router.get('/downloadfile', blastnController.downloadFile);
+router.get('/getfileinfo', blastnController.getFileInfo);
 module.exports = router;
