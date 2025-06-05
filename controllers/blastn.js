@@ -1,5 +1,8 @@
 const path = require('path');
 const blastnService = require('../services/blastn');
+const virulenceService = require('../services/virulence');
+const amrService = require('../services/amr');
+const Virulence = require('../models/virulence');
 
 const runBlastmTool = async (req, res) => {
     try {
@@ -64,16 +67,32 @@ const downloadFile = async (req, res) => {
   }
 };
 
-const getFileInfo = (req, res) => {
+
+const getFileInfo = async (req, res) => {
   const filePath = req.query.path;
 
-  blastnService.getFileInfo(filePath, (err, data) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Internal server error' });
-    }
-    return res.status(200).json({ data });
-  });
+  if (!filePath) {
+    return res.status(400).json({ error: 'Missing file path' });
+  }
+
+  try {
+    const fileBuffer = fs.readFileSync(filePath);
+    const file = {
+      buffer: fileBuffer,
+      originalname: path.basename(filePath),
+      mimetype: 'text/plain', 
+    };
+    const result = await virulenceService.runVirulenceTool(file);
+    const result2 = await amrService.runAmrTool(file);
+
+    return res.status(200).json({ 
+      virulence: result,
+      amr: result2 
+    });
+  } catch (err) {
+    console.error('Lỗi xử lý file:', err);
+    return res.status(500).json({ error: 'Internal server error while reading file' });
+  }
 };
 
 module.exports = {

@@ -427,17 +427,9 @@ const getFileForDownload = async (filePath) => {
   }
 };
 
-const getFileInfo = (filePath, callback) => {
-  fs.readFile(filePath, 'utf-8', (err, data) => {
-    if (err) return callback(err);
-    callback(null, data);
-  });
-};
-
 module.exports = {
   runBlastnTool,
   runBlastn,
   getBlastnByCode,
   getFileForDownload,
-  getFileInfo
 };
