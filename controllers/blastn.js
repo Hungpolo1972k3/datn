@@ -90,8 +90,7 @@ const getFileInfo = async (req, res) => {
       amr: result2 
     });
   } catch (err) {
-    console.error('Lỗi xử lý file:', err);
-    return res.status(500).json({ error: 'Internal server error while reading file' });
+    return res.status(500).json({ error: 'Internal server error while reading file', message: err });
   }
 };
 
