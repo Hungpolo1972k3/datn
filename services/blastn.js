@@ -34,7 +34,7 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
       createdAt: new Date().toISOString()
     };
     const resultJson = JSON.stringify(resultObject, null, 2);
-    const fastaDir = path.join('/app', 'fastA');
+    const fastaDir = path.join('/app', 'Blastn');
     const outputGzPath = path.join(fastaDir, `${id}_result.json.gz`);
 
     await new Promise((resolve, reject) => {
