@@ -28,10 +28,7 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     let amr = await amrService.runAmrTool(form);
     const resultObject = {
       virulence,
-      amr,
-      blastnId: id,
-      filename,
-      createdAt: new Date().toISOString()
+      amr
     };
     const resultJson = JSON.stringify(resultObject, null, 2);
     const fastaDir = path.join('/app', 'Blastn');
