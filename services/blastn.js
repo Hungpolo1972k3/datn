@@ -15,15 +15,15 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
   const form = new FormData();
   form.append('fasta', fs.createReadStream(inputFilePath)); 
   try {
-    const response = await axios.post(
-      `${process.env.BIOTOOL_URL}/api/blastn/blastn/${id}`,
-      form,
-      {
-        headers: {
-          ...form.getHeaders(),
-        },
-      }
-    );
+    // const response = await axios.post(
+    //   `${process.env.BIOTOOL_URL}/api/blastn/blastn/${id}`,
+    //   form,
+    //   {
+    //     headers: {
+    //       ...form.getHeaders(),
+    //     },
+    //   }
+    // );
     let virulence = await virulenceService.runVirulenceTool(form);
     let amr = await amrService.runAmrTool(form);
     const resultObject = {
@@ -44,18 +44,18 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
 
       bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
     });
-
-    let newblastn = new Blastn({
-      url: inputFilePath,
-      code: id,
-      filename: filename
-    })
-    await newblastn.save()
-    return {
-      file: response.file,
-      url: inputFilePath,
-      id: id
-    }; 
+    return resultObject;
+    // let newblastn = new Blastn({
+    //   url: inputFilePath,
+    //   code: id,
+    //   filename: filename
+    // })
+    // await newblastn.save()
+    // return {
+    //   file: response.file,
+    //   url: inputFilePath,
+    //   id: id
+    // }; 
   } catch (error) {
     if (fs.existsSync(inputFilePath)) {
       fs.unlinkSync(inputFilePath);
