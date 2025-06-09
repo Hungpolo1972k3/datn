@@ -1,8 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 const blastnService = require('../services/blastn');
-const virulenceService = require('../services/virulence');
-const amrService = require('../services/amr');
 
 const runBlastmTool = async (req, res) => {
     try {

@@ -1,9 +1,12 @@
 const axios = require('axios');
 const FormData = require('form-data');
-const fs = require('fs');
+const fs = require("fs");
+const zlib = require("zlib");
 const path = require('path');
 const cheerio = require('cheerio');
 const Blastn = require('../models/blastn');
+const virulenceService = require('../services/virulence');
+const amrService = require('../services/amr')
 
 const dataDir = path.join('/app', 'FastA');
 // const dataDir = path.join(__dirname,"../../FastA")
@@ -21,6 +24,26 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
         },
       }
     );
+    let virulence = await virulenceService.runVirulenceTool(form);
+    let amr = await amrService.runAmrTool(form);
+    const resultObject = {
+      virulence,
+      amr,
+      blastnId: id,
+      filename,
+      createdAt: new Date().toISOString()
+    };
+    const resultJson = JSON.stringify(resultObject, null, 2);
+    const outputGzPath = path.join("/app/fastA", `${id}_result.json.gz`);
+
+    await new Promise((resolve, reject) => {
+      const gzip = zlib.createGzip();
+      const writeStream = fs.createWriteStream(outputGzPath);
+      const bufferStream = require("stream").Readable.from([resultJson]);
+
+      bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
+    });
+
     let newblastn = new Blastn({
       url: inputFilePath,
       code: id,
