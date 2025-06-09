@@ -5,8 +5,6 @@ const zlib = require("zlib");
 const path = require('path');
 const cheerio = require('cheerio');
 const Blastn = require('../models/blastn');
-const virulenceService = require('../services/virulence');
-const amrService = require('../services/amr')
 
 const dataDir = path.join('/app', 'FastA');
 // const dataDir = path.join(__dirname,"../../FastA")
@@ -24,11 +22,21 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //     },
     //   }
     // );
-    let virulence = await virulenceService.runVirulenceTool(form);
-    let amr = await amrService.runAmrTool(form);
+    let virulence = await axios.post(`http://103.159.50.207:8080/api/virulence/runvirulencetool`, 
+      form, {
+        headers: {
+          ...form.getHeaders(),
+            },
+      });
+    let amr = await axios.post(`http://103.159.50.207:8080/api/amr/runamrtool`, 
+      form, {
+        headers: {
+          ...form.getHeaders(),
+            },
+      });
     const resultObject = {
-      virulence,
-      amr
+      virulence: virulence.data,
+      amr: amr.data
     };
     const resultJson = JSON.stringify(resultObject, null, 2);
     const fastaDir = path.join('/app', 'Blastn');
