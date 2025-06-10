@@ -233,20 +233,20 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
       };
     });
     const resultObject = {
-      virulence: virulenceDocs,
-      amr: amrDocs
+      virulence: virulence,
+      amr: amr
     };
-    const resultJson = JSON.stringify(resultObject, null, 2);
-    const fastaDir = path.join('/app', 'Blastn');
-    const outputGzPath = path.join(fastaDir, `${id}_result.json.gz`);
+    // const resultJson = JSON.stringify(resultObject, null, 2);
+    // const fastaDir = path.join('/app', 'Blastn');
+    // const outputGzPath = path.join(fastaDir, `${id}_result.json.gz`);
 
-    await new Promise((resolve, reject) => {
-      const gzip = zlib.createGzip();
-      const writeStream = fs.createWriteStream(outputGzPath);
-      const bufferStream = require("stream").Readable.from([resultJson]);
+    // await new Promise((resolve, reject) => {
+    //   const gzip = zlib.createGzip();
+    //   const writeStream = fs.createWriteStream(outputGzPath);
+    //   const bufferStream = require("stream").Readable.from([resultJson]);
 
-      bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
-    });
+    //   bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
+    // });
     return resultObject;
     // let newblastn = new Blastn({
     //   url: inputFilePath,
