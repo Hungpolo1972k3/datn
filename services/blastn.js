@@ -46,7 +46,7 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
 
     //   bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
     // });
-    return virulence;
+    return virulence.data.result;
     // let newblastn = new Blastn({
     //   url: inputFilePath,
     //   code: id,
