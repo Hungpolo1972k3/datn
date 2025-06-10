@@ -60,7 +60,7 @@ const getVirulencesBySampleId = async(req, res) => {
 const runVirulenceTool = async (req, res) => {
     try {
         const file = req.file;
-        const response = await virulenceService.runVirulenceTool2(file);
+        const response = await virulenceService.runVirulenceTool(file);
         return res.status(200).json({
             message: 'File successfully uploaded and processed',
             data: response,
