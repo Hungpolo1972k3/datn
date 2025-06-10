@@ -24,7 +24,12 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //     },
     //   }
     // );
-    const virulence = await virulenceService.runVirulenceTool(file);
+    // const virulence = await virulenceService.runVirulenceTool(file);
+    const virulence = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
+                headers: {
+                    ...form.getHeaders(),
+                },
+            });
     // const amr = await amrService.runAmrTool2(inputFilePath);
     // const resultObject = {
     //   virulence: virulence,
