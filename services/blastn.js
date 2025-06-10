@@ -24,8 +24,8 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //     },
     //   }
     // );
-    const virulence = await virulenceService.runVirulenceTool(inputFilePath);
-    const amr = await amrService.runAmrTool(inputFilePath);
+    const virulence = await virulenceService.runVirulenceTool({ path: inputFilePath });
+    const amr = await amrService.runAmrTool({ path: inputFilePath });
     const resultObject = {
       virulence: virulence.data,
       amr: amr.data
