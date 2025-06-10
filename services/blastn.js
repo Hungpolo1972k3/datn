@@ -151,7 +151,7 @@ const changeAmrInfo2 = (result) => {
     }
 };
 
-const runBlastnTool = async (inputFilePath, filename, id, file) => {
+const runBlastnTool = async (inputFilePath, filename, id) => {
   const form = new FormData();
   form.append('fasta', fs.createReadStream(inputFilePath)); 
   try {
@@ -164,7 +164,7 @@ const runBlastnTool = async (inputFilePath, filename, id, file) => {
     //     },
     //   }
     // );
-    const fastaContent = await fs.promises.readFile(file.path, 'utf8');
+    const fastaContent = await fs.promises.readFile(inputFilePath, 'utf8');
     const virulence = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
       headers: {
         ...form.getHeaders(),
