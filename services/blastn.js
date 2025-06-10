@@ -24,7 +24,7 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //     },
     //   }
     // );
-    // const fastaContent = await fs.promises.readFile(inputFilePath, 'utf8');
+    const fastaContent = await fs.promises.readFile(inputFilePath, 'utf8');
     // const virulence = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
     //   headers: {
     //     ...form.getHeaders(),
