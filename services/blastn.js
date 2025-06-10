@@ -12,8 +12,8 @@ const dataDir = path.join('/app', 'FastA');
 // const dataDir = path.join(__dirname,"../../FastA")
 
 const runBlastnTool = async (inputFilePath, filename, id) => {
-  // const form = new FormData();
-  // form.append('fasta', fs.createReadStream(inputFilePath)); 
+  const form = new FormData();
+  form.append('fasta', fs.createReadStream(inputFilePath)); 
   try {
     // const response = await axios.post(
     //   `${process.env.BIOTOOL_URL}/api/blastn/blastn/${id}`,
@@ -24,8 +24,12 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //     },
     //   }
     // );
-    const virulence = await virulenceService.runVirulenceTool2(inputFilePath);
-    const amr = await amrService.runAmrTool2(inputFilePath);
+    try {
+      const virulence = await virulenceService.runVirulenceTool2(inputFilePath);
+      const amr = await amrService.runAmrTool2(inputFilePath);
+    } catch (error) {
+      throw new Error(`${error.message}`);
+    }
     const resultObject = {
       virulence: virulence,
       amr: amr
