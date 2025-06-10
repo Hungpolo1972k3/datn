@@ -275,11 +275,8 @@ const runVirulenceTool2 = async (filePath) => {
                 function_group_id: productInfo.function_group_id,
             };
         }));
-        await fs.promises.unlink(file.path);
         return virulenceDocs;
     } catch (error) {
-        await fs.promises.unlink(file.path);
-        console.error(error);
         throw new Error('Failed to process and save virulence data:' + error.message);
     }
 };

@@ -248,12 +248,8 @@ const runAmrTool2 = async (filePath) => {
                 nucleic
             };
         });
-        await fs.promises.unlink(file.path);
         return amrDocs;
-
     } catch (error) {
-        await fs.promises.unlink(file.path);
-        console.error(error);
         throw new Error('Failed to process AMR data: ' + error.message);
     }
 };
