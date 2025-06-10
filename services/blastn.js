@@ -5,6 +5,8 @@ const zlib = require("zlib");
 const path = require('path');
 const cheerio = require('cheerio');
 const Blastn = require('../models/blastn');
+const virulenceService = require('../services/virulence');
+const amrService = require('../services/amr');
 
 const dataDir = path.join('/app', 'FastA');
 // const dataDir = path.join(__dirname,"../../FastA")
@@ -22,32 +24,23 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //     },
     //   }
     // );
-    const headers = form.getHeaders();
-    let virulence = await axios.post(
-      'http://103.159.50.207:8080/api/virulence/runvirulencetool',
-      form,
-      { headers }
-    );
-    let amr = await axios.post(
-      'http://103.159.50.207:8080/api/amr/runamrtool',
-      form,
-      { headers }
-    );
+    const virulence = await virulenceService.runVirulenceTool(inputFilePath);
+    const amr = await amrService.runAmrTool(inputFilePath);
     const resultObject = {
       virulence: virulence.data,
       amr: amr.data
     };
-    // const resultJson = JSON.stringify(resultObject, null, 2);
-    // const fastaDir = path.join('/app', 'Blastn');
-    // const outputGzPath = path.join(fastaDir, `${id}_result.json.gz`);
+    const resultJson = JSON.stringify(resultObject, null, 2);
+    const fastaDir = path.join('/app', 'Blastn');
+    const outputGzPath = path.join(fastaDir, `${id}_result.json.gz`);
 
-    // await new Promise((resolve, reject) => {
-    //   const gzip = zlib.createGzip();
-    //   const writeStream = fs.createWriteStream(outputGzPath);
-    //   const bufferStream = require("stream").Readable.from([resultJson]);
+    await new Promise((resolve, reject) => {
+      const gzip = zlib.createGzip();
+      const writeStream = fs.createWriteStream(outputGzPath);
+      const bufferStream = require("stream").Readable.from([resultJson]);
 
-    //   bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
-    // });
+      bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
+    });
     return resultObject;
     // let newblastn = new Blastn({
     //   url: inputFilePath,

@@ -101,31 +101,6 @@ const parseProductInfo = (productString) => {
     return result;
 };
 
-const getIndexSearchByProductInfo = (gene, description, group, function_group) => {
-    let indexsearch = [];
-    
-    let descriptionElement = description.split(" ").map(word => word.toLowerCase());
-
-    indexsearch.push(
-        gene.toLowerCase(), 
-        gene.slice(0, 3).toLowerCase(),
-        group.toLowerCase(), 
-        function_group.toLowerCase(),
-    );
-
-    descriptionElement.forEach(element => {
-        indexsearch.push(element);
-    });
-
-    indexsearch.push(
-        group.slice(0, 3).toLowerCase(), 
-        function_group.slice(0, 3).toLowerCase(), 
-        function_group.slice(0, 4).toLowerCase(),
-        function_group.slice(0, 5).toLowerCase(), 
-    );
-    
-    return indexsearch;
-};
 
 const getVirulenceInfo = async (file, sample_id) => {
     if (!file || !file.path || !fs.existsSync(file.path)) {
@@ -147,12 +122,6 @@ const getVirulenceInfo = async (file, sample_id) => {
             const rawSeq = seq ? seq.substring(v.start - 1, v.stop) : null;
             const nucleic = rawSeq ? (v.strand === '-' ? reverseComplement(rawSeq) : rawSeq) : null;
             const productInfo = parseProductInfo(v.product);
-            const index = getIndexSearchByProductInfo(
-                productInfo.gene,
-                productInfo.description,
-                productInfo.group,
-                productInfo.function_group
-            );
 
             return {
                 sample_id,
@@ -172,7 +141,6 @@ const getVirulenceInfo = async (file, sample_id) => {
                 vfdb_id: productInfo.vfdb_id,
                 function_group: productInfo.function_group,
                 function_group_id: productInfo.function_group_id,
-                index,
             };
         }));
 

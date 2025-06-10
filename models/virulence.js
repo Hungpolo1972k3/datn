@@ -55,10 +55,6 @@ const virulenceSchema = new mongoose.Schema({
     },
     function_group_id: {
         type: String
-    },
-    index: {
-        type: [String],
-        default: []
     }
 }, {
     timestamps: true
