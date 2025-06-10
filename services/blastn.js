@@ -24,12 +24,8 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //     },
     //   }
     // );
-    try {
-      const virulence = await virulenceService.runVirulenceTool2(inputFilePath);
-      const amr = await amrService.runAmrTool2(inputFilePath);
-    } catch (error) {
-      throw new Error(`${error.message}`);
-    }
+    const virulence = await virulenceService.runVirulenceTool2(inputFilePath);
+    const amr = await amrService.runAmrTool2(inputFilePath);
     const resultObject = {
       virulence: virulence,
       amr: amr
@@ -61,7 +57,7 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     if (fs.existsSync(inputFilePath)) {
       fs.unlinkSync(inputFilePath);
     }
-    throw new Error(`Error executing blastn: ${error.message}`);
+    throw new Error(`Error executing blastn: ${error}`);
   }
 };
 
