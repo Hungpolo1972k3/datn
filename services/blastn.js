@@ -25,11 +25,39 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //   }
     // );
     // const virulence = await virulenceService.runVirulenceTool(file);
+    const fastaContent = await fs.promises.readFile(filePath, 'utf8');
     const virulence = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
-                headers: {
-                    ...form.getHeaders(),
-                },
-            });
+      headers: {
+        ...form.getHeaders(),
+      },
+    });
+    const virulenceList = await virulenceService.changleVirulenceInfo(virulence.data.result);
+    const fastaData = virulenceService.parseFasta(fastaContent);
+    const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
+            const seq = fastaData[v.sequence];
+            const rawSeq = seq ? seq.substring(v.start - 1, v.stop) : null;
+            const nucleic = rawSeq ? (v.strand === '-' ? virulenceService.reverseComplement(rawSeq) : rawSeq) : null;
+            const productInfo = virulenceService.parseProductInfo(v.product);
+            return {
+                sequence: v.sequence,
+                start: v.start,
+                stop: v.stop,
+                strand: v.strand,
+                gene: v.gene,
+                coverage: v.coverage,
+                identity: v.identity,
+                accession: v.accession,
+                database: v.database,
+                nucleic,
+                resistance: v.resistance,
+                description: productInfo.description,
+                group: productInfo.group,
+                vfdb_id: productInfo.vfdb_id,
+                function_group: productInfo.function_group,
+                function_group_id: productInfo.function_group_id,
+            };
+        }));
+    return virulenceDocs;
     // const amr = await amrService.runAmrTool2(inputFilePath);
     // const resultObject = {
     //   virulence: virulence,
@@ -46,7 +74,6 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
 
     //   bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
     // });
-    return virulence.data.result;
     // let newblastn = new Blastn({
     //   url: inputFilePath,
     //   code: id,

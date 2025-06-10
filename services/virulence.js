@@ -286,5 +286,9 @@ module.exports = {
     getAllVirulenceGroup,
     getVirulencesBySampleId,
     runVirulenceTool,
-    runVirulenceTool2
+    runVirulenceTool2,
+    changleVirulenceInfo, 
+    parseFasta,
+    reverseComplement,
+    parseProductInfo
  };
