@@ -2,7 +2,6 @@ const axios = require('axios');
 const FormData = require('form-data');
 const Virulence = require('../models/virulence');
 const fs = require('fs');
-const { default: mongoose } = require('mongoose');
 require('dotenv').config();
 
 const changleVirulenceInfo = async (result) => {
