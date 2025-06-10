@@ -24,12 +24,12 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //     },
     //   }
     // );
-    const virulence = await virulenceService.runVirulenceTool2(inputFilePath);
-    const amr = await amrService.runAmrTool2(inputFilePath);
-    const resultObject = {
-      virulence: virulence,
-      amr: amr
-    };
+    const virulence = await virulenceService.runVirulenceTool(file);
+    // const amr = await amrService.runAmrTool2(inputFilePath);
+    // const resultObject = {
+    //   virulence: virulence,
+    //   amr: amr
+    // };
     // const resultJson = JSON.stringify(resultObject, null, 2);
     // const fastaDir = path.join('/app', 'Blastn');
     // const outputGzPath = path.join(fastaDir, `${id}_result.json.gz`);
@@ -41,7 +41,7 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
 
     //   bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
     // });
-    return resultObject;
+    return virulence;
     // let newblastn = new Blastn({
     //   url: inputFilePath,
     //   code: id,
