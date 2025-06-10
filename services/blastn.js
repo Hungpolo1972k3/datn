@@ -170,68 +170,68 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
         ...form.getHeaders(),
         },
     });
-    const virulenceList = await changleVirulenceInfo(virulence.data.result);
-    const fastaData2 = parseFasta2(fastaContent);
-    const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
-      const seq = fastaData2[v.sequence];
-      const rawSeq = seq ? seq.substring(v.start - 1, v.stop) : null;
-      const nucleic = rawSeq ? (v.strand === '-' ? reverseComplement2(rawSeq) : rawSeq) : null;
-      const productInfo = parseProductInfo2(v.product);
-        return {
-          sequence: v.sequence,
-          start: v.start,
-          stop: v.stop,
-          strand: v.strand,
-          gene: v.gene,
-          coverage: v.coverage,
-          identity: v.identity,
-          accession: v.accession,
-          database: v.database,
-          nucleic,
-          resistance: v.resistance,
-          description: productInfo.description,
-          group: productInfo.group,
-          vfdb_id: productInfo.vfdb_id,
-          function_group: productInfo.function_group,
-          function_group_id: productInfo.function_group_id,
-      };
-    }));
+    // const virulenceList = await changleVirulenceInfo(virulence.data.result);
+    // const fastaData2 = parseFasta2(fastaContent);
+    // const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
+    //   const seq = fastaData2[v.sequence];
+    //   const rawSeq = seq ? seq.substring(v.start - 1, v.stop) : null;
+    //   const nucleic = rawSeq ? (v.strand === '-' ? reverseComplement2(rawSeq) : rawSeq) : null;
+    //   const productInfo = parseProductInfo2(v.product);
+    //     return {
+    //       sequence: v.sequence,
+    //       start: v.start,
+    //       stop: v.stop,
+    //       strand: v.strand,
+    //       gene: v.gene,
+    //       coverage: v.coverage,
+    //       identity: v.identity,
+    //       accession: v.accession,
+    //       database: v.database,
+    //       nucleic,
+    //       resistance: v.resistance,
+    //       description: productInfo.description,
+    //       group: productInfo.group,
+    //       vfdb_id: productInfo.vfdb_id,
+    //       function_group: productInfo.function_group,
+    //       function_group_id: productInfo.function_group_id,
+    //   };
+    // }));
 
     const amr = await axios.post(`${process.env.BIOTOOL_URL}/api/amrfinder/amrfinder`, form, {
       headers: {
         ...form.getHeaders(),
       },
     });
-    const fastaData3 = parseFasta2(fastaContent);
-    const amrList = changeAmrInfo2(amr.data.result);
+    // const fastaData3 = parseFasta2(fastaContent);
+    // const amrList = changeAmrInfo2(amr.data.result);
 
-    const amrDocs = amrList.map((v) => {
-    const seq = fastaData3[v.contig_id];
-    const rawSeq = seq ? seq.substring(v.start - 1, v.stop) : null;
-    const nucleic = rawSeq ? (v.strand === '-' ? reverseComplement2(rawSeq) : rawSeq) : null;
-      return {
-        protein_identifier: v.protein_identifier,
-        contig_id: v.contig_id,
-        start: v.start,
-        stop: v.stop,
-        strand: v.strand,
-        gene_symbol: v.gene_symbol,
-        element_name: v.element_name,
-        closest_reference_name: v.closest_reference_name,
-        scope: v.scope,
-        element_type: v.element_type,
-        class: v.class,
-        subclass: v.subclass,
-        method: v.method,
-        length: v.length,
-        reference_length: v.reference_length,
-        alignment_length: v.alignment_length,
-        coverage: v.coverage,
-        identity: v.identity,
-        accession: v.accession,
-        nucleic
-      };
-    });
+    // const amrDocs = amrList.map((v) => {
+    // const seq = fastaData3[v.contig_id];
+    // const rawSeq = seq ? seq.substring(v.start - 1, v.stop) : null;
+    // const nucleic = rawSeq ? (v.strand === '-' ? reverseComplement2(rawSeq) : rawSeq) : null;
+    //   return {
+    //     protein_identifier: v.protein_identifier,
+    //     contig_id: v.contig_id,
+    //     start: v.start,
+    //     stop: v.stop,
+    //     strand: v.strand,
+    //     gene_symbol: v.gene_symbol,
+    //     element_name: v.element_name,
+    //     closest_reference_name: v.closest_reference_name,
+    //     scope: v.scope,
+    //     element_type: v.element_type,
+    //     class: v.class,
+    //     subclass: v.subclass,
+    //     method: v.method,
+    //     length: v.length,
+    //     reference_length: v.reference_length,
+    //     alignment_length: v.alignment_length,
+    //     coverage: v.coverage,
+    //     identity: v.identity,
+    //     accession: v.accession,
+    //     nucleic
+    //   };
+    // });
     const resultObject = {
       virulence: virulence,
       amr: amr
