@@ -15,15 +15,15 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
   const form = new FormData();
   form.append('fasta', fs.createReadStream(inputFilePath)); 
   try {
-    // const response = await axios.post(
-    //   `${process.env.BIOTOOL_URL}/api/blastn/blastn/${id}`,
-    //   form,
-    //   {
-    //     headers: {
-    //       ...form.getHeaders(),
-    //     },
-    //   }
-    // );
+    const responseBlastn = await axios.post(
+      `${process.env.BIOTOOL_URL}/api/blastn/blastn/${id}`,
+      form,
+      {
+        headers: {
+          ...form.getHeaders(),
+        },
+      }
+    );
     const form1 = new FormData();
     form1.append('fasta', fs.createReadStream(inputFilePath));
     const form2 = new FormData();
@@ -111,18 +111,18 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
 
       bufferStream.pipe(gzip).pipe(writeStream).on("finish", resolve).on("error", reject);
     });
-    return resultObject;
-    // let newblastn = new Blastn({
-    //   url: inputFilePath,
-    //   code: id,
-    //   filename: filename
-    // })
-    // await newblastn.save()
-    // return {
-    //   file: response.file,
-    //   url: inputFilePath,
-    //   id: id
-    // }; 
+    let newblastn = new Blastn({
+      url: inputFilePath,
+      code: id,
+      filename: filename
+    })
+    await newblastn.save()
+    return {
+      file: responseBlastn.file,
+      url: inputFilePath,
+      id: id,
+      resultObject
+    }; 
   } catch (error) {
     if (fs.existsSync(inputFilePath)) {
       fs.unlinkSync(inputFilePath);
