@@ -11,7 +11,7 @@ const amrService = require('../services/amr');
 const dataDir = path.join('/app', 'FastA');
 // const dataDir = path.join(__dirname,"../../FastA")
 
-const runBlastnTool = async (inputFilePath, filename, id, file) => {
+const runBlastnTool = async (inputFilePath, filename, id) => {
   // const form = new FormData();
   // form.append('fasta', fs.createReadStream(inputFilePath)); 
   try {
@@ -24,8 +24,8 @@ const runBlastnTool = async (inputFilePath, filename, id, file) => {
     //     },
     //   }
     // );
-    const virulence = await virulenceService.runVirulenceTool(file);
-    const amr = await amrService.runAmrTool(file);
+    const virulence = await virulenceService.runVirulenceTool2(inputFilePath);
+    const amr = await amrService.runAmrTool2(inputFilePath);
     const resultObject = {
       virulence: virulence,
       amr: amr

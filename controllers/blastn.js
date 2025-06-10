@@ -9,7 +9,7 @@ const runBlastmTool = async (req, res) => {
       if (!file) {
         return res.status(400).json({ message: 'Không có file được tải lên' });
       }
-      const result = await blastnService.runBlastnTool(file.path, file.originalname, id, file);
+      const result = await blastnService.runBlastnTool(file.path, file.originalname, id);
       return res.status(200).json({ 
         message: 'Thành công', 
         data: result 
