@@ -258,5 +258,8 @@ module.exports = {
     getAmrInfo, 
     getAmrsBySampleId,
     runAmrTool,
-    runAmrTool2
+    runAmrTool2,
+    parseFasta,
+    changeAmrInfo,
+    reverseComplement
  };
