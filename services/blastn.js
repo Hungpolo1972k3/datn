@@ -24,13 +24,23 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
     //     },
     //   }
     // );
+    const form1 = new FormData();
+    form1.append('fasta', fs.createReadStream(inputFilePath));
+    const form2 = new FormData();
+    form2.append('fasta', fs.createReadStream(inputFilePath));
+    const [virulenceRes, amrRes] = await Promise.all([
+      axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form1, {
+        headers: form1.getHeaders(),
+        timeout: 300000
+      }),
+      axios.post(`${process.env.BIOTOOL_URL}/api/amrfinder/amrfinder`, form2, {
+        headers: form2.getHeaders(),
+        timeout: 300000
+      })
+    ]);
+
     const fastaContent = await fs.promises.readFile(inputFilePath, 'utf8');
-    const virulence = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
-      headers: {
-        ...form.getHeaders(),
-      },
-    });
-    const virulenceList = await virulenceService.changleVirulenceInfo(virulence.data.result);
+    const virulenceList = await virulenceService.changleVirulenceInfo(virulenceRes.data.result);
     const fastaDataVirulence = virulenceService.parseFasta(fastaContent);
     const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
       const seq = fastaDataVirulence[v.sequence];
@@ -55,15 +65,9 @@ const runBlastnTool = async (inputFilePath, filename, id) => {
         function_group: productInfo.function_group,
         function_group_id: productInfo.function_group_id,
         };
-    }));
-    const amr = await axios.post(`${process.env.BIOTOOL_URL}/api/amrfinder/amrfinder`, form, {
-      headers: {
-        ...form.getHeaders(),
-        },
-    });
-            
+    }));      
     const fastaDataAmr = amrService.parseFasta(fastaContent);
-    const amrList = amrService.changeAmrInfo(amr.data.result);
+    const amrList = amrService.changeAmrInfo(amrRes.data.result);
     
     const amrDocs = amrList.map((v) => {
       const seq = fastaDataAmr[v.contig_id];
