@@ -3,7 +3,7 @@ const amrController = require("../controllers/amr")
 const router = express.Router();
 const fs = require('fs');
 const path = require('path');
-const uploadDir = path.join(__dirname, 'uploads');
+const uploadDir = path.join("/app", 'Blastn');
 const requireLogin = require('../utils/requireLogin')
 
 if (!fs.existsSync(uploadDir)) {

@@ -1,6 +1,7 @@
 const axios = require('axios');
 const FormData = require('form-data');
 const Virulence = require('../models/virulence');
+const Sample = require('../models/sample');
 const fs = require('fs');
 require('dotenv').config();
 
@@ -100,7 +101,6 @@ const parseProductInfo = (productString) => {
     return result;
 };
 
-
 const getVirulenceInfo = async (file, sample_id) => {
     if (!file || !file.path || !fs.existsSync(file.path)) {
         throw new Error('File not found or invalid path');
@@ -148,7 +148,6 @@ const getVirulenceInfo = async (file, sample_id) => {
         return virulenceDocs;
     } catch (error) {
         await fs.promises.unlink(file.path);
-        console.error(error);
         throw new Error('Failed to process and save virulence data:' + error.message);
     }
 };

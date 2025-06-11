@@ -2,6 +2,7 @@ const axios = require('axios');
 const Amr = require('../models/amr');
 const fs = require('fs');
 const FormData = require('form-data');
+const Sample = require('../models/sample')
 require('dotenv').config();
 
 const changeAmrInfo = (result) => {
@@ -126,7 +127,10 @@ const getAmrInfo = async (file, sample_id) => {
         });
 
         await Amr.insertMany(amrDocs);
-        await fs.promises.unlink(file.path);
+        await Sample.findByIdAndUpdate(
+            sample_id,
+            { fastaFilePath: file.path }
+        );
         return amrDocs;
 
     } catch (error) {
