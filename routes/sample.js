@@ -13,4 +13,6 @@ router.delete('/deletesample', requireLogin, sampleController.deleteSample);
 
 //ADMIN
 router.get('getallsamples', requireLogin, sampleController.getAllSamples);
+// Admin
+router.get('/samplestatisticadmin', requireLogin, sampleController.getSampleStatisticAdmin);
 module.exports = router;

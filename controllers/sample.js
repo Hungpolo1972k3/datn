@@ -69,4 +69,15 @@ const getAllSamples = async(req, res) => {
         res.status(400).json({ message: error.message });
     }
 }
-module.exports = { createSample, getSamplesByExperimentId, editSample, deleteSample, getAllSamples };
+const getSampleStatisticAdmin = async (req, res) => {
+    try {
+        const result = await sampleService.getSampleStatisticAdmin();
+        return res.status(200).json({
+            message: "Lấy mẫu thí nghiệm thành công",
+            data: result
+        })
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+}
+module.exports = { createSample, getSamplesByExperimentId, editSample, deleteSample, getAllSamples, getSampleStatisticAdmin };

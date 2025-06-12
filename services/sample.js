@@ -2,6 +2,7 @@ const Sample = require('../models/sample');
 const crypto = require('crypto');
 const Virulence = require('../models/virulence');
 const Amr = require('../models/amr');
+const User = require('../models/user');
 
 const createSample = async (user_id, experiment_id,name, header, length, file_name, fastaFilePath) => {
     try {
@@ -67,4 +68,27 @@ const getAllSamples = async () => {
         throw new Error('Lỗi: ' + error.message);
     }
 }
-module.exports = { createSample, getSamplesByExperimentId, editSample, deleteSample, getAllSamples };
+const getSampleStatisticAdmin = async () => {
+  try {
+    const users = await User.find().select("username");
+
+    const result = await Promise.all(
+      users.map(async (user) => {
+        const samples = await Sample.find(
+          { user_id: user._id },
+          { _id: 1, createdAt: 1 }
+        ).sort({ createdAt: -1 });
+        return {
+          user,
+          samples,
+          total: samples.length
+        };
+      })
+    );
+
+    return result;
+  } catch (error) {
+    throw new Error("Error: " + error.message);
+  }
+};
+module.exports = { createSample, getSamplesByExperimentId, editSample, deleteSample, getAllSamples, getSampleStatisticAdmin };
