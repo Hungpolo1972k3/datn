@@ -11,10 +11,6 @@ const experimentSchema = new mongoose.Schema({
     code: {
         type: String,
         default: ""
-    },
-    status: {
-        type: Boolean,
-        default: true
     }
 },
 {

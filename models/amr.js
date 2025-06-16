@@ -5,8 +5,7 @@ const amrSchema = new mongoose.Schema({
         type: String
     },
     contig_id: {
-        type: String,
-        required: true
+        type: String
     },
     start: {
         type: Number

@@ -8,8 +8,7 @@ const virulenceSchema = new mongoose.Schema({
         type: Number
     },
     stop: {
-        type: Number,
-        required: true
+        type: Number
     },
     strand: {
         type: String,

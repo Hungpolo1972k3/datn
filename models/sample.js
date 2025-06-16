@@ -8,9 +8,6 @@ const sampleSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true
     },
-    code: {
-        type: String
-    },
     header: {
         type: String
     },
@@ -26,11 +23,7 @@ const sampleSchema = new mongoose.Schema({
     },
     fastaFilePath: {
         type: String
-    }, 
-    status: {
-        type: Boolean,
-        default: true
-    }    
+    }   
 },
 {
     timestamps: true
