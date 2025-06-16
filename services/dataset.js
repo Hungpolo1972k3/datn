@@ -148,7 +148,7 @@ const getFileInfo = async (relativePath) => {
 
 const getZipFile = async(id) =>{
   try {
-    const encodedUrl = encodeURIComponent(`/app/fastA/${id}.json.gz`);
+    const encodedUrl = encodeURIComponent(`/app/Blastn/${id}.json.gz`);
     const response = await axios.get(`${process.env.BIOTOOL_URL}/api/blastn/getzipfile?url=${encodedUrl}`);
     return response.data;
   } catch (error) {
