@@ -35,3 +35,11 @@ export const apiDeleteSampleById = async (id) => {
     }
   };
   
+export const apiGetSampleStatisticAdmin = async () => {
+  try {
+    const response = await axiosConfig.get('/api/sample/samplestatisticadmin');
+    return response.data;
+  } catch (error) {
+    throw error.message;
+  }
+};

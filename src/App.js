@@ -16,6 +16,8 @@ import Tool from "./pages/Tool";
 import DatasetStatistic from "./pages/StatisticsView";
 import StatisticAdmin from "./pages/StatisticAdmin";
 import ResultPage from "./pages/ResultPage";
+import DatasetPopup from "./pages/DatasetPopup";
+import UserInfo from "./pages/UserInfo";
 
 const Container = styled.div`
   display: flex;
@@ -41,6 +43,8 @@ function App() {
               <Route path="/tool" element={<Tool />} />
               <Route path="/dataset_statistics" element={<DatasetStatistic/>} />
               <Route path="/blastn-result" element={<ResultPage/>}/>
+              <Route path="/dataset-popup/:name" element={<DatasetPopup />} />
+              <Route path="/user-info" element={<UserInfo />}/>
               <Route
                 path="/submit"
                 element={

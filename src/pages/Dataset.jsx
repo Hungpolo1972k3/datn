@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { Search, Download} from "lucide-react";
-import DatasetPopup from "../components/DatasetPopup";
-import { apiDownloadFolder, apiGetFolderInfo } from "../service/dataset";
+import { apiDownloadFolder } from "../service/dataset";
 import datasetFolder from '../utils/datasetFolder.json';
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useNotice } from "../context/NoticeContext";
 import datasetGeneVirulence from "../utils/datasetGeneVirulence.json"
 import datasetGeneAmr from "../utils/datasetGeneAmr.json"
-import { useLocation } from "react-router-dom";
 
 const TableWrapper = styled.div`
   padding: 20px;
@@ -162,18 +161,52 @@ const ToolRight = styled.div`
     white-space: nowrap;
   }
 `;
+const BreadcrumbWrapper = styled.nav`
+  font-size: 14px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  color: #555;
+  user-select: none;
+`;
+
+const Crumb = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-weight: bold;
+  font-size: 22px;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const CrumbMain = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const Separator = styled.span`
+  margin: 0 15px;
+  font-size: 30px;
+`;
+
 const PaginatedTable = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
   const [itemPerPage, setItemPerPage] = useState(50);
-  const [selectedGenome, setSelectedGenome] = useState(null);
-  const [dataset, setDataset] = useState();
   const [isDownloading, setIsDownloading] = useState(false);
   const { showNotice } = useNotice();
   const location = useLocation();
+  const [selectedGenome, setSelectedGenome] = useState(null);
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const searchParam = params.get("search");
@@ -311,15 +344,13 @@ const PaginatedTable = () => {
       document.body.style.overflow = "auto";
     };
   }, [selectedGenome]);
-  const handleShowDatasetPopup = async(item) => {
+  const handleShowDatasetPopup = (item) => {
     try {
-      let data = await apiGetFolderInfo(item.downloadUrl);
-      setSelectedGenome(data);
-      setDataset(item);
+      navigate(`/dataset-popup/${item.name}`);
     } catch (error) {
-      console.log(error)
+      console.error(error);
     }
-  }
+  };
 
   const handleDownloadFolder = async (e,url) => {
     e.preventDefault();
@@ -328,7 +359,6 @@ const PaginatedTable = () => {
       await apiDownloadFolder(url);
       showNotice(1, t('datasetAB.downloadSuccess'));
     } catch (error) {
-      console.error("Download failed:", error);
       showNotice(0, t('datasetAB.downloadFail'))
     }
     finally {
@@ -337,6 +367,11 @@ const PaginatedTable = () => {
   }
   return (
     <TableWrapper>
+      <BreadcrumbWrapper>
+        <Crumb onClick={() => navigate('/')}>{t("breadcrumb.ABDataset")}</Crumb>
+        <Separator>›</Separator>
+        <CrumbMain onClick={() => navigate('/dataset')}>{t("breadcrumb.dataset")}</CrumbMain>
+      </BreadcrumbWrapper>
       <Title>{t("datasetAB.title")}</Title>
       <Tool>
         <SearchWrapper>
@@ -401,13 +436,6 @@ const PaginatedTable = () => {
       </StyledTable>
 
       <Pagination>{renderPageNumbers()}</Pagination>
-      {selectedGenome && (
-        <DatasetPopup
-          dataset={dataset}
-          genome={selectedGenome}
-          onClose={() => setSelectedGenome(null)}
-        />
-      )}
       {isDownloading && <LoadingSpinner />}
     </TableWrapper>
   );

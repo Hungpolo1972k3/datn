@@ -100,14 +100,16 @@
         "account": "Tài khoản",
         "experiment": "Thí nghiệm",
         "sample": "Mẫu thí nghiệm",
-        "user_statistics": "Thống kê hệ thống"
+        "user_statistics": "Thống kê theo người dùng",
+        "experiment_statistics": "Thống kê thí nghiệm",
+        "sample_statistics": "Thống kê mẫu thí nghiệm"
       },
     "submitPage": {
         "title": "Thêm mẫu thí nghiệm",
         "selectExperiment": "Chọn thí nghiệm",
         "sampleNamePlaceholder": "Tên mẫu thí nghiệm",
         "chooseFile": "Chọn tệp FASTA",
-        "submitBtn": "Gửi",
+        "submitBtn": "Xác nhận",
         "resetBtn": "Cài lại",
         "error": {
         "selectExperiment": "Vui lòng chọn thí nghiệm.",
@@ -164,6 +166,8 @@
         "name": "Tên mẫu",
         "header": "Header",
         "length": "Chiều dài",
+        "virulence": "Số gene độc lực",
+        "amr": "Số gene kháng kháng sinh",
         "createdTime": "Thời gian tạo"
       },
     "amrComponent":{
@@ -181,13 +185,27 @@
         },
         "columns": {
           "Index": "STT",
-          "contig_id": "Mã Contig",
-          "start": "Vị trí bắt đầu",
-          "stop": "Vị trí kết thúc",
-          "strand": "Chiều",
-          "gene_symbol": "Ký hiệu gen",
+          "accession": "Mã truy cập",
+          "alignment_length": "Độ dài",
+          "class": "Lớp",
+          "closest_reference_name": "Tên tham chiếu",
+          "contig_id": "ID Contig",
+          "coverage": "Độ phủ",
           "element_name": "Tên phần tử",
-          "nucleic": "Trình tự nucleic"
+          "element_type": "Loại phần tử",
+          "gene_symbol": "Ký hiệu gen",
+          "identity": "Độ tương đồng",
+          "length": "Độ dài",
+          "method": "Phương pháp",
+          "nucleic": "Chuỗi nucleic",
+          "protein_identifier": "ID protein",
+          "reference_length": "Độ dài tham chiếu",
+          "sample_id": "ID mẫu",
+          "scope": "Phạm vi",
+          "start": "Bắt đầu",
+          "stop": "Kết thúc",
+          "strand": "Chiều",
+          "subclass": "Phân lớp"
         }
       },
     "noticeComponent": {
@@ -244,6 +262,7 @@
         "role": "Vai trò",
         "username": "Họ và tên",
         "error": {
+          "invalid_username": "Họ và tên không hợp lệ",
           "invalid_email": "Email không hợp lệ",
           "name_required": "Họ và tên không được để trống",
           "invalid_phone": "Số điện thoại không hợp lệ",
@@ -256,7 +275,8 @@
         },
         "success": {
           "update_user": "Chỉnh sửa thông tin thành công"
-        }
+        },
+        "editing_title": "Chỉnh sửa thông tin "
     },
     "virulenceComponent":{
         "title": "Dữ liệu gene độc lực",
@@ -268,7 +288,7 @@
         "strand": "Chiều",
         "identity": "Mức độ giống (%)",
         "coverage": "Độ bao phủ (%)",
-        "accession": "Accession",
+        "accession": "Mã định danh",
         "nucleic": "Trình tự nucleic"
       },
     "virulenceList": {
@@ -380,7 +400,7 @@
   "statistics_viewer":{
     "title": "Thống kê bộ dữ liệu",
     "histogram": "Biểu đồ MIC",
-    "amr_plot": "Biểu đồ AMR",
+    "amr_plot": "Biểu đồ yếu tố kháng kháng sinh",
     "vfactors_plot": "Biểu đồ yếu tố độc lực"
   },
     "editPassword": {
@@ -406,7 +426,7 @@
       } 
     },
     "resultPage": {
-      "title": "Kết quả BLASTN",
+      "title": "Công cụ so khớp",
       "enterRid": "Nhập mã giải trình tự",
       "search": "Tìm kiếm",
       "upload": "Tải lên",
@@ -469,7 +489,8 @@
       "noData": "Không có dữ liệu BLASTN",
       "info": "Thông tin so khớp",
       "virulenceFactor": "Yếu tố độc lực",
-      "amrFactor": "Yếu tố kháng sinh"
+      "amrFactor": "Yếu tố kháng sinh",
+      "detailedResults": "Kết quả so khớp chi tiết"
     },
     "finalExport": {
       "showPoint": "Hiển thị điểm",
@@ -518,6 +539,21 @@
       "prev": "Trước",
       "next": "Tiếp",
       "page": "Trang"
-    }               
+    },
+    "breadcrumb":{
+      "ABDataset": "Trang chủ",
+      "dataset": "Bộ dữ liệu",
+      "statistic": "Thống kê",
+      "tool": "Công cụ", 
+      "blastn": "Công cụ so khớp",
+      "home": "Trang chủ",
+      "userinfo": "Thông tin tài khoản",
+      "edituserinfo": "Chỉnh sửa"
+    },
+  "noticeBlastn": {
+    "line1": "Bạn vui lòng chờ khoảng 30 phút để nhận kết quả nhé!",
+    "line2": "Để xem kết quả, bạn hãy lưu trữ lại mã kết quả sau và nhập vào phần tìm kiếm trong công cụ so khớp.",
+    "resultLink": "Kết quả so khớp"
+  }               
 }
   

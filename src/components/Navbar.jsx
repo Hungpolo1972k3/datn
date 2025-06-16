@@ -5,9 +5,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/userSlice";
 import { useNavigate } from 'react-router-dom';
-import UserInfoPopup from "./UserInfo";
 import { useNotice } from "../context/NoticeContext";
-import { apiGetUserById } from "../service/user";
 import "../i18next";
 import { useTranslation } from "react-i18next";
 
@@ -48,7 +46,7 @@ const UserIcon = styled(User)`
   color: #59595e;
   cursor: pointer;
   margin-left: 30px;
-  border-radius: 50%; /* Làm tròn biểu tượng */
+  border-radius: 50%;
   padding: 5px;
   border: 2px solid transparent; 
   transition: all 0.3s ease; 
@@ -63,8 +61,6 @@ const UserIcon = styled(User)`
   }
 `;
 
-
-// Dropdown and modal styles
 const DropdownMenu = styled.div`
   position: absolute;
   top: 50px;
@@ -130,7 +126,7 @@ const Modal = styled.div`
     }
 
     &:first-child {
-      background-color: #4CAF50;
+      background-color: #007bff;
       color: white;
     }
 
@@ -145,16 +141,6 @@ const Modal = styled.div`
     justify-content: space-between;
     width: 100%;
   }
-`;
-
-const BackgroundOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.3);
-  z-index: 999; 
 `;
 
 const SettingsIcon = styled(Settings)`
@@ -259,11 +245,9 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const { showNotice } = useNotice();
   const { isLogin } = useSelector((state) => state.user);
-  const { token } = useSelector((state) => state.user);
   const { isLoginAdmin} = useSelector((state) => state.user);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showModal, setShowModal] = useState(false); 
-  const [userInfo, setUserInfo] = useState({})
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -282,17 +266,10 @@ const Navbar = () => {
     setShowModal(false);
   };
 
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-
   const handleOpenPopup = async() => {
     setShowDropdown(!showDropdown);
-    setIsPopupOpen(true);
-    const res = await apiGetUserById(token);
-    console.log(res.data)
-    setUserInfo(res.data);
+    navigate("/user-info");
   }
-  const handleClosePopup = () => setIsPopupOpen(false);
-
   const { t, i18n } = useTranslation();
 
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
@@ -424,11 +401,6 @@ const Navbar = () => {
           </>
         )}
       </Wrapper>
-
-      {isPopupOpen && <BackgroundOverlay />}
-      <UserInfoPopup openPopup={isPopupOpen} closePopup={handleClosePopup} userInfo={userInfo} />
-
-
       <ModalBackground show={showModal}>
         <Modal>
           <h3>{t('navbarComponent.confirm_logout')}</h3>

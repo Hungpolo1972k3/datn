@@ -40,6 +40,7 @@ const IconRow = styled.div`
 const Icon = styled.span`
   font-size: 22px;
   margin-right: 10px;
+  color: ${(props) => (props.success ? "#2e7d32" : "#c62828")};
 `;
 
 const Content = styled.div`
@@ -88,7 +89,7 @@ const Notice = ({ label, content }) => {
   return (
     <NoticeContainer success={success}>
       <IconRow>
-        <Icon>{icon}</Icon>
+        <Icon success={success}>{icon}</Icon>
         <span>{success ? t("noticeComponent.success") : t("noticeComponent.error")}</span>
       </IconRow>
       <Content>{content}</Content>

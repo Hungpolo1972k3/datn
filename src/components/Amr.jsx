@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 
 const TableContainer = styled.div`
@@ -20,6 +20,7 @@ const Title = styled.h3`
   font-weight: bold;
   margin-bottom: 20px;
   text-align: center;
+  color: #1e3a8a;
 `;
 
 const TableWrapper = styled.div`
@@ -28,14 +29,13 @@ const TableWrapper = styled.div`
 `;
 
 const Table = styled.table`
-  width: auto;
-  min-width: 100%;
+  width: 100%;
   border-collapse: collapse;
 `;
 
 const Th = styled.th`
-  background: #d6d6d6;
-  color: black;
+  background: #007bff;
+  color: #ffffff;
   padding: 10px;
   text-align: left;
   white-space: nowrap;
@@ -47,12 +47,16 @@ const Td = styled.td`
   white-space: nowrap;
 `;
 
-const EyeIcon = styled.span`
+const TableRow = styled.tr`
   cursor: pointer;
-  color: #007bff;
-  font-size: 18px;
+  ${(props) =>
+    props.selected &&
+    css`
+      background-color: #dbeafe; /* Màu nền khi được chọn */
+    `}
+
   &:hover {
-    text-decoration: underline;
+    background-color: #f1f5f9; /* Màu hover */
   }
 `;
 
@@ -74,17 +78,24 @@ const AmrTable = ({ data = [] }) => {
   const headers = [
     "Index",
     "contig_id",
+    "accession",
+    "gene_symbol",
+    "length",   
     "start",
     "stop",
     "strand",
-    "gene_symbol",
+    "class",
+    "subclass",
+    "reference_length",
+    "coverage",
+    "identity",
+    "method",
+    "scope",
     "element_name",
-    "nucleic",
   ];
 
-  const toggleNucleic = (index) => {
+  const toggleRow = (index) => {
     setSelectedRow((prev) => (prev === index ? null : index));
-
     setTimeout(() => {
       titleRef.current?.scrollIntoView({ behavior: "smooth" });
     }, 100);
@@ -96,16 +107,15 @@ const AmrTable = ({ data = [] }) => {
 
       {selectedRow !== null && (
         <NucleicContent>
-          {headers.map((header, i) => {
-            const key = headers[i] === "Index" ? null : headers[i];
+          {["Index", ...headers.slice(1), "nucleic"].map((header, i) => {
             const value =
-              headers[i] === "Index"
+              header === "Index"
                 ? selectedRow + 1
-                : data[selectedRow]?.[key] || t("amrComponent.notAvailable");
+                : data[selectedRow]?.[header] || t("amrComponent.notAvailable");
 
             return (
               <div key={i}>
-                <strong>{t(`amrComponent.columns.${headers[i]}`)}:</strong> {value}
+                <strong>{t(`amrComponent.columns.${header}`)}:</strong> {value}
               </div>
             );
           })}
@@ -123,20 +133,30 @@ const AmrTable = ({ data = [] }) => {
           </thead>
           <tbody>
             {data.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                <Td>{rowIndex + 1}</Td>
-                {headers.slice(1).map((key, cellIndex) => (
+              <TableRow
+                key={rowIndex}
+                selected={selectedRow === rowIndex}
+                onClick={() => toggleRow(rowIndex)}
+              >
+                {headers.map((key, cellIndex) => (
                   <Td key={cellIndex}>
-                    {key === "nucleic" ? (
-                      <EyeIcon onClick={() => toggleNucleic(rowIndex)}>
-                        {selectedRow === rowIndex ? "🙈" : "👁️"}
-                      </EyeIcon>
-                    ) : (
-                      row[key] || t("amrComponent.notAvailable")
-                    )}
+                    {key === "Index"
+                      ? rowIndex + 1
+                      : key === "accession"
+                      ? (
+                          <a
+                            href={`https://www.ncbi.nlm.nih.gov/search/all/?term=${row[key]}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ color: "#2563eb", textDecoration: "underline" }}
+                          >
+                            {row[key]}
+                          </a>
+                        )
+                      : row[key] || t("amrComponent.notAvailable")}
                   </Td>
                 ))}
-              </tr>
+              </TableRow>
             ))}
           </tbody>
         </Table>

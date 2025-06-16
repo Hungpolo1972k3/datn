@@ -3,7 +3,8 @@ import { useNotice } from "../context/NoticeContext";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import datasetFolder from "../utils/datasetFolder.json";
-import { apiRunBlastnTwoFiles, apiDownloadFile, apiGetFileInfo2 } from "../service/blastn";
+import { apiRunBlastnTwoFiles, apiDownloadFile, apiGetZipFile, apiGetFileInfo2 } from "../service/blastn";
+import { apiGetZipFile2 } from "../service/dataset";
 import LoadingSpinner from "./LoadingSpinner";
 import BlastnModal from "./Blastn";
 import { FiDownload } from "react-icons/fi";
@@ -157,33 +158,34 @@ const ResultTable = ({ results, blastnInfo }) => {
   const [amr, setAmr]= useState([]);
   const [virulence2, setVirulence2] = useState([]);
   const [amr2, setAmr2]= useState([]);
-
-  const handleViewDetails = async (url, name, info, bacteria) => {
-    let url2 = `/app/FastA/${name}/Spades_output/contigs.fasta`;
+  const handleViewDetails = async (code, name, info, bacteria, inputUrl) => {
+    let datasetUrl = `/app/FastA/${name}/Spades_output/contigs.fasta`
+    let url = `${code}_result`
     setIsLoading(true);
     try {
-      const [blob, blob2] = await Promise.all([
-        apiGetFileInfo2(url),
-        apiGetFileInfo2(url2),
-      ]);
-      const file = new File([blob], 'contigs.fasta', { type: 'text/plain' });
-      const file2 = new File([blob2], 'contigs2.fasta', { type: 'text/plain' });
-      const [result, virulence, amr, virulence2, amr2] = await Promise.all([
-        apiRunBlastnTwoFiles(url, url2),
-        apiRunVirulenceTool(file),
-        apiRunAmrTool(file),
-        apiRunVirulenceTool(file2),
-        apiRunAmrTool(file2),
-      ]);
-      setVirulence(virulence.data);
-      setAmr(amr.data);
-      setVirulence2(virulence2.data);
-      setAmr2(amr2.data);
-      setBlastnData(result.data);
-      setModalInfo(info);
-      setShowModal(true);
-      setBacteriaInfo(bacteria);
+     const [result, inputFileresult, blob] = await Promise.all([
+      apiRunBlastnTwoFiles(inputUrl, datasetUrl),
+      apiGetZipFile2(url),
+      apiGetFileInfo2(datasetUrl),
+    ]);
+
+    const file = new File([blob], 'contigs.fasta', { type: 'text/plain' });
+
+    const [virulenceRes, amrRes] = await Promise.all([
+      apiRunVirulenceTool(file),
+      apiRunAmrTool(file),
+    ]);
+
+    setVirulence2(virulenceRes.data || []);
+    setAmr2(amrRes.data || []);
+    setVirulence(inputFileresult.data.data.virulence);
+    setAmr(inputFileresult.data.data.amr);
+    setBlastnData(result.data);
+    setModalInfo(info);
+    setShowModal(true);
+    setBacteriaInfo(bacteria);
     } catch (error) {
+      console.log(error)
       showNotice(0, t("resultPage.error.detail"));
     } finally {
       setIsLoading(false);
@@ -191,11 +193,15 @@ const ResultTable = ({ results, blastnInfo }) => {
   };
 
 
-  const handleDownload = () => {
-    if (blastnInfo?.url) {
-      apiDownloadFile(blastnInfo.url);
+  const handleDownload = async() => {
+    try {
+      if (blastnInfo?.url) {
+      await apiDownloadFile(blastnInfo.url);
     } else {
       showNotice(0,t("resultPage.error.download"))
+    }
+    } catch (error) {
+       showNotice(0,t("resultPage.error.download"))
     }
   };
 
@@ -227,7 +233,8 @@ const ResultTable = ({ results, blastnInfo }) => {
           </div>
         </div>
       )}
-      <Table>
+      {!showModal && (
+        <Table>
         <thead>
           <tr>
             <Th>{t("resultPage.tableHeaders.index")}</Th>
@@ -281,7 +288,7 @@ const ResultTable = ({ results, blastnInfo }) => {
                   <Td>
                     <span
                       style={{ cursor: "pointer", fontSize: "1.8rem", userSelect: "none" }}
-                      onClick={() => handleViewDetails(blastnInfo.url, r.name, r, bacteria)}
+                      onClick={() => handleViewDetails(blastnInfo.code, r.name, r, bacteria, blastnInfo.url)}
                       title={t("resultPage.viewDetails")}
                     >
                       👁️
@@ -293,6 +300,7 @@ const ResultTable = ({ results, blastnInfo }) => {
           )}
         </tbody>
       </Table>
+      )}
       {isLoading && (
         <div style={{ marginTop: "200px" }}>
           <LoadingSpinner />
@@ -310,7 +318,7 @@ const ResultTable = ({ results, blastnInfo }) => {
           amrDataset={amr2}
         />
       )}
-      {results.length > 0 && (
+      {results.length > 0 && !showModal && (
         <PaginationWrapper>
           <div>
             {t("resultPage.rowsPerPage")}:{" "}

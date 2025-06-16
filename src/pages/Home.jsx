@@ -2,7 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 
-// Styled components
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -15,7 +14,7 @@ const Wrapper = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 2rem;
+  font-size: 35px;
   color: #1e3a8a;
   margin: 30px 0 10px;
   border-left: 5px solid #3498db;
@@ -31,7 +30,7 @@ const Text = styled.p`
 `;
 
 const Image = styled.img`
-  width: 50%;
+  width: 700px;
   height: auto;
   display: block;
   margin: 20px auto;

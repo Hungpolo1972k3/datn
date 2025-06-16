@@ -4,6 +4,9 @@ import ResultComponent from './ResultComponent';
 import { apiGetVirulencesBySampleId } from '../service/virulence';
 import { apiGetAmrsBySampleId } from '../service/amr';
 import { useTranslation } from 'react-i18next';
+import { FiDownload } from 'react-icons/fi';
+import { apiDownloadFile } from '../service/blastn';
+import { useNotice } from "../context/NoticeContext";
 
 const PopUpContainer = styled.div`
   position: fixed;
@@ -47,6 +50,7 @@ const Title = styled.h3`
   text-align: center;
   font-size: 30px;
   margin-bottom: 20px;
+  color: #1e3a8a;
 `;
 
 const Table = styled.table`
@@ -56,10 +60,11 @@ const Table = styled.table`
 `;
 
 const TableHeader = styled.th`
-  background-color: #f4f4f4;
+  background-color: #007bff;
   padding: 10px;
   text-align: left;
   font-weight: bold;
+  color: #fff;
 `;
 
 const TableData = styled.td`
@@ -92,7 +97,7 @@ const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
   const [showResultAll, setShowResultAll] = useState(false);
   const [showResult, setShowResult] = useState({});
   const [fastaInfo, setFastaInfo] = useState({})
-
+  const { showNotice } = useNotice();
   const handleGetResult = async(index) => {
     setShowResultAll(!showResultAll);
     setShowResult((prevState) => ({
@@ -104,8 +109,20 @@ const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
     const amr = await apiGetAmrsBySampleId(experiments[index]._id);
     setVirulenceInfo(virulence.data);
     setAmrInfo(amr.data);
+    setFastaInfo((prev) => ({
+      ...prev,
+      virulence: virulence.data.length,
+      amr: amr.data.length,
+    }));
   };
-
+  const handleDownloadFile = async(inputUrl) => {
+    console.log(inputUrl)
+    try {
+      await apiDownloadFile(inputUrl);
+    } catch (error) {
+      showNotice(0,t("resultPage.error.download"))
+    }
+  }
   if (!showModal) return null;
 
   return (
@@ -118,7 +135,6 @@ const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
             <tr>
               <TableHeader>{t('experimentInfoComponent.index')}</TableHeader>
               <TableHeader>{t('experimentInfoComponent.sampleName')}</TableHeader>
-              <TableHeader>{t('experimentInfoComponent.sampleCode')}</TableHeader>
               <TableHeader>{t('experimentInfoComponent.header')}</TableHeader>
               <TableHeader>{t('experimentInfoComponent.length')}</TableHeader>
               <TableHeader>{t('experimentInfoComponent.fileName')}</TableHeader>
@@ -131,12 +147,13 @@ const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
               <TableRow key={index}>
                 <TableData>{index + 1}</TableData>
                 <TableData>{experiment.name}</TableData>
-                <TableData>{experiment.code}</TableData>
                 <TableData>{experiment.header}</TableData>
                 <TableData>{experiment.length}</TableData>
                 <TableData>
                   {experiment.file_name}
-                  <Icon onClick={() => alert(t('experimentInfoComponent.downloadFile'))}>⤓</Icon>
+                  <Icon onClick={() => handleDownloadFile(experiment.fastaFilePath)}>
+                    <FiDownload />
+                  </Icon>
                 </TableData>
                 <TableData>
                   {new Date(experiment.createdAt).toLocaleString('vi-VN', {

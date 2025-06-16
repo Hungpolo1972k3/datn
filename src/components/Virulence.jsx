@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useTranslation } from "react-i18next";
 
 const TableContainer = styled.div`
@@ -20,6 +20,7 @@ const Title = styled.h3`
   font-weight: bold;
   margin-bottom: 20px;
   text-align: center;
+  color: #1e3a8a;
 `;
 
 const TableWrapper = styled.div`
@@ -34,8 +35,8 @@ const Table = styled.table`
 `;
 
 const Th = styled.th`
-  background: #d6d6d6;
-  color: black;
+  background: #007bff;
+  color: #ffffff;
   padding: 10px;
   text-align: left;
   white-space: nowrap;
@@ -47,12 +48,15 @@ const Td = styled.td`
   white-space: nowrap;
 `;
 
-const EyeIcon = styled.span`
+const TableRow = styled.tr`
   cursor: pointer;
-  font-size: 18px;
-  color: #007bff;
+  ${(props) =>
+    props.selected &&
+    css`
+      background-color: #dbeafe;
+    `}
   &:hover {
-    text-decoration: underline;
+    background-color: #f1f5f9;
   }
 `;
 
@@ -81,10 +85,9 @@ const VirulenceTable = ({ data }) => {
     t("virulenceComponent.identity"),
     t("virulenceComponent.coverage"),
     t("virulenceComponent.accession"),
-    t("virulenceComponent.nucleic"),
   ];
 
-  const toggleNucleic = (index) => {
+  const toggleRow = (index) => {
     setSelectedRow((prev) => (prev === index ? null : index));
     setTimeout(() => {
       titleRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -97,31 +100,22 @@ const VirulenceTable = ({ data }) => {
 
       {selectedRow !== null && (
         <NucleicContent>
-          {headers.map((header, i) => {
-            const key = [
-              "index",
-              "sequence",
-              "gene",
-              "start",
-              "stop",
-              "strand",
-              "identity",
-              "coverage",
-              "accession",
-              "nucleic",
-            ][i];
-
-            const value =
-              key === "index"
-                ? selectedRow + 1
-                : data[selectedRow]?.[key] || "N/A";
-
-            return (
-              <div key={i}>
-                <strong>{header}:</strong> {value}
-              </div>
-            );
-          })}
+          {[
+            { label: t("virulenceComponent.index"), value: selectedRow + 1 },
+            { label: t("virulenceComponent.sequence"), value: data[selectedRow]?.sequence },
+            { label: t("virulenceComponent.gene"), value: data[selectedRow]?.gene },
+            { label: t("virulenceComponent.start"), value: data[selectedRow]?.start },
+            { label: t("virulenceComponent.stop"), value: data[selectedRow]?.stop },
+            { label: t("virulenceComponent.strand"), value: data[selectedRow]?.strand },
+            { label: t("virulenceComponent.identity"), value: data[selectedRow]?.identity },
+            { label: t("virulenceComponent.coverage"), value: data[selectedRow]?.coverage },
+            { label: t("virulenceComponent.accession"), value: data[selectedRow]?.accession },
+            { label: t("virulenceComponent.nucleic"), value: data[selectedRow]?.nucleic },
+          ].map((item, i) => (
+            <div key={i}>
+              <strong>{item.label}:</strong> {item.value || "N/A"}
+            </div>
+          ))}
         </NucleicContent>
       )}
 
@@ -136,7 +130,11 @@ const VirulenceTable = ({ data }) => {
           </thead>
           <tbody>
             {data.map((item, index) => (
-              <tr key={index}>
+              <TableRow
+                key={index}
+                selected={selectedRow === index}
+                onClick={() => toggleRow(index)}
+              >
                 <Td>{index + 1}</Td>
                 <Td>{item.sequence}</Td>
                 <Td>
@@ -144,7 +142,11 @@ const VirulenceTable = ({ data }) => {
                     href={`/dataset?search=${encodeURIComponent(item.gene)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
+                    style={{
+                      color: "#007bff",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
                   >
                     {item.gene}
                   </a>
@@ -155,12 +157,7 @@ const VirulenceTable = ({ data }) => {
                 <Td>{item.identity}</Td>
                 <Td>{item.coverage}</Td>
                 <Td>{item.accession}</Td>
-                <Td>
-                  <EyeIcon onClick={() => toggleNucleic(index)}>
-                    {selectedRow === index ? "🙈" : "👁️"}
-                  </EyeIcon>
-                </Td>
-              </tr>
+              </TableRow>
             ))}
           </tbody>
         </Table>

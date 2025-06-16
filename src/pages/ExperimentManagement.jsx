@@ -59,8 +59,9 @@ const TableHeader = styled.th`
   padding: 12px;
   font-size: 18px;
   text-align: left;
-  background-color: #f4f4f4;
+  background-color: #007bff;
   border: 1px solid #ddd;
+  color: #fff;
 `;
 
 const TableRow = styled.tr`
@@ -116,10 +117,10 @@ const ExperimentPage = () => {
       const matchSearch =
         exp.name?.toLowerCase().includes(keyword) ||
         exp.code?.toLowerCase().includes(keyword) ||
-        exp.engineer?.toLowerCase().includes(keyword);
+        exp.username?.toLowerCase().includes(keyword);
 
       const matchEngineer = selectedEngineer
-        ? exp.engineer === selectedEngineer
+        ? exp.username === selectedEngineer
         : true;
 
       return matchSearch && matchEngineer;
@@ -135,7 +136,7 @@ const ExperimentPage = () => {
 
   const closeModalInfo = () => setShowModalInfo(false);
 
-  const uniqueEngineers = [...new Set(experiments.map((exp) => exp.engineer))];
+  const uniqueEngineers = [...new Set(experiments.map((exp) => exp.username))];
 
   return (
     <Container>
@@ -178,7 +179,7 @@ const ExperimentPage = () => {
                 <TableData>{index + 1}</TableData>
                 <TableData>{experiment.name}</TableData>
                 <TableData>{experiment.code}</TableData>
-                <TableData>{experiment.engineer}</TableData>
+                <TableData>{experiment.username}</TableData>
                 <TableData>
                   {experiment.createdTime || new Date(experiment.createdAt).toLocaleString('vi-VN', {
                     hour: '2-digit',

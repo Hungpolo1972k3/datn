@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { apiCreateSample, apiDeleteSampleById } from "../service/sample";
 import { apiGetVirulenceInfo } from "../service/virulence";
 import { apiGetAmrInfo } from "../service/amr";
-import ResultPopup from "../components/ResultPopup";
+import ResultComponent from "../components/ResultComponent";
 import { useDispatch, useSelector } from "react-redux";
 import { apiGetExperimentsByUserId } from "../service/experiment";
 import { useNotice } from "../context/NoticeContext";
@@ -177,8 +177,6 @@ const Submit = () => {
   const [showModal, setShowModal] = useState(false);
   const [experiments, setExperiments] = useState([]);
 
-  const closeModal = () => setShowModal(false);
-
   useEffect(() => {
     const fetchExperiments = async () => {
       if (!userId) return;
@@ -294,6 +292,7 @@ const Submit = () => {
       sampleName: "",
       file: "",
     });
+    setShowModal(false);
   };
 
   return (
@@ -338,13 +337,13 @@ const Submit = () => {
           </ButtonReset>
         </ButtonWrapper>
         {isLoading && <LoadingSpinner />}
-        <ResultPopup
-          fastaInfo={fastaInfo}
-          virulenceInfo={virulenceInfo}
-          amrInfo={amrInfo}
-          showModal={showModal}
-          closeModal={closeModal}
-        />
+        {showModal && (
+          <ResultComponent
+            fastaInfo={fastaInfo}
+            virulenceInfo={virulenceInfo}
+            amrInfo={amrInfo}
+          />
+        )}
       </Wrapper>
     </Container>
   );

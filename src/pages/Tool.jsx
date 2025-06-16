@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import { apiRunVirulenceTool } from "../service/virulence";
@@ -113,8 +114,45 @@ const ButtonReset = styled.button`
   }
 `;
 
+const BreadcrumbWrapper = styled.nav`
+  font-size: 14px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+  margin-left: 40px;
+  color: #555;
+  user-select: none;
+  align-self: flex-start;
+`;
+
+const Crumb = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-weight: bold;
+  font-size: 22px;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const CrumbMain = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const Separator = styled.span`
+  margin: 0 15px;
+  font-size: 30px;
+`;
+
 const Tool = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const fileInputRef = useRef(null);
   const resultRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -192,6 +230,11 @@ const Tool = () => {
   return (
     <Container>
       <Wrapper>
+        <BreadcrumbWrapper>
+          <Crumb onClick={() => navigate('/')}>{t("breadcrumb.ABDataset")}</Crumb>
+          <Separator>›</Separator>
+          <CrumbMain onClick={() => navigate('/tool')}>{t("breadcrumb.tool")}</CrumbMain>
+      </BreadcrumbWrapper>
         <Title>{t("toolPage.title")}</Title>
         <DropdownWrapper>
           <ChooseFileButtonWrapper>

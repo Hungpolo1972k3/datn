@@ -16,13 +16,10 @@ const Popup = styled.div`
   background: white;
   padding: 30px;
   border-radius: 10px;
-  width: 70%;
-  position: relative;
-  height: 70%;
+  width: 50%;
+  height: 90%;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  position: relative;
 `;
 
 const CloseButton = styled.button`
@@ -37,24 +34,35 @@ const CloseButton = styled.button`
 const Title = styled.h2`
   font-size: 40px;
   font-weight: bold;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
   text-align: center;
+  color: #1e3a8a;
+`;
+const FormWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const InputGroup = styled.div`
   margin-bottom: 15px;
   width: 80%;
+  margin-left: auto;
+  margin-right: auto;
 `;
 
 const Label = styled.label`
+  font-size: 20px;
+  font-weight: 600;
   display: block;
   margin-bottom: 5px;
-  font-weight: bold;
+  color: #1e3a8a;
 `;
 
 const Input = styled.input`
   width: 100%;
-  padding: 8px;
+  padding: 10px;
+  font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
 `;
@@ -65,27 +73,37 @@ const PasswordWrapper = styled.div`
 
 const EyeIcon = styled.span`
   position: absolute;
-  right: 0px; top: 50%;
+  right: 10px; top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
   font-size: 18px;
 `;
 
 const Button = styled.button`
-  padding: 10px 15px;
-  background-color: #007bff;
+  padding: 10px;
+  background-color: #1e3a8a;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  width: 15%;
+  width: 30%;
   margin-top: 20px;
-  font-size: 15px
+  font-size: 16px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 `;
 
 const ErrorMsg = styled.div`
   color: red;
   font-size: 13px;
+  margin-top: 5px;
+`;
+
+const RadioGroup = styled.div`
+  display: flex;
+  gap: 15px;
+  margin-top: 5px;
 `;
 
 const AddUserPopup = ({ onClose }) => {
@@ -125,11 +143,10 @@ const AddUserPopup = ({ onClose }) => {
     const validationErrors = validate();
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
-  
+
     try {
-      const a = await apiAddUser(formData);
-      const translatedMessage = t("addUserComponent.addUserSuccess");
-      showNotice(1, translatedMessage);
+      await apiAddUser(formData);
+      showNotice(1, t("addUserComponent.addUserSuccess"));
       onClose();
       window.location.reload();
     } catch (err) {
@@ -142,112 +159,90 @@ const AddUserPopup = ({ onClose }) => {
       <Popup>
         <CloseButton onClick={onClose}>×</CloseButton>
         <Title>{t("addUserComponent.title")}</Title>
-        <InputGroup>
-        <Label>{t("addUserComponent.email")}</Label>
-        <Input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-        />
-        {errors.email && <ErrorMsg>{errors.email}</ErrorMsg>}
+        <FormWrapper>
+                  <InputGroup>
+          <Label>{t("addUserComponent.email")}</Label>
+          <Input type="email" name="email" value={formData.email} onChange={handleChange} />
+          {errors.email && <ErrorMsg>{errors.email}</ErrorMsg>}
         </InputGroup>
+
         <InputGroup>
-        <Label>{t("addUserComponent.password")}</Label>
-        <PasswordWrapper>
+          <Label>{t("addUserComponent.password")}</Label>
+          <PasswordWrapper>
             <Input
-            type={showPassword ? "text" : "password"}
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder={t("addUserComponent.passwordPlaceholder")} 
+              type={showPassword ? "text" : "password"}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder={t("addUserComponent.passwordPlaceholder")}
             />
             <EyeIcon onClick={() => setShowPassword(!showPassword)}>
-            {showPassword ? "🙈" : "👁️"}
+              {showPassword ? "🙈" : "👁️"}
             </EyeIcon>
-        </PasswordWrapper>
-        {errors.password && <ErrorMsg>{errors.password}</ErrorMsg>}
+          </PasswordWrapper>
+          {errors.password && <ErrorMsg>{errors.password}</ErrorMsg>}
         </InputGroup>
 
         <InputGroup>
-        <Label>{t("addUserComponent.username")}</Label>
-        <Input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-        />
-        {errors.username && <ErrorMsg>{errors.username}</ErrorMsg>}
+          <Label>{t("addUserComponent.username")}</Label>
+          <Input type="text" name="username" value={formData.username} onChange={handleChange} />
+          {errors.username && <ErrorMsg>{errors.username}</ErrorMsg>}
         </InputGroup>
 
         <InputGroup>
-        <Label>{t("addUserComponent.phone")}</Label>
-        <Input
-            type="text"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-        />
-        {errors.phone && <ErrorMsg>{errors.phone}</ErrorMsg>}
+          <Label>{t("addUserComponent.phone")}</Label>
+          <Input type="text" name="phone" value={formData.phone} onChange={handleChange} />
+          {errors.phone && <ErrorMsg>{errors.phone}</ErrorMsg>}
         </InputGroup>
 
         <InputGroup>
-        <Label>{t("addUserComponent.address")}</Label>
-        <Input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-        />
-        {errors.address && <ErrorMsg>{errors.address}</ErrorMsg>}
+          <Label>{t("addUserComponent.address")}</Label>
+          <Input type="text" name="address" value={formData.address} onChange={handleChange} />
         </InputGroup>
 
         <InputGroup>
-        <Label>{t("addUserComponent.birthday")}</Label>
-        <Input
-            type="date"
-            name="birthday"
-            value={formData.birthday}
-            onChange={handleChange}
-        />
-        {errors.birthday && <ErrorMsg>{errors.birthday}</ErrorMsg>}
+          <Label>{t("addUserComponent.birthday")}</Label>
+          <Input type="date" name="birthday" value={formData.birthday} onChange={handleChange} />
+          {errors.birthday && <ErrorMsg>{errors.birthday}</ErrorMsg>}
         </InputGroup>
 
         <InputGroup>
-            <Label>{t("addUserComponent.gender")}</Label>
-            <select
+          <Label>{t("addUserComponent.gender")}</Label>
+          <RadioGroup>
+            <label>
+              <input
+                type="radio"
                 name="gender"
-                value={formData.gender}
+                value="male"
+                checked={formData.gender === "male"}
                 onChange={handleChange}
-                style={{ fontSize: "15px", padding: "5px", width: "35%" }} 
-            >
-                <option value="">{t("addUserComponent.selectGender")}</option>
-                <option value={t("addUserComponent.male")}>{t("addUserComponent.male")}</option>
-                <option value={t("addUserComponent.female")}>{t("addUserComponent.female")}</option>
-              </select>
-            {errors.gender && <ErrorMsg>{errors.gender}</ErrorMsg>}
-            </InputGroup>
-        <InputGroup>
-            <Label>{t("addUserComponent.career")}</Label>
-            <Input
-                type="text"
-                name="career"
-                value={formData.career}
+              />{" "}
+              {t("addUserComponent.male")}
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                checked={formData.gender === "female"}
                 onChange={handleChange}
-            />
-            {errors.career && <ErrorMsg>{errors.career}</ErrorMsg>}
-            </InputGroup>
-
-            <InputGroup>
-            <Label>{t("addUserComponent.workplace")}</Label>
-            <Input
-                type="text"
-                name="workplace"
-                value={formData.workplace}
-                onChange={handleChange}
-            />
-            {errors.workplace && <ErrorMsg>{errors.workplace}</ErrorMsg>}
+              />{" "}
+              {t("addUserComponent.female")}
+            </label>
+          </RadioGroup>
+          {errors.gender && <ErrorMsg>{errors.gender}</ErrorMsg>}
         </InputGroup>
+
+        <InputGroup>
+          <Label>{t("addUserComponent.career")}</Label>
+          <Input type="text" name="career" value={formData.career} onChange={handleChange} />
+        </InputGroup>
+
+        <InputGroup>
+          <Label>{t("addUserComponent.workplace")}</Label>
+          <Input type="text" name="workplace" value={formData.workplace} onChange={handleChange} />
+        </InputGroup>
+        </FormWrapper>
         <Button onClick={handleSubmit}>{t("addUserComponent.confirm")}</Button>
       </Popup>
     </Overlay>

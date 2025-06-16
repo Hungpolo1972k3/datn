@@ -47,11 +47,11 @@ const Button = styled.button`
   transition: background-color 0.3s;
 
   &:first-child {
-    background-color: #f44336;
+    background-color: #007bff;
     color: white;
 
     &:hover {
-      background-color: #d32f2f;
+      background-color:rgba(0, 123, 255, 0.96);
     }
   }
 

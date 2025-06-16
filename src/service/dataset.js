@@ -61,3 +61,14 @@ export const apiGetFileInfo = async (relativePath) => {
     throw error;  
   }
 };
+
+export const apiGetZipFile2 = async (id) => {
+  try {
+    const response = await axiosConfig.get('/api/dataset/getzipfile2', {
+      params: { id } 
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+}

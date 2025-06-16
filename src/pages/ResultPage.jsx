@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ResultTable from "../components/ResultTable";
 import { useTranslation } from "react-i18next";
 import { apiRunBlastnTool, apiGetZipFile, apiGetBlastnInfo } from "../service/blastn";
 import { useNotice } from "../context/NoticeContext";
 import LoadingSpinner from "../components/LoadingSpinner";
+import NoticeBlastnPopup from "../components/NoticeBlastnPopup";
 
 const Container = styled.div`
   margin: 40px auto;
@@ -126,6 +127,40 @@ const IconButton = styled(Button)`
   height: 44px;
   min-width: auto;
 `;
+const BreadcrumbWrapper = styled.nav`
+  font-size: 14px;
+  margin-bottom: 15px;
+  margin-left: 5px;
+  color: #555;
+  user-select: none;
+  align-self: flex-start;
+`;
+
+const Crumb = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-weight: bold;
+  font-size: 22px;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const CrumbMain = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const Separator = styled.span`
+  margin: 0 15px;
+  font-size: 30px;
+`;
 
 const UploadIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" width="20" height="20">
@@ -152,6 +187,8 @@ const ResultPage = () => {
   const [uploadedIdList, setUploadedIdList] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
   const [blastnInfo, setBlastnInfo] = useState({});
+  const [showPopup, setShowPopup] = useState(false);
+  const [blastnId, setBlastnId] = useState("NoData");
 
   useEffect(() => {
     const storedUploadedIds = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
@@ -226,7 +263,8 @@ const ResultPage = () => {
       setIsLocked(true);
       setResults([]);
       setBlastnInfo({});
-      showNotice(0, t("resultPage.waitMessage", { minutes: 15 }));
+      setBlastnId(id);
+      setShowPopup(true);
       const result = await apiRunBlastnTool(file, id);
       const response = await apiGetZipFile(result.data.id);
       if (response.data.status === 0) {
@@ -261,9 +299,16 @@ const ResultPage = () => {
       handleSearch();
     }
   }, [search]);
-
+  const handleClosePopup = () => {
+    setShowPopup(false);
+  };
   return (
     <Container>
+      <BreadcrumbWrapper>
+          <Crumb onClick={() => navigate('/')}>{t("breadcrumb.ABDataset")}</Crumb>
+          <Separator>›</Separator>
+          <CrumbMain onClick={() => navigate('/tool')}>{t("breadcrumb.blastn")}</CrumbMain>
+      </BreadcrumbWrapper>
       <Title>{t("resultPage.title")}</Title>
 
       <FormGroup>
@@ -366,7 +411,9 @@ const ResultPage = () => {
       )}
 
       <ResultTable results={results} blastnInfo={blastnInfo}/>
-      
+      {showPopup && (
+        <NoticeBlastnPopup id={blastnId} onClose={handleClosePopup} />
+      )}
       {isLoading && (
         <div style={{ marginTop: "200px" }}>
           <LoadingSpinner />

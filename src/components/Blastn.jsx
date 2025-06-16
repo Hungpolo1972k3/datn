@@ -5,11 +5,6 @@ import AmrCompare from "./AmrCompare";
 import VirulenceCompare from "./VirulenceCommpare";
 
 const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
   background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
@@ -20,9 +15,8 @@ const Overlay = styled.div`
 const Modal = styled.div`
   background: white;
   padding: 24px;
-  border-radius: 12px;
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   overflow-y: auto;
   position: relative;
 `;
@@ -196,7 +190,21 @@ const TabWrapper = styled.div`
   margin-bottom: 24px;
 `;
 
+const BackButton = styled.button`
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  background: transparent;
+  border: none;
+  font-size: 2.5rem;
+  color: #334155;
+  cursor: pointer;
+  z-index: 1000;
 
+  &:hover {
+    color: #1e293b;
+  }
+`;
 const BlastnModal = ({ blastn, onClose, info, bacteria, virulence, virulenceDataset, amr, amrDataset }) => {
   const { t } = useTranslation();
   const modalRef = useRef();
@@ -261,8 +269,12 @@ const BlastnModal = ({ blastn, onClose, info, bacteria, virulence, virulenceData
   return (
     <Overlay>
       <Modal ref={modalRef}>
-        <CloseButton onClick={onClose} aria-label="Close">×</CloseButton>
-
+        {/* <BackButton onClick={onClose} title={t("blastn.back") || "Back"}>
+          ←
+        </BackButton> */}
+        <h2 style={{ fontSize: "3rem", fontWeight: "bold", color: "#1e40af", marginTop: "32px", textAlign: "center", marginBottom: "40px" }}>
+          {t("blastn.detailedResults")}
+        </h2>
         <TabWrapper>
           <TabButton active={activeTab === "info"} onClick={() => setActiveTab("info")}>
             🔬 {t("blastn.info")}
@@ -274,24 +286,31 @@ const BlastnModal = ({ blastn, onClose, info, bacteria, virulence, virulenceData
             💊 {t("blastn.amrFactor")}
           </TabButton>
         </TabWrapper>
-
+        <InfoHeader>
+          <GeneName><a
+              href={`/dataset?search=${encodeURIComponent(info.name)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#007bff', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+              {info.name}
+              </a></GeneName>
+        <BacteriaName>{bacteria}</BacteriaName>
+        </InfoHeader>
+          
 
         {activeTab === "info" && info && (
           <InfoBox>
-            <InfoHeader>
-              <GeneName>{info.name}</GeneName>
-              <BacteriaName>{bacteria}</BacteriaName>
-            </InfoHeader>
             <InfoTable>
-              <tbody>
-                {info.result && Object.entries(info.result).map(([key, value]) => (
-                  <InfoTr key={key}>
-                    <InfoTh>{keyToLabel[key] || key}</InfoTh>
-                    <InfoTd>{typeof value === "number" ? value.toFixed(2) : value}</InfoTd>
-                  </InfoTr>
-                ))}
-              </tbody>
-            </InfoTable>
+          <tbody>
+            {info.result && Object.entries(info.result).map(([key, value]) => (
+              <InfoTr key={key}>
+              <InfoTh>{keyToLabel[key] || key}</InfoTh>
+              <InfoTd>{typeof value === "number" ? value.toFixed(2) : value}</InfoTd>
+              </InfoTr>
+            ))}
+          </tbody>
+          </InfoTable>
             {selectedRow && (
               <DetailBox>
                 <NucleicContent>

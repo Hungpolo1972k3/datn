@@ -25,7 +25,7 @@ const Wrapper = styled.div`
 const Title = styled.h1`
   font-size: 36px;
   font-weight: bold;
-  color: #333;
+  color:  #1e3a8a;
   margin-bottom: 20px;
   text-align: center;
 `;
@@ -96,13 +96,13 @@ const ResultComponent = ({ fastaInfo, virulenceInfo, amrInfo }) => {
         <Title>{t("resultComponent.analysisResult")}</Title>
         <ButtonGroup>
           <Button selected={selectedTab === "Fasta"} onClick={() => handleTabClick("Fasta")}>
-            {t("resultComponent.fasta")}
+            🔬{t("resultComponent.fasta")}
           </Button>
           <Button selected={selectedTab === "Virulence"} onClick={() => handleTabClick("Virulence")}>
-            {t("resultComponent.virulence")}
+            🧫{t("resultComponent.virulence")}
           </Button>
           <Button selected={selectedTab === "AMR"} onClick={() => handleTabClick("AMR")}>
-            {t("resultComponent.amr")}
+            💊{t("resultComponent.amr")}
           </Button>
         </ButtonGroup>
 
@@ -111,13 +111,13 @@ const ResultComponent = ({ fastaInfo, virulenceInfo, amrInfo }) => {
         {selectedTab === "AMR" && <AmrTable data={amrInfo} />}
 
         {selectedTab === "Virulence" && showImage && (
-              <ImageWrapper>
+            <ImageWrapper>
               <Image src="/Bacteria-Cell.png" alt="Bacteria" />
-              <ClickArea style={{ top: "17%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.nucleoid"))} />
-              <ClickArea style={{ top: "15%", left: "0%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.ribosomes"))} />
-              <ClickArea style={{ top: "10%", left: "27%", width: "20%", height: "8%" }} onClick={() => setLabel(t("resultPopupComponent.cytoplasm"))} />
-              <ClickArea style={{ top: "40%", left: "82%", width: "20%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.plasmid"))} />
-              <ClickArea style={{ top: "23%", left: "80%", width: "15%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.pili"))} />
+              <ClickArea style={{ top: "10%", left: "40%", width: "30%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.nucleoid"))} />
+              <ClickArea style={{ top: "5%", left: "0%", width: "20%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.ribosomes"))} />
+              <ClickArea style={{ top: "2%", left: "27%", width: "20%", height: "8%" }} onClick={() => setLabel(t("resultPopupComponent.cytoplasm"))} />
+              <ClickArea style={{ top: "35%", left: "82%", width: "20%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.plasmid"))} />
+              <ClickArea style={{ top: "16%", left: "80%", width: "15%", height: "10%" }} onClick={() => setLabel(t("resultPopupComponent.pili"))} />
               <ClickArea style={{ top: "62%", left: "70%", width: "25%", height: "15%" }} onClick={() => setLabel(t("resultPopupComponent.inclusionBodies"))} />
               <ClickArea style={{ top: "80%", left: "57%", width: "25%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.flagellum"))} />
               <ClickArea style={{ top: "79%", left: "29%", width: "25%", height: "12%" }} onClick={() => setLabel(t("resultPopupComponent.cytoplasmicMembrane"))} />

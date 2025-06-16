@@ -62,8 +62,9 @@ const TableHeader = styled.th`
   padding: 12px;
   font-size: 18px;
   text-align: left;
-  background-color: #f4f4f4;
+  background-color: #007bff;
   border: 1px solid #ddd;
+  color: #fff;
 `;
 
 const TableRow = styled.tr`
@@ -180,7 +181,6 @@ const ExperimentPage = () => {
               <TableHeader>{t('experimentPage.no')}</TableHeader>
               <TableHeader>{t('experimentPage.experimentName')}</TableHeader>
               <TableHeader>{t('experimentPage.experimentCode')}</TableHeader>
-              <TableHeader>{t('experimentPage.performer')}</TableHeader>
               <TableHeader>{t('experimentPage.createdTime')}</TableHeader>
               <TableHeader>{t('experimentPage.detail')}</TableHeader>
               <TableHeader>{t('experimentPage.edit')}</TableHeader>
@@ -193,9 +193,8 @@ const ExperimentPage = () => {
                 <TableData>{index + 1}</TableData>
                 <TableData>{experiment.name}</TableData>
                 <TableData>{experiment.code}</TableData>
-                <TableData>{experiment.engineer}</TableData>
                 <TableData>
-                  {experiment.createdTime || new Date(experiment.createdAt).toLocaleString('vi-VN', {
+                  {new Date(experiment.createdAt).toLocaleString('vi-VN', {
                     hour: '2-digit',
                     minute: '2-digit',
                     day: '2-digit',

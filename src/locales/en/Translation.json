@@ -100,7 +100,9 @@
         "account": "Account",
         "experiment": "Experiment",
         "sample": "Sample",
-        "user_statistics": "System Statistic"
+        "user_statistics": "System Statistic",
+        "experiment_statistics": "Experiment Statistic",
+        "sample_statistics": "Sample Statistic"
       },
     "submitPage": {
         "title": "Add Sample",
@@ -164,6 +166,8 @@
         "name": "Sample Name",
         "header": "Header",
         "length": "Length",
+        "virulence": "Virulence Numbers",
+        "amr": "AMR Numbers",
         "createdTime": "Created Time"
       },
     "amrComponent":{
@@ -180,14 +184,28 @@
           "database": "Database"
         },
         "columns": {
-          "Index": "Index",
+          "Index": "No.",
+          "accession": "Accession",
+          "alignment_length": "Alignment Length",
+          "class": "Class",
+          "closest_reference_name": "Closest Reference Name",
           "contig_id": "Contig ID",
+          "coverage": "Coverage",
+          "element_name": "Element Name",
+          "element_type": "Element Type",
+          "gene_symbol": "Gene Symbol",
+          "identity": "Identity",
+          "length": "Length",
+          "method": "Method",
+          "nucleic": "Nucleic Sequence",
+          "protein_identifier": "Protein Identifier",
+          "reference_length": "Reference Length",
+          "sample_id": "Sample ID",
+          "scope": "Scope",
           "start": "Start",
           "stop": "Stop",
           "strand": "Strand",
-          "gene_symbol": "Gene Symbol",
-          "element_name": "Element Name",
-          "nucleic": "Nucleic Sequence"
+          "subclass": "Subclass"
         }
       },
     "noticeComponent": {
@@ -244,7 +262,8 @@
         "role": "Role",
         "username": "Full name",
         "error": {
-            "invalid_email": "Invalid email address",
+            "invalid_username": "Invalid username",
+            "invalid_email": "Invalid email",
             "name_required": "Full name is required",
             "invalid_phone": "Invalid phone number",
             "address_required": "Address is required",
@@ -256,7 +275,8 @@
         },
         "success": {
             "update_user": "User information updated successfully"
-        }
+        },
+        "editing_title": "Edit User Information "
     },
     "virulenceComponent":{
         "title": "Virulence Data",
@@ -468,7 +488,8 @@
     "noData": "No BLASTN data available",
     "info": "BLASTN Comparison",
     "virulenceFactor": "Virulence Factors",
-    "amrFactor": "AMR Resistance"
+    "amrFactor": "AMR Resistance",
+    "detailedResults": "Detailed Alignment Results"
   },
   "finalExport": {
     "showPoint": "Show Points",
@@ -517,6 +538,11 @@
     "prev": "Previous",
     "next": "Next",
     "page": "Page"
+  },
+  "noticeBlastn": {
+    "line1": "Please wait about 30 minutes to receive your result!",
+    "line2": "To check the result, please save the result ID and enter it in the search box in the matching tool.",
+    "resultLink": "Blastn Result"
   }              
 }
   

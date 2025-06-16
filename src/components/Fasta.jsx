@@ -15,10 +15,10 @@ const TableContainer = styled.div`
 `;
 
 const Title = styled.h3`
-  font-size: 32px; /* Điều chỉnh cỡ chữ tại đây */
+  font-size: 32px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #333;
+  color:  #1e3a8a;
 `;
 
 const Table = styled.table`
@@ -27,10 +27,11 @@ const Table = styled.table`
 `;
 
 const Th = styled.th`
-  background: #d6d6d6;
+  background: #007bff;
   color: black;
   padding: 10px;
   text-align: left;
+  color: #ffffff;
 `;
 
 const Td = styled.td`
@@ -63,6 +64,14 @@ const FastaTable = ({ sample }) => {
           <tr>
             <Td>{t("fastaComponent.length")}</Td>
             <Td>{sample.length}</Td>
+          </tr>
+          <tr>
+            <Td>{t("fastaComponent.virulence")}</Td>
+            <Td>{sample.virulence}</Td>
+          </tr>
+          <tr>
+            <Td>{t("fastaComponent.amr")}</Td>
+            <Td>{sample.amr}</Td>
           </tr>
           <tr>
             <Td>{t("fastaComponent.createdTime")}</Td>

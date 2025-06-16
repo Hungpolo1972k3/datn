@@ -1,45 +1,25 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
-import { apiUpdateUserById } from "../service/user";
+import { apiUpdateUserById, apiGetUserById } from "../service/user";
 import { useNotice } from "../context/NoticeContext";
 import { useTranslation } from "react-i18next";
 
 const PopupContainer = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 60%;
-  padding: 20px;
   background-color: white;
-  border-radius: 8px;
-  border: 3px solid rgb(162, 166, 171);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
 `;
 
 const Title = styled.h2`
   text-align: center;
   margin-bottom: 20px;
+  margin-top: 20px;
   position: relative;
-  font-size: 40px;
+  font-size: 4rem;
   font-weight: bold;
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 40px;
-  color: #aaa;
-  cursor: pointer;
-
-  &:hover {
-    color: #f00;
-  }
+  color: #1e3a8a;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  padding-bottom: 10px;
 `;
 
 const InfoWrapper = styled.div`
@@ -67,7 +47,7 @@ const InputField = styled.input`
   margin: 5px 0;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: 100%;
+  width: 80%;
 `;
 
 const ValueText = styled.span`
@@ -78,8 +58,10 @@ const ValueText = styled.span`
 
 const ButtonWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
-  margin: 30px 80px 10px 80px;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin: 30px 0 10px 0;
 `;
 
 const Button = styled.button`
@@ -100,7 +82,41 @@ const Button = styled.button`
     background-color: #0056b3;
   }
 `;
+const BreadcrumbWrapper = styled.nav`
+  font-size: 14px;
+  margin-bottom: 15px;
+  margin-top: 30px;
+  margin-left: 40px;
+  color: #555;
+  user-select: none;
+  text-align: left;
+`;
 
+const Crumb = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-weight: bold;
+  font-size: 22px;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const CrumbMain = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const Separator = styled.span`
+  margin: 0 15px;
+  font-size: 30px;
+`;
 const fieldMap = {
   email: "userInfoComponent.email",
   username: "userInfoComponent.name",
@@ -112,20 +128,31 @@ const fieldMap = {
   workplace: "userInfoComponent.workplace",
 };
 
-const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
+const UserInfoPopup = () => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
-  const [editableInfo, setEditableInfo] = useState(userInfo);
   const [errors, setErrors] = useState({});
   const { showNotice } = useNotice();
-
+  const [userInfo, setUserInfo]= useState({});
+  const { token } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await apiGetUserById(token);
+      setUserInfo(res.data);
+    };
+    fetchData();
+  }, [token]);
   useEffect(() => {
     setEditableInfo(userInfo);
   }, [userInfo]);
-
+  const [editableInfo, setEditableInfo] = useState(userInfo);
   const validateFields = () => {
     const newErrors = {};
 
+    if (!editableInfo.username || editableInfo.username.trim() == '') {
+      newErrors.username = t("userInfoComponent.error.invalid_username");
+    }
     if (!editableInfo.phone || !/^0\d{9}$/.test(editableInfo.phone)) {
       newErrors.phone = t("userInfoComponent.error.invalid_phone");
     }
@@ -168,6 +195,7 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
     try {
       const {
         _id,
+        username,
         phone,
         address,
         birthday,
@@ -179,7 +207,7 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
       await apiUpdateUserById(
         _id,
         editableInfo.email,
-        editableInfo.username,
+        username,
         phone,
         address,
         birthday,
@@ -188,29 +216,45 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
         workplace
       );
       setIsEditing(false);
-      closePopup();
       showNotice(1, t("userInfoComponent.success.update_user"));
     } catch (error) {
       alert(`${t("userInfoComponent.error.update_failed")}: ${error}`);
     }
   };
 
-  const handleClosePopup = () => {
+  const handleShowUserInfo = () => {
+    navigate('/user-info');
     setIsEditing(false);
-    closePopup();
-  };
+  }
 
   return (
-    openPopup && (
       <PopupContainer>
-        <Title>{t("userInfoComponent.title")}</Title>
-        <CloseButton onClick={handleClosePopup}>×</CloseButton>
+        <BreadcrumbWrapper>
+          <Crumb onClick={() => navigate('/')}>{t("breadcrumb.home")}</Crumb>
+          {!isEditing && (
+            <>
+              <Separator>›</Separator>
+              <CrumbMain onClick={() => navigate('/user-info')}>{t("breadcrumb.userinfo")}</CrumbMain>
+            </>
+          )}
+          {isEditing && (
+            <>
+              <Separator>›</Separator>
+              <Crumb onClick={handleShowUserInfo}>{t("breadcrumb.userinfo")}</Crumb>
+              <Separator>›</Separator>
+              <CrumbMain onClick={() => setIsEditing(true)}>{t("breadcrumb.edituserinfo")}</CrumbMain>
+            </>
+          )}
+      </BreadcrumbWrapper>
+        <Title>
+          {isEditing ? t("userInfoComponent.editing_title") : t("userInfoComponent.title")}
+        </Title>
         <InfoWrapper>
           {Object.entries(fieldMap).map(([key, label]) => (
             <InfoRow key={key}>
               <Label>{t(label)}</Label>
               <div style={{ width: "60%" }}>
-                {isEditing && key !== "email" && key !== "username" ? (
+                {isEditing && key !== "email" ? (
                   key === "gender" ? (
                     <>
                       <select
@@ -221,7 +265,7 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
                           padding: "10px",
                           border: "1px solid #ccc",
                           borderRadius: "4px",
-                          width: "100%",
+                          width: "83%",
                         }}
                       >
                         <option value="">{t("userInfoComponent.gender_placeholder")}</option>
@@ -273,8 +317,7 @@ const UserInfoPopup = ({ openPopup, closePopup, userInfo }) => {
           </Button>
         </ButtonWrapper>
       </PopupContainer>
-    )
-  );
+    );
 };
 
 export default UserInfoPopup;

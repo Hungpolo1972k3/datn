@@ -1,43 +1,20 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { apiDownloadFile, apiGetFileInfo } from "../service/dataset";
-import { FiDownload, FiX, FiChevronDown, FiChevronRight } from "react-icons/fi";
-import ShowFileContent from "./ShowFileContent";
-import LoadingSpinner from "./LoadingSpinner";
+import { apiDownloadFile, apiGetFileInfo, apiGetFolderInfo } from "../service/dataset";
+import { FiDownload, FiChevronDown, FiChevronRight } from "react-icons/fi";
+import ShowFileContent from "../components/ShowFileContent";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { useTranslation } from "react-i18next";
-import JsonTable from "./JsonTable"
-
-const DimBackground = styled.div`
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: 999;
-`;
+import JsonTable from "../components/JsonTable";
+import datasetFolder from "../utils/datasetFolder.json";
 
 const PopupOverlay = styled.div`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 95%;
-  max-height: 90vh;
   background: white;
   z-index: 1000;
   padding: 24px;
   overflow-y: auto;
   border-radius: 12px;
-`;
-
-const PopupHeader = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 40px;
 `;
 
 const SectionRow = styled.div`
@@ -78,6 +55,40 @@ const Label = styled.span`
   align-items: center;
   gap: 6px;
 `;
+const BreadcrumbWrapper = styled.nav`
+  font-size: 14px;
+  margin-bottom: 15px;
+  margin-left: 35px;
+  margin-top: 15px;
+  color: #555;
+  user-select: none;
+`;
+
+const Crumb = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-weight: bold;
+  font-size: 22px;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const CrumbMain = styled.span`
+  cursor: pointer;
+  color: #1e3a8a;
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const Separator = styled.span`
+  margin: 0 15px;
+  font-size: 30px;
+`;
 
 const folderLabelMap = {
   contigs_summary: "Genomad",
@@ -89,30 +100,48 @@ const folderLabelMap = {
   Spades_output: "Spades",
 };
 
-const groupByFolderName = (genome) => {
-  const groups = {};
+const DatasetPopup = () => {
+  const navigate = useNavigate();
+  const [genome, setGenome]= useState([]);
+  const { name } = useParams(); 
+  const dataset = datasetFolder.find(item => item.name === name);
 
-  genome.forEach((file) => {
-    const label = folderLabelMap[file.folderName];
-    if (!label) return; 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const folderinfo = await apiGetFolderInfo(dataset.downloadUrl);
+        setGenome(folderinfo);
+      } catch (error) {
+        console.error("Không thể tải dữ liệu dataset:", error);
+      }
+    };
+    fetchData();
+  }, [name]);
 
-    if (!groups[label]) {
-      groups[label] = [];
-    }
-
-    groups[label].push(file);
-  });
-
-  return groups;
-};
-
-const DatasetPopup = ({ dataset, genome, onClose }) => {
   const { t } = useTranslation();
+
   const handleDownload = async (filePath) => {
     await apiDownloadFile(filePath); 
   };
 
-  const grouped = groupByFolderName(genome);
+  const groupByFolderName = (genome) => {
+    const groups = {};
+
+    genome.forEach((file) => {
+      const label = folderLabelMap[file.folderName];
+      if (!label) return; 
+
+      if (!groups[label]) {
+        groups[label] = [];
+      }
+
+      groups[label].push(file);
+    });
+
+    return groups;
+  };
+
+  const grouped = genome ? groupByFolderName(genome) : {};
   const [expandedSections, setExpandedSections] = useState({});
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -126,12 +155,13 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
   const [loading, setLoading] = useState(false);
   const fileContentRef = useRef(null);
   const [jsonFileContent, setJsonFileContent] = useState([])
+
   const handleViewContent = async (filePath, fileName) => {
     setLoading(true);
     try {
       const result = await apiGetFileInfo(filePath);
       if (result.data.parsed && Array.isArray(result.data.parsed)) {
-      setJsonFileContent(result.data.parsed);
+        setJsonFileContent(result.data.parsed);
       } else {
         setJsonFileContent([]);
       }
@@ -146,15 +176,19 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
       setLoading(false);
     }
   };
+
   return (
     <>
-      <DimBackground onClick={onClose} />
       <PopupOverlay>
-        <PopupHeader>
-          <CloseButton onClick={onClose}>
-            <FiX />
-          </CloseButton>
-        </PopupHeader>
+        <BreadcrumbWrapper>
+          <Crumb onClick={() => navigate('/dataset')}>{t("breadcrumb.ABDataset")}</Crumb>
+          <Separator>›</Separator>
+          <Crumb onClick={() => navigate('/dataset')}>{t("breadcrumb.dataset")}</Crumb>
+          <Separator>›</Separator>
+          <CrumbMain onClick={() => navigate(`/dataset-popup/${dataset.name}`)}>
+            {dataset.name}
+          </CrumbMain>
+      </BreadcrumbWrapper>
         <div
           style={{
             display: "flex",
@@ -191,6 +225,7 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
             🔗
           </a>
         </div>
+
         <div
           style={{
             textAlign: "left",
@@ -213,6 +248,7 @@ const DatasetPopup = ({ dataset, genome, onClose }) => {
             <h3>{dataset.sequencingSystem}</h3>
           </div>
         </div>
+
         <div>
           {Object.entries(grouped).map(([section, files]) => {
             const isOpen = expandedSections[section] ?? true;
