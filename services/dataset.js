@@ -156,6 +156,15 @@ const getZipFile = async(id) =>{
   }
 }
 
+const getZipFile2 = async(id) =>{
+  try {
+    const encodedUrl = encodeURIComponent(`/app/Blastn/${id}.json.gz`);
+    const response = await axios.get(`${process.env.BIOTOOL_URL}/api/blastn/getzipfile?url=${encodedUrl}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Lỗi: ${error.message}`);
+  }
+}
 module.exports = {
   getFullFolderPath,
   zipFolderAndSend,
@@ -163,4 +172,5 @@ module.exports = {
   getFileForDownload,
   getFileInfo,
   getZipFile,
+  getZipFile2
 };

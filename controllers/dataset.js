@@ -76,6 +76,19 @@ const getZipFile = async(req, res) => {
   }
 }
 
+const getZipFile2 = async(req, res) => {
+  try {
+    const {id} = req.query;
+    const result = await datasetService.getZipFile2(id);
+    return res.status(200).json({
+      data: result
+    })
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+}
 
 module.exports = {
     downloadFolder,
@@ -83,4 +96,5 @@ module.exports = {
     downloadFile,
     getFileInfo,
     getZipFile,
+    getZipFile2
 };
