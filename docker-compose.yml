@@ -11,3 +11,4 @@ services:
     volumes:
       - ../FastA:/app/FastA
       - ../fastA:/app/fastA
+      - ../Blastn:/app/Blastn
