@@ -5,7 +5,7 @@ const loginUser = async (req, res) => {
         const {email, password} = req.body;
         const isExistUser = await userService.checkUser(email);
         if(!isExistUser) {
-            return res.status(400).json({
+            return res.status(200).json({
                 message: "Không tồn tại người dùng",
                 status: -1,
                 data: null
@@ -13,7 +13,7 @@ const loginUser = async (req, res) => {
         }
         
         const user = await userService.loginUser({email, password}, res);
-        return res.status(201).json({
+        return res.status(200).json({
             status: 0,
             message: "Đăng nhập thành công",
             data: user

@@ -9,7 +9,7 @@ const createSample = async (req, res) => {
         }
         let existName = await sampleService.checkExistSample(experiment_id, name);
         if(existName){
-            return res.status(400).json({
+            return res.status(200).json({
                 message: "Đã tồn tại tên thí nghiệm",
                 status: -1,
                 data: ""

@@ -9,14 +9,14 @@ const createExperiment = async (req, res) => {
         }
         let {existName, existCode} = await experimentService.checkExistExperiment(user_id, name, code);
         if(existName) {
-            return res.status(400).json({
+            return res.status(200).json({
                 message: "Tên thí nghiệm đã tồn tại",
                 status: -1,
                 data: ""
             })
         }
         if(existCode) {
-            return res.status(400).json({
+            return res.status(200).json({
                 message: "Mã thí nghiệm đã tồn tại",
                 status: -2,
                 data: ""
@@ -55,14 +55,14 @@ const editExperiment = async(req, res) =>{
         }
         let {existName, existCode} = await experimentService.checkExistExperimentEdit(user_id, name, code, id);
         if(existName) {
-            return res.status(400).json({
+            return res.status(200).json({
                 message: "Tên thí nghiệm đã tồn tại",
                 status: -1,
                 data: ""
             })
         }
         if(existCode) {
-            return res.status(400).json({
+            return res.status(200).json({
                 message: "Mã thí nghiệm đã tồn tại",
                 status: -2,
                 data: ""
