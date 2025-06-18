@@ -7,9 +7,18 @@ const createSample = async (req, res) => {
         if(!name || !header || !length){
             return res.status(400).json({message: "Thiếu thông tin"})
         }
+        let existName = await sampleService.checkExistSample(experiment_id, name);
+        if(existName){
+            return res.status(400).json({
+                message: "Đã tồn tại tên thí nghiệm",
+                status: -1,
+                data: ""
+            })
+        }
         const newsample = await sampleService.createSample(user_id, experiment_id,name, header, length, file_name, fastaFilePath)
         return res.status(200).json({
             message: "Thêm mẫu thí nghiệm thành công",
+            status: 0,
             data: newsample
         })
     } catch (error) {

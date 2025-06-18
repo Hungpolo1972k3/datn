@@ -7,9 +7,25 @@ const createExperiment = async (req, res) => {
         if(!name || !code){
             return res.status(400).json({message: "Thiếu thông tin"})
         }
+        let {existName, existCode} = await experimentService.checkExistExperiment(user_id, name, code);
+        if(existName) {
+            return res.status(400).json({
+                message: "Tên thí nghiệm đã tồn tại",
+                status: -1,
+                data: ""
+            })
+        }
+        if(existCode) {
+            return res.status(400).json({
+                message: "Mã thí nghiệm đã tồn tại",
+                status: -2,
+                data: ""
+            })
+        }
         const newExperiment = await experimentService.createExperiment({user_id,name, code})
         return res.status(200).json({
             message: "Thêm mẫu thí nghiệm thành công",
+            status: 0,
             data: newExperiment
         })
     } catch (error) {
@@ -36,6 +52,21 @@ const editExperiment = async(req, res) =>{
         const {name, code} = req.body;
         if(!name || !code){
             return res.status(400).json({message: "Thiếu thông tin"})
+        }
+        let {existName, existCode} = await experimentService.checkExistExperimentEdit(user_id, name, code, id);
+        if(existName) {
+            return res.status(400).json({
+                message: "Tên thí nghiệm đã tồn tại",
+                status: -1,
+                data: ""
+            })
+        }
+        if(existCode) {
+            return res.status(400).json({
+                message: "Mã thí nghiệm đã tồn tại",
+                status: -2,
+                data: ""
+            })
         }
         const newExperiment = await experimentService.editExperiment(id,name, code)
         return res.status(200).json({

@@ -52,7 +52,7 @@ const getUserById = async (token) => {
     }
 };
 
-const updateUserInfo = async (user_id, email,username,phone,address,birthday,gender,career,workplace) => {
+const updateUserInfo = async (user_id, email, username, phone, address, birthday, gender, career, workplace) => {
     try {
         const updatedUser = await User.findByIdAndUpdate(
             user_id,
@@ -78,7 +78,7 @@ const updateUserInfo = async (user_id, email,username,phone,address,birthday,gen
 
 const checkUser = async (email) => {
     try {
-        const isExistUser = await User.findOne({email: email});
+        const isExistUser = await User.findOne({email});
         return !!isExistUser;
     } catch (error) {
         throw new Error("Lỗi : " + error.message);

@@ -7,13 +7,15 @@ const loginUser = async (req, res) => {
         if(!isExistUser) {
             return res.status(400).json({
                 message: "Không tồn tại người dùng",
+                status: -1,
                 data: null
             })
         }
+        
         const user = await userService.loginUser({email, password}, res);
         return res.status(201).json({
-            status: 1,
-            message: "Login successfully !",
+            status: 0,
+            message: "Đăng nhập thành công",
             data: user
         });
     } catch (error) {

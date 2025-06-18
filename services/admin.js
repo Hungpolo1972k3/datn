@@ -49,8 +49,7 @@ const addUser = async ({ email, password, username, address, phone, birthday, ge
             gender,
             career,
             workplace,
-            role,
-            status: true
+            role
         });
         await newUser.save();
         return newUser;
@@ -82,7 +81,7 @@ const deleteUser = async (id) => {
 const editPassword = async (user_id, newpassword) => {
   try {
     const hashedPassword = await bcrypt.hash(newpassword,parseInt(process.env.PASSWORD_HASH_NUMBER));
-    const updatedUser = await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
       user_id,
       { password: hashedPassword },
       { new: true }

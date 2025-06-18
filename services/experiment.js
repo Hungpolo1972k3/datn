@@ -4,6 +4,26 @@ const User = require('../models/user');
 const Virulence = require('../models/virulence');
 const Amr = require('../models/amr')
 
+const checkExistExperiment = async(user_id, name, code) => {
+  try {
+    let existName = await Experiment.findOne({user_id, name});
+    let existCode = await Experiment.findOne({user_id, code});
+    return { existName, existCode };
+  } catch (error) {
+    throw new Error('Lỗi: ' + error.message);
+  }
+}
+
+const checkExistExperimentEdit = async(user_id, name, code, id) => {
+  try {
+    let existName = await Experiment.findOne({user_id, name, _id: { $ne: id }});
+    let existCode = await Experiment.findOne({user_id, code, _id: { $ne: id }});
+    return { existName, existCode };
+  } catch (error) {
+    throw new Error('Lỗi: ' + error.message);
+  }
+}
+
 const createExperiment = async ({user_id,name, code}) => {
     try {
         const newExperiment = new Experiment({
@@ -20,7 +40,7 @@ const createExperiment = async ({user_id,name, code}) => {
 
 const getExperimentsByUserId = async(user_id) =>{
     try {
-        const experiments = await Experiment.find({user_id: user_id, status: true});
+        const experiments = await Experiment.find({user_id: user_id});
         return experiments;
     } catch (error) {
         throw new Error('Lỗi: ' + error.message);
@@ -121,4 +141,4 @@ const getExperimentStatisticAdmin = async () => {
   }
 };
 
-module.exports = { createExperiment, getExperimentsByUserId , editExperiment, experimentStatistic, getAllExperiments, deleteExperiment, getExperimentStatisticAdmin };
+module.exports = { createExperiment, getExperimentsByUserId , editExperiment, experimentStatistic, getAllExperiments, deleteExperiment, getExperimentStatisticAdmin, checkExistExperiment, checkExistExperimentEdit };

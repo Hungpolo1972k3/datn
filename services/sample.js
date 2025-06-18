@@ -4,6 +4,14 @@ const Virulence = require('../models/virulence');
 const Amr = require('../models/amr');
 const User = require('../models/user');
 
+const checkExistSample = async(experiment_id, name) => {
+  try {
+    let existName = await Sample.findOne({experiment_id, name});
+    return existName;
+  } catch (error) {
+    throw new Error('Lỗi: ' + error.message);
+  }
+}
 const createSample = async (user_id, experiment_id,name, header, length, file_name, fastaFilePath) => {
     try {
         const code = crypto.randomBytes(4).toString('hex');
@@ -91,4 +99,4 @@ const getSampleStatisticAdmin = async () => {
     throw new Error("Error: " + error.message);
   }
 };
-module.exports = { createSample, getSamplesByExperimentId, editSample, deleteSample, getAllSamples, getSampleStatisticAdmin };
+module.exports = { createSample, getSamplesByExperimentId, editSample, deleteSample, getAllSamples, getSampleStatisticAdmin, checkExistSample };

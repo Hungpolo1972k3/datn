@@ -20,12 +20,14 @@ const addUser = async(req, res) => {
         if(isExistUser) {
             return res.status(400).json({
                 message: "Đã tồn tại người dùng",
+                status: -1,
                 data: null
             })
         }
         const newuser = await adminService.addUser({email, password, username, address, phone, birthday, gender, career, workplace, role});
         return res.status(200).json({
             message: "Thêm người dùng thành công",
+            status: 0,
             data: newuser
         })
     } catch (error) {
