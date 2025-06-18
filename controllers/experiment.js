@@ -49,7 +49,7 @@ const getExperimentsByUserId = async(req,res) =>{
 const editExperiment = async(req, res) =>{
     try {
         const {id} = req.query;
-        const {name, code} = req.body;
+        const {user_id, name, code} = req.body;
         if(!name || !code){
             return res.status(400).json({message: "Thiếu thông tin"})
         }
@@ -68,7 +68,7 @@ const editExperiment = async(req, res) =>{
                 data: ""
             })
         }
-        const newExperiment = await experimentService.editExperiment(id,name, code)
+        const newExperiment = await experimentService.editExperiment(id, name, code)
         return res.status(200).json({
             message: "Chỉnh sửa mẫu thí nghiệm thành công",
             data: newExperiment
