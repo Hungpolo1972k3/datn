@@ -137,20 +137,25 @@ const ExperimentAddPopup = ({ showModal, closeModal }) => {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      await createExperiment({
+      let data = await createExperiment({
         user_id: userId,
         name: experimentName,
         code: experimentCode
       });
-      showNotice(1, t("experimentAddComponent.success"));
-
-      setExperimentName('');
-      setExperimentCode('');
-      setErrors({});
-      closeModal();
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      if(data.status === -1) {
+        showNotice(0, t("experimentAddComponent.existName"));
+      } else if(data.status === -2) {
+        showNotice(0, t("experimentAddComponent.existCode"));
+      }else{
+        showNotice(1, t("experimentAddComponent.success"));
+        setExperimentName('');
+        setExperimentCode('');
+        setErrors({});
+        closeModal();
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+        }
     } catch (err) {
       showNotice(0, t("experimentAddComponent.fail"));
     }

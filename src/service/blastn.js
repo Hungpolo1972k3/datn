@@ -82,3 +82,13 @@ export const apiGetFileInfo2 = async (filePath) => {
     throw error.response?.data || error.message;
   }
 };
+
+
+export const apiGetAllBlastn = async () => {
+  try {
+    const response = await axiosConfig.get('/api/blastn/getallblastn');
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};

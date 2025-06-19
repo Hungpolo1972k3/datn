@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from "react-redux";
 import styled from 'styled-components';
 import { apiEditExperiment } from '../service/experiment';
 import { useNotice } from "../context/NoticeContext";
@@ -89,7 +90,7 @@ const CloseIcon = styled.div`
 const ExperimentEdit = ({ showModal, closeModal, experimentInfo }) => {
   const { showNotice } = useNotice();
   const { t } = useTranslation();
-
+  const { userId } = useSelector((state) => state.user);
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
 
@@ -102,10 +103,16 @@ const ExperimentEdit = ({ showModal, closeModal, experimentInfo }) => {
 
   const handleSave = async () => {
     try {
-      await apiEditExperiment(experimentInfo._id, name, code);
-      showNotice(1, t('experimentEditComponent.success'));
-      closeModal();
-      window.location.reload();
+      let data = await apiEditExperiment(experimentInfo._id, userId, name, code);
+      if(data.status === -1) {
+        showNotice(0, t('experimentEditComponent.existName'));
+      } else if(data.status === -2) {
+        showNotice(0, t('experimentEditComponent.existCode'));
+      } else {
+        showNotice(1, t('experimentEditComponent.success'));
+        closeModal();
+        window.location.reload();
+      }
     } catch (error) {
       showNotice(2, t('experimentEditComponent.fail'));
     }

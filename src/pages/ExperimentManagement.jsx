@@ -127,11 +127,12 @@ const ExperimentPage = () => {
     });
     setFilteredExperiments(filtered);
   }, [searchTerm, selectedEngineer, experiments]);
-
-  const handleViewDetails = async (id) => {
+  const [experimentInfo, setExperimentInfo] = useState({});
+  const handleViewDetails = async (id, experiment) => {
     setShowModalInfo(true);
     let samples = await apiGetSamplesByExperimentId(id);
     setSampleInfo(samples.data);
+    setExperimentInfo(experiment);
   };
 
   const closeModalInfo = () => setShowModalInfo(false);
@@ -190,7 +191,7 @@ const ExperimentPage = () => {
                   })}
                 </TableData>
                 <TableData>
-                  <ViewDetailsWrapper onClick={() => handleViewDetails(experiment._id)}>
+                  <ViewDetailsWrapper onClick={() => handleViewDetails(experiment._id, experiment)}>
                     <span>🔍</span>
                     <span style={{ marginLeft: '8px' }}>{t('experimentPage.detail')}</span>
                   </ViewDetailsWrapper>
@@ -200,7 +201,7 @@ const ExperimentPage = () => {
           </tbody>
         </Table>
 
-        <ExperimentInfo showModal={showModalInfo} closeModal={closeModalInfo} experiments={sampleInfo} />
+        <ExperimentInfo showModal={showModalInfo} closeModal={closeModalInfo} experiments={sampleInfo} info={experimentInfo}/>
       </Wrapper>
     </Container>
   );

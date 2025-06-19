@@ -92,8 +92,9 @@
         "login_button": "Log In",
         "invalid_email": "Invalid email format (e.g. example@gmail.com)",
         "login_success": "Login successful",
-        "login_failed": "Login failed. Please check your information.",
-        "system_error": "Login failed. System error."
+        "fail": "The account does not exist in the system",
+        "login_failed": "Incorrect password, please try again",
+        "system_error": "Incorrect password, please try again"
     },
     "statisticPage":{
         "all": "All",
@@ -117,7 +118,8 @@
         "file": "Please choose a FASTA file."
         },
         "success": "Sample added successfully",
-        "fail": "Failed to add sample"
+        "fail": "Failed to add sample",
+        "existName": "Sample name already exists"
     },
     "experimentAddComponent":{
         "title": "Add Experiment",
@@ -134,7 +136,9 @@
         "timePlaceholder": "Enter creation time (e.g., 2025-04-05 10:00)",
         "submitBtn": "Add Experiment",
         "success": "Experiment added successfully",
-        "fail": "Failed to add experiment"
+        "fail": "Failed to add experiment",
+        "existName": "Experiment name already exists",
+        "existCode": "Experiment code already exists"
       },
     "experimentEditComponent":{
         "title": "Edit Experiment",
@@ -145,7 +149,9 @@
         "cancelBtn": "Cancel",
         "saveBtn": "Save",
         "success": "Experiment edited successfully",
-        "fail": "Failed to edit experiment"
+        "fail": "Failed to edit experiment",
+        "existName": "Experiment name already exists",
+        "existCode": "Experiment code already exists"
       },
     "experimentInfoComponent":{
         "title": "Experiment Information",
@@ -157,7 +163,14 @@
         "fileName": "FASTA File Name",
         "createdTime": "Created Time",
         "details": "Details",
-        "downloadFile": "Download FASTA file"
+        "downloadFile": "Download FASTA file",
+        "delete": "Delete",
+        "code": "Experiment Code",
+        "experimentName": "Experiment Name",
+        "deletecontent": "Double click to delete the sample",
+        "deleteSuccess": "Successfully deleted sample \"{{name}}\"",
+        "deleteFail": "Failed to delete sample",
+        "noData": "No sample available"
       },
     "fastaComponent":{
         "title": "Sample Information",
@@ -425,7 +438,7 @@
     }
   },
   "resultPage": {
-    "title": "BLASTn Results",
+    "title": "BLAST Results",
     "enterRid": "Enter Sequence ID",
     "search": "Search",
     "upload": "Upload File",
@@ -456,12 +469,25 @@
     "noData": "No data",
     "time": "Upload time",
     "success": "Success to blastn file !",
-    "previousIds": "Saved BLASTN IDs",
     "filename":"FASTA File",
     "createdAt": "Created Time",
     "download": "Download",
     "viewDetails": "Detail",
-    "waitMessage": "Please wait {{minutes}} more minutes to continue."
+    "waitMessage": "Please wait {{minutes}} more minutes to continue.",
+    "previousIds": "Uploaded ID list",
+    "id": "ID",
+    "timeCreate": "Created Time",
+    "fileName": "File name",
+    "action": "Delete",
+    "delete": "Delete",
+    "status": {
+      "success": "Success",
+      "process": "Processing",
+      "fail": "Error occurred",
+      "title": "Status"
+    }, 
+    "index": "No.",
+    "blastnTitle": "BLASTN Comparison Results"
   },
   "blastn": {
     "index": "Index",
@@ -525,7 +551,7 @@
     "noData": "No data",
     "position": "Position",
     "strand": "Strand",
-    "nucleic": "Nucleic Acid",
+    "nucleic": "Nucleic",
     "protein": "Protein",
     "noGene": "No virulence genes found in either dataset.",
     "gene": "Gene",
@@ -538,6 +564,17 @@
     "prev": "Previous",
     "next": "Next",
     "page": "Page"
+  },
+  "breadcrumb": {
+    "ABDataset": "AB Dataset",
+    "dataset": "Dataset",
+    "statistic": "Statistics",
+    "tool": "Tool",
+    "blastn": "Alignment Tool",
+    "home": "Home",
+    "userinfo": "User Information",
+    "edituserinfo": "Edit",
+    "overview": "Overview"
   },
   "noticeBlastn": {
     "line1": "Please wait about 30 minutes to receive your result!",

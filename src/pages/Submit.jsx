@@ -250,28 +250,32 @@ const Submit = () => {
     let sampleId = "";
     try {
       const result = await apiCreateSample(userId, selectedExperiment, sampleName, header, length, fastaFilePath);
-      sampleId = result.data._id;
-      setFastaInfo(result.data);
-  
-      try {
-        const [virulenceRes, amrRes] = await Promise.all([
-          apiGetVirulenceInfo(file, sampleId),
-          apiGetAmrInfo(file, sampleId),
-        ]);
-        setVirulenceInfo(virulenceRes.data);
-        setAmrInfo(amrRes.data);
-  
-        showNotice(1, t("submitPage.success"));
-        setShowModal(true);
-      } catch (infoError) {
-        if (sampleId) {
-          try {
-            await apiDeleteSampleById(sampleId);
-          } catch (deleteErr) {
-            console.error("Lỗi khi xoá sample:", deleteErr);
+      if(result.status === -1) {
+        showNotice(0, t("submitPage.existName"));
+      }else{
+        sampleId = result.data._id;
+        setFastaInfo(result.data);
+    
+        try {
+          const [virulenceRes, amrRes] = await Promise.all([
+            apiGetVirulenceInfo(file, sampleId),
+            apiGetAmrInfo(file, sampleId),
+          ]);
+          setVirulenceInfo(virulenceRes.data);
+          setAmrInfo(amrRes.data);
+    
+          showNotice(1, t("submitPage.success"));
+          setShowModal(true);
+        } catch (infoError) {
+          if (sampleId) {
+            try {
+              await apiDeleteSampleById(sampleId);
+            } catch (deleteErr) {
+              console.error("Lỗi khi xoá sample:", deleteErr);
+            }
           }
+          showNotice(0, t("submitPage.fail"));
         }
-        showNotice(0, t("submitPage.fail"));
       }
     } catch (error) {
       showNotice(0, t("submitPage.fail"));

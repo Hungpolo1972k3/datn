@@ -92,28 +92,16 @@ const Select = styled.select`
   background-color: white;
   color: #1e293b;
 `;
-const TabWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 24px;
+
+const TitleBlastn = styled.h2`
+  font-size: 3rem;
+  color: #1e3a8a;
+  font-weight: 700;
+  margin-bottom: 16px;
+  margin-top: 30px;
+  text-align: center;
 `;
 
-const TabButton = styled.button`
-  padding: 10px 20px;
-  background-color: ${(props) => (props.active ? "#2563eb" : "#e2e8f0")};
-  color: ${(props) => (props.active ? "white" : "#1e293b")};
-  border: none;
-  border-radius: 20px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: ${(props) => (props.active ? "#1e40af" : "#cbd5e1")};
-  }
-`;
 const formatDateVN = (isoDate) => {
   const date = new Date(isoDate);
   return date.toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
@@ -207,6 +195,7 @@ const ResultTable = ({ results, blastnInfo }) => {
 
   return (
     <>
+      <TitleBlastn>{t("resultPage.blastnTitle")}</TitleBlastn>
       {blastnInfo && Object.keys(blastnInfo).length > 0 && (
         <div
           style={{

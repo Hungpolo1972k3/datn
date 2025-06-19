@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { FiDownload } from 'react-icons/fi';
 import { apiDownloadFile } from '../service/blastn';
 import { useNotice } from "../context/NoticeContext";
+import { apiDeleteSampleById } from '../service/sample';
 
 const PopUpContainer = styled.div`
   position: fixed;
@@ -48,7 +49,7 @@ const CloseButton = styled.button`
 
 const Title = styled.h3`
   text-align: center;
-  font-size: 30px;
+  font-size: 40px;
   margin-bottom: 20px;
   color: #1e3a8a;
 `;
@@ -81,7 +82,6 @@ const TableRow = styled.tr`
 
 const Icon = styled.span`
   cursor: pointer;
-  margin-left: 20px;
   color: ${(props) => props.color || '#007bff'};
   font-size: 30px;
 
@@ -90,7 +90,39 @@ const Icon = styled.span`
   }
 `;
 
-const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
+const InfoText = styled.p`
+  text-align: center;
+  font-size: 18px;
+  color: #1e3a8a;
+  margin-bottom: 15px;
+`;
+
+const TooltipWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+
+  &:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+`;
+
+const TooltipText = styled.div`
+  background-color: #e53935;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 6px 10px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+`;
+const ExperimentInfo = ({ showModal, closeModal, experiments, info }) => {
   const { t } = useTranslation();
   const [virulenceInfo, setVirulenceInfo] = useState([]);
   const [amrInfo, setAmrInfo] = useState([]);
@@ -124,12 +156,29 @@ const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
     }
   }
   if (!showModal) return null;
+  const handleDeleteSample = async (index) => {
+    const sample = experiments[index];
+    try {
+      await apiDeleteSampleById(sample._id);
+      showNotice(1, t("experimentInfoComponent.deleteSuccess", { name: sample.name }));
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      showNotice(0, t("experimentInfoComponent.deleteFailed"));
+    }
+  };
 
   return (
     <PopUpContainer>
       <PopUpForm>
         <CloseButton onClick={closeModal}>×</CloseButton>
         <Title>{t('experimentInfoComponent.title')}</Title>
+        <InfoText>
+          🧪 <strong>{t("experimentInfoComponent.experimentName")}:</strong> {info.name} |  
+          🧬 <strong>{t("experimentInfoComponent.code")}:</strong> {info.code} |  
+          🕒 <strong>{t("experimentInfoComponent.createdTime")}:</strong> {new Date(info.createdAt).toLocaleString('vi-VN')}
+        </InfoText>
         <Table>
           <thead>
             <tr>
@@ -140,10 +189,18 @@ const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
               <TableHeader>{t('experimentInfoComponent.fileName')}</TableHeader>
               <TableHeader>{t('experimentInfoComponent.createdTime')}</TableHeader>
               <TableHeader>{t('experimentInfoComponent.details')}</TableHeader>
+              <TableHeader>{t('experimentInfoComponent.delete')}</TableHeader>
             </tr>
           </thead>
           <tbody>
-            {experiments.map((experiment, index) => (
+          {experiments.length === 0 ? (
+            <TableRow>
+              <TableData colSpan="8" style={{ textAlign: 'center', color: '#999', padding: '20px' }}>
+                {t('experimentInfoComponent.noData')}
+              </TableData>
+            </TableRow>
+          ) : (
+            experiments.map((experiment, index) => (
               <TableRow key={index}>
                 <TableData>{index + 1}</TableData>
                 <TableData>{experiment.name}</TableData>
@@ -170,8 +227,19 @@ const ExperimentInfo = ({ showModal, closeModal, experiments }) => {
                     {showResult[index] ? '🧐' : '🔍'}
                   </Icon>
                 </TableData>
+                <TableData>
+                  <TooltipWrapper>
+                    <Icon color="#e53935" onDoubleClick={() => handleDeleteSample(index)}>
+                      ❌
+                    </Icon>
+                    <TooltipText className="tooltip-text">
+                      {t('experimentInfoComponent.deletecontent')}
+                    </TooltipText>
+                  </TooltipWrapper>
+                </TableData>
               </TableRow>
-            ))}
+            ))
+          )}
           </tbody>
         </Table>
         {showResultAll && (

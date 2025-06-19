@@ -1,6 +1,6 @@
 import axiosConfig from "../axiosConfig"
 
-export const createExperiment = async ({user_id,name, code}) => {
+export const createExperiment = async ({user_id, name, code}) => {
     try {
       const response = await axiosConfig.post(
         '/api/experiment/createexperiment',
@@ -24,10 +24,10 @@ export const apiGetExperimentsByUserId = async (user_id) => {
     }
 };
 
-export const apiEditExperiment = async (id,name, code) => {
+export const apiEditExperiment = async (id, userId, name, code) => {
   try {
       const response = await axiosConfig.put('/api/experiment/editexperiment', 
-        {name, code},
+        {user_id: userId, name, code},
         {params: {id}}
       );
       return response.data;

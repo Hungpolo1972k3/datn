@@ -118,7 +118,7 @@ const AuthForm = () => {
 
     try {
       const response = await apiUserLogin(formData);
-      if (response.status === 1) {
+      if (response.status === 0) {
         dispatch(
           loginSuccess({
             userId: response.data.user._id,
@@ -129,6 +129,8 @@ const AuthForm = () => {
         );
         showNotice(1, t("authForm.login_success"));
         navigate("/");
+      } else if(response.status === -1){
+        showNotice(0, t("authForm.fail"));
       } else {
         showNotice(0, t("authForm.login_failed"));
       }

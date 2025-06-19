@@ -92,8 +92,9 @@
         "login_button": "Đăng nhập",
         "invalid_email": "Email không hợp lệ (vd: example@gmail.com)",
         "login_success": "Đăng nhập thành công",
-        "login_failed": "Đăng nhập thất bại. Hãy kiểm tra lại thông tin.",
-        "system_error": "Đăng nhập thất bại. Hệ thống lỗi."
+        "fail": "Tài khoản không tồn tại trên hệ thống",
+        "login_failed": "Mật khẩu không chính xác vui lòng thử lại",
+        "system_error": "Mật khẩu không chính xác vui lòng thử lại"
     },
     "statisticPage": {
         "all": "Tất cả",
@@ -117,7 +118,8 @@
         "file": "Vui lòng chọn tệp FASTA."
         },
         "success": "Thêm mẫu thí nghiệm thành công",
-        "fail": "Gặp lỗi khi thêm mẫu"
+        "fail": "Gặp lỗi khi thêm mẫu",
+        "existName": "Tên mẫu thí nghiệm đã tồn tại"
     }, 
     "experimentAddComponent": {
         "title": "Thêm Thí Nghiệm",
@@ -134,7 +136,9 @@
         "timePlaceholder": "Nhập thời gian tạo (ví dụ: 2025-04-05 10:00)",
         "submitBtn": "Thêm thí nghiệm",
         "success": "Thêm thí nghiệm thành công",
-        "fail": "Thêm thí nghiệm thất bại"
+        "fail": "Thêm thí nghiệm thất bại",
+        "existName": "Tên thí nghiệm đã tồn tại",
+        "existCode": "Mã thí nghiệm đã tồn tại"
       },
     "experimentEditComponent":{
         "title": "Chỉnh sửa Thí nghiệm",
@@ -145,19 +149,27 @@
         "cancelBtn": "Hủy",
         "saveBtn": "Lưu",
         "success": "Chỉnh sửa thí nghiệm thành công",
-        "fail": "Chỉnh sửa thí nghiệm thất bại"
+        "fail": "Chỉnh sửa thí nghiệm thất bại",
+        "existName": "Tên thí nghiệm đã tồn tại",
+        "existCode": "Mã thí nghiệm đã tồn tại"
       },
     "experimentInfoComponent":{
         "title": "Thông Tin Thí Nghiệm",
         "index": "STT",
         "sampleName": "Mẫu Thí Nghiệm",
-        "sampleCode": "Mã Code",
         "header": "Header",
         "length": "Chiều dài mẫu",
         "fileName": "Tên Tệp FASTA",
         "createdTime": "Thời gian tạo",
         "details": "Chi Tiết",
-        "downloadFile": "Tải xuống tệp FASTA"
+        "downloadFile": "Tải xuống tệp FASTA",
+        "delete": "Xóa",
+        "code": "Mã thí nghiệm",
+        "experimentName": "Tên thí nghiệm",
+        "deletecontent": "Nhấn 2 lần để xóa mẫu thí nghiệm",
+        "deleteSuccess": "Xóa mẫu thí nghiệm \"{{name}}\" thành công",
+        "deleteFail": "Lỗi xóa mẫu thí nghiệm",
+        "noData": "Không có mẫu thí nghiệm"
       },
     "fastaComponent":{
         "title": "Thông tin mẫu thí nghiệm",
@@ -457,12 +469,25 @@
       "time": "Thời gian tải lên",
       "noData": "Không tồn tại dữ liệu",
       "success": "Phân tích thành công !",
-      "previousIds": "Các BLASTN ID đã lưu",
       "filename":"Tên file phân tích",
       "createdAt": "Thời gian tạo",
       "download": "Tải xuống",
       "viewDetails": "Xem chi tiết",
-      "waitMessage": "Vui lòng chờ {{minutes}} phút để tiếp tục."
+      "waitMessage": "Vui lòng chờ {{minutes}} phút để tiếp tục.",
+      "previousIds": "Danh sách ID đã tải lên",
+      "id": "Mã ID",
+      "timeCreate": "Thời gian tạo",
+      "fileName": "Tên tệp",
+      "action": "Xóa",
+      "delete": "Xóa",
+      "status": {
+        "success": "Thành công",
+        "process": "Đang xử lý",
+        "fail": "Đang xảy ra lỗi",
+        "title": "Trạng thái"
+      },
+      "index": "STT",
+      "blastnTitle": "Kết quả so khớp BLASTN"
     },
     "blastn": {
       "index": "STT",
@@ -520,13 +545,13 @@
     },
     "virulenceCompare": {
       "virulenceTitle": "Dữ liệu Gene độc lực",
-      "detailFor": "Chi tiết cho",
+      "detailFor": "Chi tiết",
       "uploadedData": "Dữ liệu tải lên",
       "referenceData": "Dữ liệu tham chiếu",
       "noData": "Không có dữ liệu",
       "position": "Vị trí",
       "strand": "Mạch",
-      "nucleic": "Acid nucleic",
+      "nucleic": "Nucleic",
       "protein": "Protein",
       "noGene": "Không tìm thấy gen độc lực trong cả hai bộ dữ liệu.",
       "gene": "Gen",
@@ -541,14 +566,15 @@
       "page": "Trang"
     },
     "breadcrumb":{
-      "ABDataset": "Trang chủ",
+      "ABDataset": "AB Dataset",
       "dataset": "Bộ dữ liệu",
       "statistic": "Thống kê",
       "tool": "Công cụ", 
       "blastn": "Công cụ so khớp",
       "home": "Trang chủ",
       "userinfo": "Thông tin tài khoản",
-      "edituserinfo": "Chỉnh sửa"
+      "edituserinfo": "Chỉnh sửa",
+      "overview": "Kết quả tổng quát"
     },
   "noticeBlastn": {
     "line1": "Bạn vui lòng chờ khoảng 30 phút để nhận kết quả nhé!",

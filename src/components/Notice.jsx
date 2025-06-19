@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import { useTranslation } from "react-i18next";
+import { FiCheckCircle, FiXCircle } from "react-icons/fi";
 
 const slideIn = keyframes`
   from {
@@ -37,10 +38,12 @@ const IconRow = styled.div`
   font-weight: 600;
 `;
 
-const Icon = styled.span`
-  font-size: 22px;
+const StyledIcon = styled.span`
+  font-size: 24px;
   margin-right: 10px;
   color: ${(props) => (props.success ? "#2e7d32" : "#c62828")};
+  display: flex;
+  align-items: center;
 `;
 
 const Content = styled.div`
@@ -77,7 +80,6 @@ const Notice = ({ label, content }) => {
   const { t } = useTranslation();
 
   const success = label === 1;
-  const icon = success ? "✔️" : "❌";
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(false), 3000);
@@ -89,7 +91,9 @@ const Notice = ({ label, content }) => {
   return (
     <NoticeContainer success={success}>
       <IconRow>
-        <Icon success={success}>{icon}</Icon>
+        <StyledIcon success={success}>
+          {success ? <FiCheckCircle /> : <FiXCircle />}
+        </StyledIcon>
         <span>{success ? t("noticeComponent.success") : t("noticeComponent.error")}</span>
       </IconRow>
       <Content>{content}</Content>

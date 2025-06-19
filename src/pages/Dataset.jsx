@@ -33,7 +33,7 @@ const TableHead = styled.thead`
 
 const TableRow = styled.tr`
   &:nth-child(even) {
-    background-color: #e0f7fa; /* Xanh nhạt */
+    background-color: #e0f7fa;
   }
 
   &:nth-child(odd) {

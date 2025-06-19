@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import ResultTable from "../components/ResultTable";
 import { useTranslation } from "react-i18next";
-import { apiRunBlastnTool, apiGetZipFile, apiGetBlastnInfo } from "../service/blastn";
+import { apiRunBlastnTool, apiGetZipFile, apiGetBlastnInfo, apiGetAllBlastn } from "../service/blastn";
 import { useNotice } from "../context/NoticeContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import NoticeBlastnPopup from "../components/NoticeBlastnPopup";
@@ -175,7 +175,65 @@ const SearchIcon = () => (
   </svg>
 );
 
-const FIFTEEN_MINUTES = 15 * 60 * 1000; 
+const TableWrapper = styled.div`
+  margin-top: 20px;
+  overflow-x: auto;
+`;
+
+const Table = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+`;
+
+const Thead = styled.thead`
+  background-color: #1e3a8a;
+  color: #fff;
+  text-align: left;
+`;
+
+const Th = styled.th`
+  padding: 12px 16px;
+  font-weight: bold;
+`;
+
+const Tr = styled.tr`
+  border-bottom: 1px solid #e2e8f0;
+`;
+
+const Td = styled.td`
+  padding: 12px 16px;
+  color: #1e3a8a;
+  vertical-align: middle;
+
+  a {
+    color: #2563eb;
+    text-decoration: underline;
+  }
+`;
+
+const DeleteButton = styled.button`
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-weight: 900;
+  cursor: pointer;
+  font-size: 2rem;
+  user-select: none;
+
+  &:hover {
+    color: #b91c1c;
+  }
+`;
+
+const Status = styled.span`
+  font-weight: bold;
+  color: ${({ status }) =>
+    status === 1 ? '#16a34a' : status === 0 ? '#d97706' : '#dc2626'};
+`;
 
 const ResultPage = () => {
   const { showNotice } = useNotice();
@@ -189,34 +247,66 @@ const ResultPage = () => {
   const [blastnInfo, setBlastnInfo] = useState({});
   const [showPopup, setShowPopup] = useState(false);
   const [blastnId, setBlastnId] = useState("NoData");
-
+  const [blastnAll, setBlastnAll] = useState([]);
+  const THIRTY_MINUTES = 30 * 60 * 1000;
   useEffect(() => {
-    const storedUploadedIds = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
-    setUploadedIdList(storedUploadedIds);
-
-    const lockUntilStr = localStorage.getItem("lockUntil");
-    if (lockUntilStr) {
-      const lockUntil = new Date(lockUntilStr);
-      const now = Date.now();
-
-      if (now < lockUntil.getTime()) {
-        setIsLocked(true);
-        const diffMs = lockUntil.getTime() - now;
-        const minutesLeft = Math.ceil(diffMs / (60 * 1000));
-        showNotice(0, t("resultPage.waitMessage", { minutes: minutesLeft }));
-      } else {
-        localStorage.removeItem("lockUntil");
+    const fetchBlastn = async () => {
+      try {
+        const data = await apiGetAllBlastn();
+        const blastnCodeArray = data.data.map(item => item.code) || [];
+        setBlastnAll(blastnCodeArray);
+      } catch (error) {
+        console.error('Lỗi khi fetch dữ liệu BLASTN:', error);
       }
-    }
+    };
+    fetchBlastn();
   }, []);
 
   useEffect(() => {
-    if (isLocked) {
-      if (!localStorage.getItem("lockStartTime")) {
-        localStorage.setItem("lockStartTime", Date.now().toString());
-      }
+    const lockTime = sessionStorage.getItem("blastnLockTime");
+    if (!lockTime) return;
+
+    const now = new Date().getTime();
+    const lockTimestamp = new Date(lockTime).getTime();
+    const twentyMinutes = 20 * 60 * 1000;
+    const remainingTime = twentyMinutes - (now - lockTimestamp);
+
+    if (remainingTime > 0) {
+      setIsLocked(true);
+      const minutes = Math.ceil(remainingTime / 60000);
+
+      showNotice(
+        1,
+        t("resultPage.waitMessage", {
+          minutes,
+        })
+      );
+
+      setTimeout(() => {
+        setIsLocked(false);
+        sessionStorage.removeItem("blastnLockTime");
+      }, remainingTime);
     }
-  }, [isLocked]);
+  }, []);
+
+  useEffect(() => { 
+    if (blastnAll.length === 0) return;
+    const storedUploadedIds = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
+    const updatedStoredUploadedIds = storedUploadedIds.map((item) => {
+      const itemTime = new Date(item.time).getTime();
+      if (blastnAll.includes(item.id)) {
+        return { ...item, status: 1 };
+      } else {
+        const isWithin30Minutes = Date.now() - itemTime < THIRTY_MINUTES;
+        return {
+          ...item,
+          status: isWithin30Minutes ? 0 : -1,
+        };
+      }
+    });
+    console.log(updatedStoredUploadedIds);
+    setUploadedIdList(updatedStoredUploadedIds);
+  }, [blastnAll]);
 
   const handleSearch = async () => {
     const trimmedSearch = search.trim();
@@ -256,10 +346,10 @@ const ResultPage = () => {
     if (!file) return;
 
     const id = generateTimeBasedId();
-    addBlastIdToUploadedList(id, new Date().toISOString(), file.name);
+    const currentTime = new Date().toISOString();
+    addBlastIdToUploadedList(id, currentTime, file.name);
+    sessionStorage.setItem("blastnLockTime", currentTime);
     try {
-      const lockUntil = new Date(Date.now() + FIFTEEN_MINUTES);
-      localStorage.setItem("lockUntil", lockUntil.toISOString());
       setIsLocked(true);
       setResults([]);
       setBlastnInfo({});
@@ -301,6 +391,7 @@ const ResultPage = () => {
   }, [search]);
   const handleClosePopup = () => {
     setShowPopup(false);
+    window.location.reload();
   };
   return (
     <Container>
@@ -366,51 +457,68 @@ const ResultPage = () => {
       </FormGroup>
 
       {uploadedIdList.length > 0 && (
-        <div style={{ marginTop: "20px" }}>
+        <TableWrapper>
           <h3 style={{ color: "#1e3a8a", marginBottom: "8px" }}>
             {t("resultPage.previousIds")}
           </h3>
-          <ul style={{ listStyle: "none", paddingLeft: 0, color: "#2563eb" }}>
-            {uploadedIdList.map((item, index) => (
-              <li
-                key={index}
-                style={{ marginBottom: "6px", display: "flex", alignItems: "center", gap: "4px" }}
-              >
-                <button
-                    onClick={() => {
-                      const filteredList = uploadedIdList.filter((_, i) => i !== index);
-                      localStorage.setItem("uploadedIdList", JSON.stringify(filteredList));
-                      setUploadedIdList(filteredList);
-                    }}
-                    style={{
-                      background: "transparent",
-                      border: "none",
-                      color: "#ef4444",
-                      fontWeight: "900",
-                      cursor: "pointer",
-                      fontSize: "1.8rem",
-                      userSelect: "none",
-                      paddingRight: "20px",    
-                      lineHeight: "1",     
-                    }}
-                  >
-                    x
-                  </button>
-                <a
-                  href={`/blastn-result?search=${item.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "#2563eb", textDecoration: "underline", flex: 1 }}
-                >
-                  {item.id} - {new Date(item.time).toLocaleString()} - {item.fileName}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+          <Table>
+            <Thead>
+              <Tr>
+                <Th>{t("resultPage.index")}</Th>
+                <Th>{t("resultPage.id")}</Th>
+                <Th>{t("resultPage.timeCreate")}</Th>
+                <Th>{t("resultPage.fileName")}</Th>
+                <Th>{t("resultPage.status.title")}</Th>
+                <Th>{t("resultPage.action")}</Th>
+              </Tr>
+            </Thead>
+            <tbody>
+              {uploadedIdList.map((item, index) => (
+                <Tr key={index}>
+                  <Td>{index + 1}</Td>
+                  <Td>
+                    <a
+                      href={`/blastn-result?search=${item.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.id}
+                    </a>
+                  </Td>
+                  <Td>{new Date(item.time).toLocaleString()}</Td>
+                  <Td>{item.fileName}</Td>
+                  <Td>
+                    <Status status={item.status}>
+                      {item.status === 1
+                        ? t("resultPage.status.success")
+                        : item.status === 0
+                        ? t("resultPage.status.process")
+                        : t("resultPage.status.fail")
+                      }
+                    </Status>
+                  </Td>
+                  <Td>
+                    <DeleteButton
+                      onClick={() => {
+                        const filteredList = uploadedIdList.filter((_, i) => i !== index);
+                        localStorage.setItem("uploadedIdList", JSON.stringify(filteredList));
+                        setUploadedIdList(filteredList);
+                      }}
+                      title={t("resultPage.delete")}
+                    >
+                      x
+                    </DeleteButton>
+                  </Td>
+                </Tr>
+              ))}
+            </tbody>
+          </Table>
+        </TableWrapper>
       )}
 
-      <ResultTable results={results} blastnInfo={blastnInfo}/>
+      {results.length > 0 && (
+        <ResultTable results={results} blastnInfo={blastnInfo} />
+      )}
       {showPopup && (
         <NoticeBlastnPopup id={blastnId} onClose={handleClosePopup} />
       )}
