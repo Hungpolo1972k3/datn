@@ -88,10 +88,24 @@ const getFileInfo = (req, res) => {
   });
 };
 
+const getAllBlastn = async(req, res) =>{
+  try {
+    let data = await blastnService.getAllBlastn();
+    return res.status(200).json({
+      message: "Lấy danh sách Blastn thành công",
+      data: data
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+}
 module.exports = {
     runBlastmTool,
     runBlastn,
     getBlastnByCode,
     downloadFile,
-    getFileInfo
+    getFileInfo,
+    getAllBlastn
 };

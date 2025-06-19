@@ -518,9 +518,18 @@ const getFileForDownload = async (filePath) => {
   }
 };
 
+const getAllBlastn = async() => {
+  try {
+    let data = await Blastn.find();
+    return data;
+  } catch (error) {
+    throw new Error('Lỗi' + error.message);
+  }
+}
 module.exports = {
   runBlastnTool,
   runBlastn,
   getBlastnByCode,
   getFileForDownload,
+  getAllBlastn
 };
