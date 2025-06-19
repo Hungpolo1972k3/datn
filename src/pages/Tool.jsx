@@ -215,6 +215,14 @@ const Tool = () => {
       }));
       setVirulenceInfo(virulence.data);
       setAmrInfo(amr.data);
+      setFastaInfo((prev) => ({
+        ...prev,
+        header,
+        length,
+        virulence: virulence.data.length || '',
+        amr: amr.data.length || '',
+        createdAt: Date.now(),
+      }));
       showNotice(1, t("toolPage.successConfirm"));
       setIsSuccessConfirm(true);
       setIsLoading(false);
