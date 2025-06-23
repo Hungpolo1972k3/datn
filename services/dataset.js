@@ -128,7 +128,8 @@ const getFileInfo = async (relativePath) => {
     const safePath = path.normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, '').replace(/^[/\\]/, '');
     const fullPath = path.join(dataDir, safePath);
 
-    const content = await fs.promises.readFile(fullPath, 'utf8');
+    let content = await fs.promises.readFile(fullPath, 'utf8');
+    content = content.replaceAll('/media/data3/users/cuongnk/', '');
     const ext = path.extname(fullPath).toLowerCase();
 
     if (ext === '.tsv' || ext === '.csv') {

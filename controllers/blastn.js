@@ -74,7 +74,6 @@ const getFileInfo = (req, res) => {
   }
 
   if (!fs.existsSync(filePath)) {
-    console.error('File not found:', filePath);
     return res.status(404).json({ error: 'File not found or invalid path' });
   }
 
