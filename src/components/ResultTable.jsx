@@ -151,27 +151,31 @@ const ResultTable = ({ results, blastnInfo }) => {
     let url = `${code}_result`
     setIsLoading(true);
     try {
-     const [result, inputFileresult, blob] = await Promise.all([
-      apiRunBlastnTwoFiles(inputUrl, datasetUrl),
-      apiGetZipFile2(url),
-      apiGetFileInfo2(datasetUrl),
-    ]);
+      const runBlastnPromise = apiRunBlastnTwoFiles(inputUrl, datasetUrl);
+      const getZipFilePromise = apiGetZipFile2(url);
+      const getFileInfoPromise = apiGetFileInfo2(datasetUrl);
 
-    const file = new File([blob], 'contigs.fasta', { type: 'text/plain' });
+      const [result, inputFileresult, blob] = await Promise.all([
+        runBlastnPromise,
+        getZipFilePromise,
+        getFileInfoPromise,
+      ]);
 
-    const [virulenceRes, amrRes] = await Promise.all([
-      apiRunVirulenceTool(file),
-      apiRunAmrTool(file),
-    ]);
+      const file = new File([blob], 'contigs.fasta', { type: 'text/plain' });
 
-    setVirulence2(virulenceRes.data || []);
-    setAmr2(amrRes.data || []);
-    setVirulence(inputFileresult.data.data.virulence);
-    setAmr(inputFileresult.data.data.amr);
-    setBlastnData(result.data);
-    setModalInfo(info);
-    setShowModal(true);
-    setBacteriaInfo(bacteria);
+      const [virulenceRes, amrRes] = await Promise.all([
+        apiRunVirulenceTool(file),
+        apiRunAmrTool(file),
+      ]);
+
+      setVirulence2(virulenceRes.data || []);
+      setAmr2(amrRes.data || []);
+      setVirulence(inputFileresult.data.data.virulence);
+      setAmr(inputFileresult.data.data.amr);
+      setBlastnData(result.data);
+      setModalInfo(info);
+      setShowModal(true);
+      setBacteriaInfo(bacteria);
     } catch (error) {
       console.log(error)
       showNotice(0, t("resultPage.error.detail"));

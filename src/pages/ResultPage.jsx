@@ -236,6 +236,7 @@ const Status = styled.span`
 `;
 
 const ResultPage = () => {
+  const navigate = useNavigate();
   const { showNotice } = useNotice();
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
@@ -290,7 +291,6 @@ const ResultPage = () => {
   }, []);
 
   useEffect(() => { 
-    if (blastnAll.length === 0) return;
     const storedUploadedIds = JSON.parse(localStorage.getItem("uploadedIdList") || "[]");
     const updatedStoredUploadedIds = storedUploadedIds.map((item) => {
       const itemTime = new Date(item.time).getTime();
@@ -304,29 +304,28 @@ const ResultPage = () => {
         };
       }
     });
-    console.log(updatedStoredUploadedIds);
     setUploadedIdList(updatedStoredUploadedIds);
   }, [blastnAll]);
 
   const handleSearch = async () => {
     const trimmedSearch = search.trim();
-  if (!trimmedSearch) return;
-    setIsLoading(true);
-    try {
-      const result = await apiGetZipFile(trimmedSearch);
-      if (result.data.status === 0) {
-        showNotice(0, t("resultPage.error.existfile"));
-      } else {
-        setResults(result.data.data);
+    if (!trimmedSearch) return;
+      setIsLoading(true);
+      try {
+        const result = await apiGetZipFile(trimmedSearch);
+        if (result.data.status === 0) {
+          showNotice(0, t("resultPage.error.existfile"));
+        } else {
+          setResults(result.data.data);
+        }
+        const data = await apiGetBlastnInfo(trimmedSearch);
+        setBlastnInfo(data.data)
+      } catch (error) {
+        showNotice(0, t("resultPage.uploadError"));
+      } finally {
+        setIsLoading(false);
       }
-      const data = await apiGetBlastnInfo(trimmedSearch);
-      setBlastnInfo(data.data)
-    } catch (error) {
-      showNotice(0, t("resultPage.uploadError"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
   const generateTimeBasedId = () => {
     return new Date().toISOString().replace(/[-:T.Z]/g, "") + Math.random().toString(36).substr(2, 5);
@@ -398,7 +397,7 @@ const ResultPage = () => {
       <BreadcrumbWrapper>
           <Crumb onClick={() => navigate('/')}>{t("breadcrumb.ABDataset")}</Crumb>
           <Separator>›</Separator>
-          <CrumbMain onClick={() => navigate('/tool')}>{t("breadcrumb.blastn")}</CrumbMain>
+          <CrumbMain onClick={() => navigate('/blastn-result')}>{t("breadcrumb.blastn")}</CrumbMain>
       </BreadcrumbWrapper>
       <Title>{t("resultPage.title")}</Title>
 

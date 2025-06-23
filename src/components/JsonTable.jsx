@@ -70,7 +70,7 @@ const JsonTable = ({ data }) => {
   const expandedRef = useRef(null);
 
   if (!Array.isArray(data) || data.length === 0) {
-    return <p style={{ color: "#1e3a8a", fontWeight: 600 }}>{t("No structured data to display")}</p>;
+    return <p style={{ color: "#1e3a8a", fontWeight: 600 }}>{t("breadcrumb.viewFile")}</p>;
   }
 
   useEffect(() => {

@@ -121,7 +121,11 @@ const DatasetPopup = () => {
   const { t } = useTranslation();
 
   const handleDownload = async (filePath) => {
-    await apiDownloadFile(filePath); 
+    try {
+      await apiDownloadFile(filePath); 
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const groupByFolderName = (genome) => {
@@ -156,7 +160,7 @@ const DatasetPopup = () => {
   const fileContentRef = useRef(null);
   const [jsonFileContent, setJsonFileContent] = useState([])
 
-  const handleViewContent = async (filePath, fileName) => {
+  const handleViewContent = async (filePath) => {
     setLoading(true);
     try {
       const result = await apiGetFileInfo(filePath);
@@ -171,7 +175,7 @@ const DatasetPopup = () => {
         fileContentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     } catch (error) {
-      setFileContent("Không thể tải nội dung file.");
+      setFileContent(t("breadcrumb.viewFile"));
     } finally {
       setLoading(false);
     }
@@ -236,7 +240,7 @@ const DatasetPopup = () => {
           <div style={{ marginBottom: "10px", marginLeft:"10px", display: "flex", flexDirection: "column", gap: "16px" }}>
             <h2>
               <a
-                href="https://www.ncbi.nlm.nih.gov/sra/SRR1945422"
+                href={`https://www.ncbi.nlm.nih.gov/sra/${encodeURIComponent(dataset.name)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "#1e40af", textDecoration: "underline" }}
@@ -279,7 +283,7 @@ const DatasetPopup = () => {
                       </Label>
                       <ActionButtons>
                         <span
-                          onClick={() => handleViewContent(file.path, file.fileName)}
+                          onClick={() => handleViewContent(file.path)}
                           style={{ cursor: "pointer", fontSize: "1.5rem" }}
                         >
                           {viewedFilePath === file.path ? "🧐" : "🔍"}

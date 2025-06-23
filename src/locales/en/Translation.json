@@ -574,7 +574,8 @@
     "home": "Home",
     "userinfo": "User Information",
     "edituserinfo": "Edit",
-    "overview": "Overview"
+    "overview": "Overview",
+    "viewFile": "No file data"
   },
   "noticeBlastn": {
     "line1": "Please wait about 30 minutes to receive your result!",

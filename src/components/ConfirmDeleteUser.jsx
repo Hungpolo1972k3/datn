@@ -24,7 +24,7 @@ const ConfirmBox = styled.div`
   border-radius: 10px;
   text-align: center;
   width: 500px;
-  position: relative; // Để đặt icon X vào vị trí chính xác
+  position: relative;
 `;
 
 const ConfirmText = styled.p`

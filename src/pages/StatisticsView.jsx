@@ -95,7 +95,6 @@ const StatisticsView = () => {
                 {activeChart === "amrplot" && t("statistics_viewer.amr_plot")}
                 {activeChart === "vfactorsplot" && t("statistics_viewer.vfactors_plot")}
               </CrumbMain>
-              <Separator>›</Separator>
             </>
           )}
       </BreadcrumbWrapper>

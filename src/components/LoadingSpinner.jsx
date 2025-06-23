@@ -7,7 +7,10 @@ const Overlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(rgba(100, 100, 100, 0.6), rgba(50, 50, 50, 0.6));
+   background: linear-gradient(
+    rgba(173, 216, 230, 0.6), 
+    rgba(135, 206, 250, 0.6) 
+  );
   display: flex;
   flex-direction: column;
   justify-content: center;

@@ -36,7 +36,6 @@ const Image = styled.img`
   margin: 20px auto;
 `;
 
-// Component hỗ trợ xử lý xuống dòng
 const MultilineText = ({ text }) => (
   <Text>
     {text.split("\n").map((line, index) => (

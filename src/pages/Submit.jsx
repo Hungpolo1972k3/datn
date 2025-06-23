@@ -252,10 +252,10 @@ const Submit = () => {
       const result = await apiCreateSample(userId, selectedExperiment, sampleName, header, length, fastaFilePath);
       if(result.status === -1) {
         showNotice(0, t("submitPage.existName"));
-      }else{
+      } else {
         sampleId = result.data._id;
         setFastaInfo(result.data);
-    
+        
         try {
           const [virulenceRes, amrRes] = await Promise.all([
             apiGetVirulenceInfo(file, sampleId),
@@ -263,7 +263,11 @@ const Submit = () => {
           ]);
           setVirulenceInfo(virulenceRes.data);
           setAmrInfo(amrRes.data);
-    
+          setFastaInfo((prev) => ({
+            ...prev,
+            virulence: virulenceRes.data.length || '',
+            amr: amrRes.data.length || ''
+          }));
           showNotice(1, t("submitPage.success"));
           setShowModal(true);
         } catch (infoError) {

@@ -574,7 +574,8 @@
       "home": "Trang chủ",
       "userinfo": "Thông tin tài khoản",
       "edituserinfo": "Chỉnh sửa",
-      "overview": "Kết quả tổng quát"
+      "overview": "Kết quả tổng quát",
+      "viewFile": "Không có dữ liệu file"
     },
   "noticeBlastn": {
     "line1": "Bạn vui lòng chờ khoảng 30 phút để nhận kết quả nhé!",
