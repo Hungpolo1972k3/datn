@@ -2,60 +2,10 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 
-const GridBox = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  margin-bottom: 20px;
-`;
-
 const DetailWrapper = styled.div`
   flex: 1 1 48%;
   min-width: 300px;
   max-width: 100%;
-`;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-`;
-
-const Th = styled.th`
-  background-color: #f1f5f9;
-  color: #1e293b;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  text-align: left;
-`;
-
-const Td = styled.td`
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  text-align: left;
-  color: #334155;
-  vertical-align: top;
-`;
-
-const Row = styled.tr`
-  cursor: pointer;
-  &:nth-child(even) {
-    background-color: #f8fafc;
-  }
-  &:hover {
-    background-color: #e2e8f0;
-  }
-  &.selected {
-    background-color: #bae6fd;
-  }
-`;
-
-const DetailBox = styled.div`
-  border: 1px solid #cbd5e1;
-  padding: 16px;
-  background-color: #f1f5f9;
-  color: #1e293b;
-  border-radius: 6px;
 `;
 
 const DetailTable = styled.table`
@@ -230,6 +180,9 @@ const VirulenceCompare = ({ virulence = [], virulenceDataset = [] }) => {
   let allGenes = Array.from(new Set([...uploadedMap.keys(), ...referenceMap.keys()]));
   allGenes.sort((a, b) => sortOrder === "asc" ? a.localeCompare(b) : b.localeCompare(a));
 
+  const matchedCount = allGenes.filter((gene) => uploadedMap.has(gene) && referenceMap.has(gene)).length;
+  const unmatchedCount = allGenes.length - matchedCount;
+
   const totalPages = Math.ceil(allGenes.length / itemsPerPage);
   const startIdx = (currentPage - 1) * itemsPerPage;
   const currentGenes = allGenes.slice(startIdx, startIdx + itemsPerPage);
@@ -330,8 +283,12 @@ const VirulenceCompare = ({ virulence = [], virulenceDataset = [] }) => {
         </div>
       )}
 
-      <h3>{t("virulenceCompare.title")}</h3>
+      <h2 style={{ marginBottom: '10px' }}>{t("virulenceCompare.title")}</h2>
 
+      <InfoBox style={{ marginBottom: "20px", fontSize: "1rem", gap: "16px" }}>
+        <span>🧬 {t("virulenceCompare.virulenceCompare")} <strong>{matchedCount}</strong> / {allGenes.length}</span>
+        <span>❌ {t("virulenceCompare.virulenceNoCompare")} <strong>{unmatchedCount}</strong> / {allGenes.length}</span>
+      </InfoBox>
       <PaginationWrapper>
         <div>
           {t("virulenceCompare.itemsPerPage") || "Rows per page"}:

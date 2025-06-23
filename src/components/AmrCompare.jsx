@@ -180,6 +180,9 @@ const AmrCompare = ({ amr = [], amrDataset = [] }) => {
   const sortedGenes = Array.from(new Set([...uploadedMap.keys(), ...referenceMap.keys()]))
     .sort((a, b) => (sortOrder === "asc" ? a.localeCompare(b) : b.localeCompare(a)));
 
+  const matchedCount = sortedGenes.filter((gene) => uploadedMap.has(gene) && referenceMap.has(gene)).length;
+  const unmatchedCount = sortedGenes.length - matchedCount;
+
   const totalPages = Math.ceil(sortedGenes.length / itemsPerPage);
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
@@ -264,8 +267,12 @@ const AmrCompare = ({ amr = [], amrDataset = [] }) => {
         </DetailBox>
       )}
 
-      <h3>{t("amrCompare.title")}</h3>
+      <h2 style={{ marginBottom: '10px' }}>{t("amrCompare.title")}</h2>
 
+      <InfoBox style={{ marginBottom: "20px", fontSize: "1rem", gap: "16px" }}>
+        <span>💊 {t("amrCompare.amrCompare")} <strong>{matchedCount}</strong> / {sortedGenes.length}</span>
+        <span>❌ {t("amrCompare.amrNoCompare")} <strong>{unmatchedCount}</strong> / {sortedGenes.length}</span>
+      </InfoBox>
       <ControlsWrapper>
         <SortButton onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}>
           {sortOrder === "asc" ? "🔼 A-Z" : "🔽 Z-A"}

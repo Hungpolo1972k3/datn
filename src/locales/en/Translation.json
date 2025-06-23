@@ -541,7 +541,9 @@
     "prev": "Previous",
     "next": "Next",
     "page": "Page",
-    "itemsPerPage": "Items"
+    "itemsPerPage": "Items",
+    "amrCompare": "Number of matched antibiotic resistance genes:",
+    "amrNoCompare": "Number of unmatched antibiotic resistance genes:"
   },
   "virulenceCompare": {
     "virulenceTitle": "Virulence Gene Comparison",
@@ -563,7 +565,9 @@
     "itemsPerPage": "Items",
     "prev": "Previous",
     "next": "Next",
-    "page": "Page"
+    "page": "Page",
+    "virulenceCompare": "Number of matched virulence genes:",
+    "virulenceNoCompare": "Number of unmatched virulence genes:"
   },
   "breadcrumb": {
     "ABDataset": "AB Dataset",

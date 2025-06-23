@@ -302,7 +302,7 @@ const BlastnModal = ({ blastn, onClose, info, bacteria, virulence, virulenceData
             🔬 {t("blastn.info")}
           </TabButton>
           <TabButton active={activeTab === "virulence"} onClick={() => setActiveTab("virulence")}>
-            🧫 {t("blastn.virulenceFactor")}
+            🧬 {t("blastn.virulenceFactor")}
           </TabButton>
           <TabButton active={activeTab === "amr"} onClick={() => setActiveTab("amr")}>
             💊 {t("blastn.amrFactor")}

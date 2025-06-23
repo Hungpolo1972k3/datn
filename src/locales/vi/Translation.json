@@ -187,7 +187,7 @@
         "notAvailable": "Không có dữ liệu",
         "fields": {
           "Index": "STT",
-          "gene": "Gen",
+          "gene": "Gene",
           "nucleic": "Chuỗi nucleic",
           "identity": "Độ giống nhau",
           "coverage": "Độ phủ",
@@ -205,7 +205,7 @@
           "coverage": "Độ phủ",
           "element_name": "Tên phần tử",
           "element_type": "Loại phần tử",
-          "gene_symbol": "Ký hiệu gen",
+          "gene_symbol": "Ký hiệu gene",
           "identity": "Độ tương đồng",
           "length": "Độ dài",
           "method": "Phương pháp",
@@ -309,7 +309,7 @@
         "fields": {
             "index": "Số thứ tự",
             "sequence": "Chuỗi",
-            "gene": "Gen",
+            "gene": "Gene",
             "start": "Vị trí bắt đầu",
             "stop": "Vị trí kết thúc",
             "strand": "Chuỗi",
@@ -376,12 +376,12 @@
     "fail": "Lỗi khi xóa thí nghiệm"
   },
   "datasetAB": {
-    "title": "Danh sách bộ gen",
+    "title": "Danh sách bộ gene",
     "filterPlaceholder": "Tìm theo tên hoặc từ khóa...",
     "default": "Mặc định",
     "all": "Tất cả",
     "column": {
-      "name": "Tên bộ gen",
+      "name": "Tên bộ gene",
       "id": "Mã giải trình tự",
       "description": "Chức năng"
     },
@@ -522,16 +522,16 @@
       "hidePoint": "Ẩn điểm",
       "exportSVG": "Tải xuống",
       "reset": "Cài lại",
-      "unknownGene": "Gen không xác định",
-      "gene": "Gen",
+      "unknownGene": "Gene không xác định",
+      "gene": "Gene",
       "dataLabel": "Bộ dữ liệu {{index}}"
     },
     "amrCompare": {
-      "title": "So sánh gen AMR",
-      "gene": "Gen",
+      "title": "So sánh gene kháng kháng sinh",
+      "gene": "Gene",
       "inFileUpload": "Dữ liệu tải lên",
       "inReference": "Dữ liệu tham chiếu",
-      "detailsForGene": "Chi tiết gen",
+      "detailsForGene": "Chi tiết gene",
       "inReferenceDataset": "Dữ liệu tham chiếu",
       "noData": "Không có dữ liệu",
       "position": "Vị trí",
@@ -541,7 +541,9 @@
       "prev": "Trước",
       "next": "Tiếp",
       "page": "Trang",
-      "itemsPerPage": "Số trang"
+      "itemsPerPage": "Số trang",
+      "amrCompare": "Số gene kháng kháng sinh khớp:",
+      "amrNoCompare": "Số gene kháng kháng sinh không khớp:"
     },
     "virulenceCompare": {
       "virulenceTitle": "Dữ liệu Gene độc lực",
@@ -553,17 +555,19 @@
       "strand": "Mạch",
       "nucleic": "Nucleic",
       "protein": "Protein",
-      "noGene": "Không tìm thấy gen độc lực trong cả hai bộ dữ liệu.",
-      "gene": "Gen",
+      "noGene": "Không tìm thấy gene độc lực trong cả hai bộ dữ liệu.",
+      "gene": "Gene",
       "uploaded": "Dữ liệu tải lên",
       "reference": "Dữ liệu tham chiếu",
       "no": "Không",
       "clickToDetail": "Nhấn để xem chi tiết",
-      "title": "So sánh gen độc lực",
+      "title": "So sánh gene độc lực",
       "itemsPerPage": "Số trang",
       "prev": "Trước",
       "next": "Tiếp",
-      "page": "Trang"
+      "page": "Trang",
+      "virulenceCompare": "Số gene độc lực khớp:",
+      "virulenceNoCompare": "Số gene độc lực không khớp:"
     },
     "breadcrumb":{
       "ABDataset": "AB Dataset",

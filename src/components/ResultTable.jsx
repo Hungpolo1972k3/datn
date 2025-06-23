@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import datasetFolder from "../utils/datasetFolder.json";
 import { apiRunBlastnTwoFiles, apiDownloadFile, apiGetZipFile, apiGetFileInfo2 } from "../service/blastn";
-import { apiGetZipFile2 } from "../service/dataset";
+import { apiGetZipFile2, apiGetVirulenceInfoById } from "../service/dataset";
 import LoadingSpinner from "./LoadingSpinner";
 import BlastnModal from "./Blastn";
 import { FiDownload } from "react-icons/fi";
@@ -151,25 +151,13 @@ const ResultTable = ({ results, blastnInfo }) => {
     let url = `${code}_result`
     setIsLoading(true);
     try {
-      const runBlastnPromise = apiRunBlastnTwoFiles(inputUrl, datasetUrl);
-      const getZipFilePromise = apiGetZipFile2(url);
-      const getFileInfoPromise = apiGetFileInfo2(datasetUrl);
-
-      const [result, inputFileresult, blob] = await Promise.all([
-        runBlastnPromise,
-        getZipFilePromise,
-        getFileInfoPromise,
+      const [result, inputFileresult, response] = await Promise.all([
+        apiRunBlastnTwoFiles(inputUrl, datasetUrl),
+        apiGetZipFile2(url),
+        apiGetVirulenceInfoById(name),
       ]);
-
-      const file = new File([blob], 'contigs.fasta', { type: 'text/plain' });
-
-      const [virulenceRes, amrRes] = await Promise.all([
-        apiRunVirulenceTool(file),
-        apiRunAmrTool(file),
-      ]);
-
-      setVirulence2(virulenceRes.data || []);
-      setAmr2(amrRes.data || []);
+      setVirulence2(response.data.virulence || []);
+      setAmr2(response.data.amr || []);
       setVirulence(inputFileresult.data.data.virulence);
       setAmr(inputFileresult.data.data.amr);
       setBlastnData(result.data);

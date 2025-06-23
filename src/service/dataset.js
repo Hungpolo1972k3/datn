@@ -72,3 +72,12 @@ export const apiGetZipFile2 = async (id) => {
     throw error.response?.data || error.message;
   }
 }
+
+export const apiGetVirulenceInfoById = async (id) => {
+  try {
+    const response = await axiosConfig.get(`/api/dataset/getvirulencedatasetbyid?id=${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+}
