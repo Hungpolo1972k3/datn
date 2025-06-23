@@ -6,6 +6,8 @@ const { exec } = require('child_process');
 const path = require('path');
 const cheerio = require('cheerio');
 const Blastn = require('../models/blastn');
+const VirulenceService = require('./virulence');
+const AmrService = require ('./amr');
 
 const dataDir = path.join('/app', 'FastA');
 // const dataDir = path.join(__dirname,"../../FastA")
@@ -166,6 +168,38 @@ const getZipFile2 = async(id) =>{
     throw new Error(`Lỗi: ${error.message}`);
   }
 }
+
+const getVirulenceDatasetById = async(id) => {
+  try {
+    const fastaUrl = `/app/FastA/${id}/Spades_output/contigs.fasta`;
+    const virulenceUrl = `/app/FastA/${id}/Platon_output/chromosome/abricate_virulence.csv`;
+    const amrUrl1 = `/app/FastA/${id}/Platon_output/chromosome/amrfinder.txt`;
+    const amrUrl2 = `/app/FastA/${id}/Platon_output/plasmid/amrfinder.txt`;
+    const [
+      fastaContent,
+      virulenceContent,
+      amrContent1,
+      amrContent2
+    ] = await Promise.all([
+      fs.promises.readFile(fastaUrl, 'utf8'),
+      fs.promises.readFile(virulenceUrl, 'utf8'),
+      fs.promises.readFile(amrUrl1, 'utf8'),
+      fs.promises.readFile(amrUrl2, 'utf8')
+    ]);
+    const [virulenceResult, amrResult1, amrResult2] = await Promise.all([
+      VirulenceService.runVirulenceTool2(fastaContent, virulenceContent),
+      AmrService.runAmrTool2(fastaContent, amrContent1),
+      AmrService.runAmrTool2(fastaContent, amrContent2),
+    ]);
+    const amrResult = amrResult1.concat(amrResult2);
+    return {
+      virulence: virulenceResult,
+      amr: amrResult
+    }
+  } catch (error) {
+    throw new Error(`Lỗi: ${error.message}`);
+  }
+}
 module.exports = {
   getFullFolderPath,
   zipFolderAndSend,
@@ -173,5 +207,6 @@ module.exports = {
   getFileForDownload,
   getFileInfo,
   getZipFile,
-  getZipFile2
+  getZipFile2,
+  getVirulenceDatasetById
 };

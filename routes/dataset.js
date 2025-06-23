@@ -9,4 +9,5 @@ router.get('/getfileinfo', datasetController.getFileInfo);
 router.get('/downloadfile', datasetController.downloadFile);
 router.get('/getzipfile', datasetController.getZipFile );
 router.get('/getzipfile2', datasetController.getZipFile2 );
+router.get('/getvirulencedatasetbyid', datasetController.getVirulenceDatasetById);
 module.exports = router;

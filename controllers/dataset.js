@@ -90,11 +90,25 @@ const getZipFile2 = async(req, res) => {
   }
 }
 
+const getVirulenceDatasetById = async (req, res) => {
+  try {
+    const {id} = req.query;
+    const data = await datasetService.getVirulenceDatasetById(id);
+    return res.status(200).json({
+        data: data
+    })
+  } catch (error) {
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+}
 module.exports = {
     downloadFolder,
     getFolderInfo,
     downloadFile,
     getFileInfo,
     getZipFile,
-    getZipFile2
+    getZipFile2,
+    getVirulenceDatasetById
 };

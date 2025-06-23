@@ -5,7 +5,7 @@ const Sample = require('../models/sample');
 const fs = require('fs');
 require('dotenv').config();
 
-const changleVirulenceInfo = async (result) => {
+const changleVirulenceInfo = (result) => {
     try {
         const records = result
             .split("\n")
@@ -114,7 +114,7 @@ const getVirulenceInfo = async (file, sample_id) => {
                 ...form.getHeaders(),
             },
         });
-        const virulenceList = await changleVirulenceInfo(response.data.result);
+        const virulenceList = changleVirulenceInfo(response.data.result);
         const fastaData = parseFasta(fastaContent);
         const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
             const seq = fastaData[v.sequence];
@@ -200,7 +200,7 @@ const runVirulenceTool = async (file) => {
                 ...form.getHeaders(),
             },
         });
-        const virulenceList = await changleVirulenceInfo(response.data.result);
+        const virulenceList = changleVirulenceInfo(response.data.result);
         const fastaData = parseFasta(fastaContent);
         const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
             const seq = fastaData[v.sequence];
@@ -235,20 +235,9 @@ const runVirulenceTool = async (file) => {
     }
 };
 
-const runVirulenceTool2 = async (filePath) => {
-    if (!fs.existsSync(filePath)) {
-        throw new Error('File not found or invalid path');
-    }
-    const form = new FormData();
-    form.append('fasta', fs.createReadStream(filePath));
+const runVirulenceTool2 = async (fastaContent, virulenceContent) => {
     try {
-        const fastaContent = await fs.promises.readFile(filePath, 'utf8');
-        const response = await axios.post(`${process.env.BIOTOOL_URL}/api/virulence/abricate`, form, {
-            headers: {
-                ...form.getHeaders(),
-            },
-        });
-        const virulenceList = await changleVirulenceInfo(response.data.result);
+        const virulenceList = changleVirulenceInfo(virulenceContent);
         const fastaData = parseFasta(fastaContent);
         const virulenceDocs = await Promise.all(virulenceList.map(async (v) => {
             const seq = fastaData[v.sequence];

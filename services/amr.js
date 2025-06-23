@@ -206,23 +206,10 @@ const runAmrTool = async (file) => {
     }
 };
 
-const runAmrTool2 = async (filePath) => {
-    if (!fs.existsSync(file.path)) {
-        throw new Error('File not found or invalid path');
-    }
-
-    const form = new FormData();
-    form.append('fasta', fs.createReadStream(filePath));
+const runAmrTool2 = async (fastaContent, amrContent) => {
     try {
-        const fastaContent = await fs.promises.readFile(filePath, 'utf8');
-        const response = await axios.post(`${process.env.BIOTOOL_URL}/api/amrfinder/amrfinder`, form, {
-            headers: {
-                ...form.getHeaders(),
-            },
-        });
-        
         const fastaData = parseFasta(fastaContent);
-        const amrList = changeAmrInfo(response.data.result);
+        const amrList = changeAmrInfo(amrContent);
 
         const amrDocs = amrList.map((v) => {
             const seq = fastaData[v.contig_id];
