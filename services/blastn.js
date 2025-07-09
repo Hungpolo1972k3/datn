@@ -84,7 +84,7 @@ const runBlastn = async (queryFastaPath, id, res) => {
     const queryPath = path.resolve(queryFastaPath);
     const results = [];
     const pLimit = (await pLimitImport).default;
-    const limit = pLimit(4);
+    const limit = pLimit(3);
 
     const jsonPath = path.join('/app', 'fastA', `${id}.json`);
     const gzipPath = jsonPath + '.gz';

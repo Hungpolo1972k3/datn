@@ -1,5 +1,28 @@
 [
-    
+    {
+        "name": "SRR1945422",
+        "fastaUrl": "/SRR1945422/Spades_output/contigs.fasta"
+    },
+    {
+        "name": "SRR1945425",
+        "fastaUrl": "/SRR1945425/Spades_output/contigs.fasta"
+    },
+    {
+        "name": "SRR1945426",
+        "fastaUrl": "/SRR1945426/Spades_output/contigs.fasta"
+    },
+    {
+        "name": "SRR1945427",
+        "fastaUrl": "/SRR1945427/Spades_output/contigs.fasta"
+    },
+    {
+        "name": "SRR1945428",
+        "fastaUrl": "/SRR1945428/Spades_output/contigs.fasta"
+    },
+    {
+        "name": "SRR1945430",
+        "fastaUrl": "/SRR1945430/Spades_output/contigs.fasta"
+    },
     {
         "name": "SRR1946597",
         "fastaUrl": "/SRR1946597/Spades_output/contigs.fasta"
